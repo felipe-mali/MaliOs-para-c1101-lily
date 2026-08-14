@@ -5,7 +5,7 @@
 
 class ConfigMenu : public MenuItemInterface {
 public:
-    ConfigMenu() : MenuItemInterface("Config") {}
+    ConfigMenu() : MenuItemInterface("Configurações") {}
 
     void optionsMenu(void);
     void drawIcon(float scale);

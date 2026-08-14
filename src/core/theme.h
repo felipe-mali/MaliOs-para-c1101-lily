@@ -3,8 +3,8 @@
 #include "sd_functions.h"
 #include <ArduinoJson.h>
 
-#define DEFAULT_PRICOLOR 0xA80F
-#define DEFAULT_SECCOLOR 0xCB76
+#define DEFAULT_PRICOLOR 0x5820
+#define DEFAULT_SECCOLOR 0xBD95
 
 struct themeFiles {
     String wifi = "";
@@ -72,9 +72,7 @@ public:
 
     bool openThemeFile(FS *fs, String filepath, bool overwriteConfigSettings);
     bool validateImgFile(FS *fs, String filepath);
-    const String& getThemeItemImg(const String& item) const {
-        return item;
-    };
+    const String &getThemeItemImg(const String &item) const { return item; };
     void removeTheme(void);
     FS *themeFS(void);
 };

@@ -5,12 +5,12 @@
 
 class FMMenu : public MenuItemInterface {
 public:
-    FMMenu() : MenuItemInterface("FM") {}
+    FMMenu() : MenuItemInterface("Rádio FM") {}
 
     void optionsMenu(void);
     void drawIcon(float scale);
     bool hasTheme() { return bruceConfig.theme.fm; }
-    const String& themePath() override { return bruceConfig.theme.paths.fm; }
+    const String &themePath() override { return bruceConfig.theme.paths.fm; }
 };
 
 #endif

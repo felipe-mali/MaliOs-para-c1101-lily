@@ -5,13 +5,13 @@
 
 class ClockMenu : public MenuItemInterface {
 public:
-    ClockMenu() : MenuItemInterface("Clock") {}
+    ClockMenu() : MenuItemInterface("Relógio") {}
 
     void optionsMenu(void);
     void showSubMenu(void);
     void drawIcon(float scale);
     bool hasTheme() { return bruceConfig.theme.clock; }
-    const String& themePath() override { return bruceConfig.theme.paths.clock; }
+    const String &themePath() override { return bruceConfig.theme.paths.clock; }
 };
 
 #endif

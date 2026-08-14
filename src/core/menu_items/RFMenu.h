@@ -5,12 +5,12 @@
 
 class RFMenu : public MenuItemInterface {
 public:
-    RFMenu() : MenuItemInterface("RF") {}
+    RFMenu() : MenuItemInterface("Sub-GHz") {}
 
     void optionsMenu(void);
     void drawIcon(float scale);
     bool hasTheme() { return bruceConfig.theme.rf; }
-    const String& themePath() override { return bruceConfig.theme.paths.rf; }
+    const String &themePath() override { return bruceConfig.theme.paths.rf; }
 
 private:
     void configMenu(void);

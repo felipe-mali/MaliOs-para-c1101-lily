@@ -5,12 +5,12 @@
 
 class IRMenu : public MenuItemInterface {
 public:
-    IRMenu() : MenuItemInterface("IR") {}
+    IRMenu() : MenuItemInterface("Infravermelho") {}
 
     void optionsMenu(void);
     void drawIcon(float scale);
     bool hasTheme() { return bruceConfig.theme.ir; }
-    const String& themePath() override { return bruceConfig.theme.paths.ir; }
+    const String &themePath() override { return bruceConfig.theme.paths.ir; }
 
 private:
     void configMenu(void);

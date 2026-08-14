@@ -6,7 +6,7 @@
 class OthersMenu : public MenuItemInterface {
 
 public:
-    OthersMenu() : MenuItemInterface("Others") {}
+    OthersMenu() : MenuItemInterface("Ferramentas") {}
 
     void micMenu();
     void badUsbHidMenu(); // New submenu for BadUSB & HID tools
@@ -14,7 +14,7 @@ public:
     void drawIcon(float scale);
 
     bool hasTheme() { return bruceConfig.theme.others; }
-    const String& themePath() override { return bruceConfig.theme.paths.others; }
+    const String &themePath() override { return bruceConfig.theme.paths.others; }
 };
 
 #endif

@@ -5,12 +5,12 @@
 
 class ConnectMenu : public MenuItemInterface {
 public:
-    ConnectMenu() : MenuItemInterface("Connect") {}
+    ConnectMenu() : MenuItemInterface("Conexões") {}
 
     void optionsMenu(void);
     void drawIcon(float scale);
     bool hasTheme() { return bruceConfig.theme.connect; }
-    const String& themePath() override { return bruceConfig.theme.paths.connect; }
+    const String &themePath() override { return bruceConfig.theme.paths.connect; }
 };
 
 #endif

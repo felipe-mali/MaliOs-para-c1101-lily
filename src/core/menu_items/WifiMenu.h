@@ -5,12 +5,12 @@
 
 class WifiMenu : public MenuItemInterface {
 public:
-    WifiMenu() : MenuItemInterface("WiFi") {}
+    WifiMenu() : MenuItemInterface("Rede") {}
 
     void optionsMenu(void);
     void drawIcon(float scale);
     bool hasTheme() { return bruceConfig.theme.wifi; }
-    const String& themePath() override { return bruceConfig.theme.paths.wifi; }
+    const String &themePath() override { return bruceConfig.theme.paths.wifi; }
 
 private:
     void configMenu(void);
