@@ -11,7 +11,7 @@
 void EthernetMenu::start_ethernet() {
     eth = new EthernetHelper();
     if (!eth->setup()) {
-        displayError("W5500 not found");
+        displayError("W5500 nao encontrado");
         delete eth;
         eth = nullptr;
         return;
@@ -21,33 +21,33 @@ void EthernetMenu::start_ethernet() {
 
 void EthernetMenu::optionsMenu() {
     options = {
-        {"Scan Hosts",
+        {"Procurar hosts",
          [this]() {
              start_ethernet();
              if (eth != nullptr) {
                  run_arp_scanner();
                  eth->stop();
              } else {
-                    displayError("W5500 not found");
+                    displayError("W5500 nao encontrado");
              }
          }                        },
-        {"DHCP Starvation",
+        {"Esgotar DHCP",
          [this]() {
              start_ethernet();
              if (eth != nullptr) {
                  DHCPStarvation();
                  eth->stop();
              } else {
-                    displayError("W5500 not found");
+                    displayError("W5500 nao encontrado");
              }
          }                        },
-        {"MAC Flooding",    [this]() {
+        {"Flood de MAC",    [this]() {
              start_ethernet();
              if (eth != nullptr) {
                  MACFlooding();
                  eth->stop();
              } else {
-                    displayError("W5500 not found");
+                    displayError("W5500 nao encontrado");
              }
          }}
     };

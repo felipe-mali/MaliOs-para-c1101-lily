@@ -43,9 +43,9 @@ MACFlooding::MACFlooding() {
 MACFlooding::~MACFlooding() { pbuf_free(p); }
 
 void MACFlooding::show_gui() {
-    drawMainBorderWithTitle("MAC Flooding");
+    drawMainBorderWithTitle("Inundacao MAC");
 
-    displayTextLine("Press Any key to stop");
+    displayTextLine("Pressione uma tecla p/ parar");
 }
 
 void MACFlooding::loop() {
@@ -138,14 +138,14 @@ void MACFlooding::setup() {
     randomSeed(millis());
     netif = netif_list;
     if (netif == NULL) {
-        displayError("No interface found");
+        displayError("Interface nao encontrada");
         Serial.println("No interface found");
         return;
     }
 
     p = pbuf_alloc(PBUF_RAW, PACKET_LENGTH_MF, PBUF_RAM);
     if (p == NULL) {
-        displayError("Failed to allocate pbuf");
+        displayError("Falha ao alocar pbuf");
         Serial.println("Failed to allocate pbuf");
         return;
     }

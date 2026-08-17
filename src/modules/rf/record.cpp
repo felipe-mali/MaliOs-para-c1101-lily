@@ -41,28 +41,28 @@ void rf_raw_record_draw(RawRecordingStatus status) {
     tft.setTextSize(FP);
     if (status.frequency <= 0) {
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-        tft.print("Looking for frequency...");
+        tft.print("Buscando frequencia...");
         tft.setTextColor(getColorVariation(bruceConfig.priColor), bruceConfig.bgColor);
-        tft.println("   Press [ESC] to exit  ");
+        tft.println("   [ESC] para sair  ");
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
         // The frequency scan function calls the animation
     } else if (!status.recordingStarted) {
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-        tft.print("Waiting for signal...");
+        tft.print("Aguardando sinal...");
         sinewave_animation();
     } else if (status.recordingFinished) {
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-        tft.print("Recording finished.");
+        tft.print("Gravacao concluida.");
         tft.setTextColor(getColorVariation(bruceConfig.priColor), bruceConfig.bgColor);
-        tft.println("   Press [OK] to save   ");
+        tft.println("   [OK] para salvar   ");
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     } else if (status.latestRssi < 0) {
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-        tft.print("Recording: ");
+        tft.print("Gravando: ");
         tft.print(status.frequency);
         tft.print(" MHz");
         tft.setTextColor(getColorVariation(bruceConfig.priColor), bruceConfig.bgColor);
-        tft.println("   Press [OK] to stop ");
+        tft.println("   [OK] para parar ");
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
         // Calculate bar dimensions
         int centerY = (TFT_WIDTH / 2) + 20;      // Center axis for the bars
@@ -367,15 +367,15 @@ void rf_raw_record_create(RawRecording &recorded, bool &returnToMenu) {
 int rf_raw_record_options(bool saved) {
     int option = 0;
     options = {
-        {"Replay", [&]() { option = 1; }},
-        {"Save",   [&]() { option = 2; }},
-        {"Exit",   [&]() { option = 4; }},
+        {"Repetir", [&]() { option = 1; }},
+        {"Salvar",  [&]() { option = 2; }},
+        {"Sair",    [&]() { option = 4; }},
     };
     if (saved) {
         options.erase(options.begin() + 1);
-        options.insert(options.begin() + 1, {"Record another", [&]() { option = 3; }});
+        options.insert(options.begin() + 1, {"Gravar outro", [&]() { option = 3; }});
     } else {
-        options.insert(options.begin() + 1, {"Discard", [&]() { option = 3; }});
+        options.insert(options.begin() + 1, {"Descartar", [&]() { option = 3; }});
     }
     loopOptions(options);
 

@@ -24,7 +24,10 @@ public:
     virtual const String& themePath() = 0;
 
     bool checkTheme() { return hasTheme() && themePath().length() > 0; }
+    // Stable identifier used by configuration and CLI integrations.
     String getName() const { return String(_name); }
+    // User-facing label. This may be translated without changing the stable identifier.
+    String getDisplayName() const { return String(_displayName); }
 
     void draw(float scale = 1) {
         if (rotation != bruceConfigPins.rotation) resetCoordinates();
@@ -102,11 +105,12 @@ public:
         tft.drawPixel(0, 0, 0);
         tft.fillRect(arrowAreaX, titleY, tftWidth - 2 * arrowAreaX, LH * FM, bruceConfig.bgColor);
         int nchars = (tftWidth - 16) / (LW * FM);
-        tft.drawCentreString(getName().substring(0, nchars), iconCenterX, titleY, 1);
+        tft.drawCentreString(getDisplayName().substring(0, nchars), iconCenterX, titleY, 1);
     }
 
 protected:
     const char *_name = "";
+    const char *_displayName = "";
     uint8_t rotation = ROTATION;
 
     int iconAreaH =
@@ -124,7 +128,8 @@ protected:
     int arrowAreaX = BORDER_PAD_X;
     int arrowAreaW = iconAreaX - arrowAreaX;
 
-    MenuItemInterface(const char *name) : _name(name) {}
+    MenuItemInterface(const char *name, const char *displayName = nullptr)
+        : _name(name), _displayName(displayName != nullptr ? displayName : name) {}
 
     void clearIconArea(void) {
         tft.fillRect(iconAreaX, iconAreaY, iconAreaW, iconAreaH, bruceConfig.bgColor);

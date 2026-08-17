@@ -15,7 +15,7 @@ void ScriptsMenu::optionsMenu() {
 
     options = getScriptsOptionsList("", false);
 
-    options.push_back({"Load...", run_bjs_script});
+    options.push_back({"Carregar...", run_bjs_script});
     addOptionToMainMenu();
 
     loopOptions(options, MENU_TYPE_SUBMENU, "Scripts");

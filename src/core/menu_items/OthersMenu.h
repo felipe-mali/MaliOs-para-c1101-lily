@@ -6,7 +6,7 @@
 class OthersMenu : public MenuItemInterface {
 
 public:
-    OthersMenu() : MenuItemInterface("Ferramentas") {}
+    OthersMenu() : MenuItemInterface("Others", "Ferramentas") {}
 
     void micMenu();
     void badUsbHidMenu(); // New submenu for BadUSB & HID tools

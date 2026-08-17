@@ -135,16 +135,16 @@ void nrf_jammer() {
 
             if (redraw) {
                 drawMainBorderWithTitle("NRF JAMMER", false);
-                printSubtitle("NRF function Jammer");
-                padprintln("STATUS : " + String(NRFOnline) + " ACTIVE");
+                printSubtitle("Jammer NRF");
+                padprintln("STATUS : " + String(NRFOnline) + " ATIVO");
                 String _modeName = String(modes[modeIndex].name) + "            ";
                 _modeName = _modeName.substring(0, 13);
-                padprintln("MODE : " + _modeName);
-                padprintln("HOP  : " + String(hopping_mode == 0 ? "Sequential " : "FHSS        "));
+                padprintln("MODO : " + _modeName);
+                padprintln("SALTO: " + String(hopping_mode == 0 ? "Sequencial  " : "FHSS        "));
                 padprintln("");
-                padprintln("> Switch Mode: Next/Prev");
-                padprintln("> Hop Mode: Sel");
-                padprintln("> Exit: Esc");
+                padprintln("> Trocar modo: Prox/Ant");
+                padprintln("> Modo salto: Sel");
+                padprintln("> Sair: Esc");
 
                 tft.drawRoundRect(5, 5, tftWidth - 10, tftHeight - 10, 5, bruceConfig.priColor);
                 if ((CHECK_NRF_UART(mode)) || (CHECK_NRF_BOTH(mode))) {
@@ -202,6 +202,6 @@ void nrf_jammer() {
         if ((CHECK_NRF_UART(mode)) || (CHECK_NRF_BOTH(mode))) { NRFSerial.println("OFF"); }
 
     } else {
-        displayError("NRF24 not found", true);
+        displayError("NRF24 nao encontrado", true);
     }
 }

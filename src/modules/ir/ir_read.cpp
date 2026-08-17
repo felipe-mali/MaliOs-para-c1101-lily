@@ -298,7 +298,7 @@ void IrRead::emulate_signal() {
     _emulate_mode = true;
     display_banner();
     tft.setTextSize(FP);
-    padprintln("Signal emulated!");
+    padprintln("Sinal emulado!");
     display_btn_options();
 }
 
@@ -430,7 +430,7 @@ void IrRead::save_device() {
     };
 
     if (fs && write_file(filename, fs)) {
-        displaySuccess("File saved to " + String((fs == &SD) ? "SD Card" : "LittleFS") + ".", true);
+        displaySuccess("Arquivo salvo em " + String((fs == &SD) ? "SD Card" : "LittleFS") + ".", true);
         signals_read = 0;
         strDeviceContent = "";
         if (quickloop) {
@@ -439,7 +439,7 @@ void IrRead::save_device() {
             returnToMenu = true;
             return;
         }
-    } else displayError(fs ? "Error writing file." : "No storage available.", true);
+    } else displayError(fs ? "Erro ao gravar arquivo." : "Sem armazenamento.", true);
 
     delay(1000);
 
@@ -465,7 +465,7 @@ String IrRead::loop_headless(int max_loops) {
         return "";
     }
 
-    if (results.overflow) displayWarning("buffer overflow, data may be truncated", true);
+    if (results.overflow) displayWarning("Buffer cheio; dados podem ser cortados", true);
 
     String r = "Filetype: IR signals file\n";
     r += "Version: 1\n";

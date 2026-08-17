@@ -10,18 +10,17 @@ void nrf_info() {
     tft.fillScreen(bruceConfig.bgColor);
     tft.setTextSize(FM);
     tft.setTextColor(TFT_RED, bruceConfig.bgColor);
-    tft.drawCentreString("_Disclaimer_", tftWidth / 2, 10, 1);
+    tft.drawCentreString("_Aviso_", tftWidth / 2, 10, 1);
     tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
     tft.setTextSize(FP);
     tft.setCursor(15, 33);
-    padprintln("These functions were made to be used in a controlled environment for STUDY only.");
+    padprintln("Use estas funcoes apenas para ESTUDO em ambiente controlado.");
     padprintln("");
-    padprintln("DO NOT use these functions to harm people or companies, you can go to jail!");
+    padprintln("NAO use estas funcoes para prejudicar pessoas ou empresas!");
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     padprintln("");
     padprintln(
-        "This device is VERY sensible to noise, so long wires or passing near VCC line can make "
-        "things go wrong."
+        "Este dispositivo e MUITO sensivel a ruido. Fios longos ou perto do VCC podem causar falhas."
     );
     delay(1000);
     while (!check(AnyKeyPress)) { vTaskDelay(pdMS_TO_TICKS(1)); }
@@ -33,7 +32,7 @@ bool nrf_start(NRF24_MODE mode) {
 
     if (CHECK_NRF_UART(mode)) {
         if (USBserial.getSerialOutput() == &Serial1) {
-            displayError("(E) UART already in use", true);
+            displayError("(E) UART ja esta em uso", true);
             result = false;
         }
         NRFSerial.begin(115200, SERIAL_8N1, bruceConfigPins.uart_bus.rx, bruceConfigPins.uart_bus.tx);
@@ -77,7 +76,7 @@ NRF24_MODE nrf_setMode() {
     bool nrfSPI = true;
     bool nrfUART = true;
     if (bruceConfigPins.NRF24_bus.checkConflict(GPIO_NUM_NC)) {
-        displayError("NRF24 pins not configured", true);
+        displayError("Pinos NRF24 nao configurados", true);
         nrfSPI = false;
     }
     // Serial UART oly display errors on Serial Monitor

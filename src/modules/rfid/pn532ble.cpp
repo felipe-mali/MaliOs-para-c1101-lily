@@ -26,17 +26,17 @@ bool Pn532ble::connect() {
     displayInfo("Searching...");
 
     if (!pn532_ble.searchForDevice()) {
-        displayError("Not found");
+        displayError("Nao encontrado");
         delay(1000);
         return false;
     }
 
     if (!pn532_ble.connectToDevice()) {
-        displayError("Connect failed");
+        displayError("Falha ao conectar");
         delay(1000);
         return false;
     }
-    displaySuccess("Connected");
+    displaySuccess("Conectado");
     delay(800);
 
     return true;
@@ -240,11 +240,11 @@ void Pn532ble::setMode(AppMode mode) {
             if (pn532_ble.isConnected()) {
                 showDeviceInfo();
             } else {
-                padprintln("Device not connected");
+                padprintln("Dispositivo desconectado");
             }
             break;
         case HF_14A_SCAN_MODE: hf14aScan(); break;
-        case HF_14B_SCAN_MODE: padprintln("Scan mode not supported"); break;
+        case HF_14B_SCAN_MODE: padprintln("Modo de busca sem suporte"); break;
         case HF_15_SCAN_MODE: hf15Scan(); break;
         case LF_EM4100_SCAN_MODE: lfScan(); break;
         case HF_MF_READ_MODE: hf14aMfReadDumpMode(); break;
@@ -272,7 +272,7 @@ void Pn532ble::showDeviceInfo() {
     pn532_ble.setNormalMode();
     bool res = pn532_ble.getVersion();
     if (!res) {
-        displayError("Get version failed");
+        displayError("Falha ao obter versao");
         delay(1000);
         return;
     }
@@ -296,9 +296,9 @@ void Pn532ble::hf14aScan() {
     pn532_ble.setNormalMode();
     PN532_BLE::Iso14aTagInfo tagInfo = pn532_ble.hf14aScan();
     if (tagInfo.uid.empty()) {
-        displayError("No tag found");
+        displayError("Nenhuma tag encontrada");
     } else if (tagInfo.uid.size() != 4 && tagInfo.uid.size() != 7 && tagInfo.uid.size() != 10) {
-        displayError("Not ISO14443A Tag");
+        displayError("Tag nao e ISO14443A");
     } else {
         padprintln("------------");
         padprintln("Type: " + tagInfo.type);
@@ -309,11 +309,11 @@ void Pn532ble::hf14aScan() {
             padprintln("------------");
         } else if (tagInfo.sak == 0x08 || tagInfo.sak == 0x09 || tagInfo.sak == 0x18) {
             bool isGen1A = pn532_ble.isGen1A();
-            padprintln("Gen1A: " + String(isGen1A ? "Yes" : "No"));
+            padprintln("Gen1A: " + String(isGen1A ? "Sim" : "Nao"));
             bool isGen3 = pn532_ble.isGen3();
-            padprintln("Gen3:  " + String(isGen3 ? "Yes" : "No"));
+            padprintln("Gen3:  " + String(isGen3 ? "Sim" : "Nao"));
             bool isGen4 = pn532_ble.isGen4(gen4pwd);
-            padprintln("Gen4:  " + String(isGen4 ? "Yes" : "No"));
+            padprintln("Gen4:  " + String(isGen4 ? "Sim" : "Nao"));
         }
     }
 }

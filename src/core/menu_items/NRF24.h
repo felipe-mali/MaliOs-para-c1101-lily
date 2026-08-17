@@ -5,7 +5,7 @@
 
 class NRF24Menu : public MenuItemInterface {
 public:
-    NRF24Menu() : MenuItemInterface("nRF24") {}
+    NRF24Menu() : MenuItemInterface("NRF24", "nRF24") {}
 
     void optionsMenu(void);
     void configMenu(void);

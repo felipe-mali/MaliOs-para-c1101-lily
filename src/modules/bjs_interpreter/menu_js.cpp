@@ -40,7 +40,7 @@ JSValue native_menuShow(JSContext *ctx, JSValue *this_val, int argc, JSValue *ar
             const char *str = JS_ToCString(ctx, item, &item_buf);
             labels.push_back(String(str));
         } else {
-            labels.push_back("Option " + String(i));
+            labels.push_back("Opcao " + String(i));
         }
         // The lambda is a no-op; we just need the index from loopOptions
         options.push_back({labels.back().c_str(), []() {}});

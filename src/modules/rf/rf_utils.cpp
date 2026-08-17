@@ -255,7 +255,7 @@ bool initRfModule(String mode, float frequency) {
         if (ELECHOUSE_cc1101.getCC1101()) { // Check the CC1101 Spi connection.
             Serial.println("cc1101 Connection OK");
         } else {
-            displayError("CC1101 not found");
+            displayError("CC1101 nao encontrado");
             Serial.println("cc1101 Connection Error");
             return false;
         }
@@ -271,7 +271,7 @@ bool initRfModule(String mode, float frequency) {
               (frequency >= 779 && frequency <= 928))) {
             Serial.println("Invalid Frequency, setting default");
             frequency = 433.92;
-            displayWarning("Wrong freq, set to 433.92", true);
+            displayWarning("Freq. invalida: usando 433.92", true);
         }
         // else
         // ELECHOUSE_cc1101.setRxBW(812.50);  // reset to default
@@ -503,9 +503,9 @@ struct RfCodes selectRecentRfMenu() {
         });
     }
     if (!recent_rfcodes.empty()) {
-        options.emplace_back("Clear Recent", []() { recent_rfcodes.clear(); });
+        options.emplace_back("Limpar recentes", []() { recent_rfcodes.clear(); });
     }
-    options.emplace_back("Main Menu", []() {});
+    options.emplace_back("Menu principal", []() {});
 
     loopOptions(options);
     options.clear();

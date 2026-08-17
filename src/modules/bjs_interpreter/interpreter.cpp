@@ -45,7 +45,11 @@ void interpreterHandler(void *pvParameters) {
         psramAvailable ? "yes" : "no"
     );
     if (mem_size < 2000) {
-        print_errorMessage("Failed to allocate memory for JS engine, try restarting the device");
+        print_errorMessage(
+            "Failed to allocate memory for JS engine, try restarting the device",
+            NULL,
+            "Sem memoria para JavaScript. Reinicie o aparelho."
+        );
         interpreter_state = -1;
         vTaskDelete(NULL);
         return;
@@ -53,7 +57,11 @@ void interpreterHandler(void *pvParameters) {
 
     uint8_t *mem_buf = psramAvailable ? (uint8_t *)ps_malloc(mem_size) : (uint8_t *)malloc(mem_size);
     if (mem_buf == NULL) {
-        print_errorMessage("Failed to allocate memory for JS engine, try restarting the device");
+        print_errorMessage(
+            "Failed to allocate memory for JS engine, try restarting the device",
+            NULL,
+            "Sem memoria para JavaScript. Reinicie o aparelho."
+        );
         interpreter_state = -1;
         vTaskDelete(NULL);
         return;
@@ -139,7 +147,7 @@ void run_bjs_script() {
     setupSdCard();
     if (sdcardMounted) {
         options = {
-            {"SD Card",  [&]() { fs = &SD; }      },
+            {"Cartao SD", [&]() { fs = &SD; }      },
             {"LittleFS", [&]() { fs = &LittleFS; }},
         };
         loopOptions(options);
@@ -285,7 +293,7 @@ getScriptsOptionsList(const String &currentPath, bool saveStartupScript, int rem
     // Add back navigation if we're in a subdirectory
     if (currentPath != "" && currentPath != getScriptsFolder(fs)) {
         opt.push_back(
-            {"< Back", [=]() {
+            {"< Voltar", [=]() {
                  // Calculate parent directory
                  String parentPath = currentPath;
                  int lastSlash = parentPath.lastIndexOf('/');

@@ -60,12 +60,12 @@ void ARPoisoner::setup(IPAddress gateway) {
         victimIP[i] = gateway[i];
     }
     long tmp = 0;
-    drawMainBorderWithTitle("ARP Poisoning");
+    drawMainBorderWithTitle("Envenenamento ARP");
     padprintln("");
-    padprintln("Sending ARP msg to all hosts");
+    padprintln("Enviando ARP a todos hosts");
     padprintln("");
 
-    padprintln("Press Any key to STOP.");
+    padprintln("Pressione uma tecla p/ PARAR");
 
     loop();
 }
@@ -101,7 +101,7 @@ void ARPoisoner::loop() {
                 );
             }
             tmp = millis();
-            tft.drawRightString("     Waiting...", tftWidth - 12, tftHeight - 16, 1);
+            tft.drawRightString("     Aguardando...", tftWidth - 12, tftHeight - 16, 1);
         }
     }
     pcapFile.close();

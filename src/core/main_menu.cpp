@@ -3,6 +3,72 @@
 #include "utils.h"
 #include <globals.h>
 
+namespace {
+struct MenuNameAlias {
+    const char *stableName;
+    const char *legacyDisplayName;
+};
+
+const MenuNameAlias legacyMenuNames[] = {
+    {"BLE",            "Bluetooth"     },
+    {"Clock",          "Relógio"        },
+    {"Config",         "Configurações"  },
+    {"Connect",        "Conexões"        },
+    {"Ethernet",       "Ethernet"      },
+    {"Files",          "Arquivos"      },
+    {"FM",             "Rádio FM"       },
+    {"GPS",            "GPS"           },
+    {"IR",             "Infravermelho" },
+    {"LoRa",           "LoRa"          },
+    {"NRF24",          "nRF24"         },
+    {"Others",         "Ferramentas"   },
+    {"RFID",           "NFC / RFID"    },
+    {"RF",             "Sub-GHz"       },
+    {"JS Interpreter", "Scripts em Js" },
+    {"WiFi",           "Rede"          },
+};
+
+bool matchesMenuName(const String &storedName, const MenuItemInterface *item) {
+    if (storedName.equalsIgnoreCase(item->getName()) || storedName.equalsIgnoreCase(item->getDisplayName())) {
+        return true;
+    }
+
+    for (const auto &alias : legacyMenuNames) {
+        if (item->getName().equalsIgnoreCase(alias.stableName) &&
+            storedName.equalsIgnoreCase(alias.legacyDisplayName)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool migrateDisabledMenuNames(const std::vector<MenuItemInterface *> &items) {
+    std::vector<String> migratedNames;
+    migratedNames.reserve(bruceConfig.disabledMenus.size());
+    bool changed = false;
+
+    for (const String &storedName : bruceConfig.disabledMenus) {
+        String resolvedName = storedName;
+        for (const auto *item : items) {
+            if (matchesMenuName(storedName, item)) {
+                resolvedName = item->getName();
+                break;
+            }
+        }
+
+        if (resolvedName != storedName) changed = true;
+        if (std::find(migratedNames.begin(), migratedNames.end(), resolvedName) == migratedNames.end()) {
+            migratedNames.push_back(resolvedName);
+        } else {
+            changed = true;
+        }
+    }
+
+    if (changed) bruceConfig.disabledMenus = migratedNames;
+    return changed;
+}
+} // namespace
+
 MainMenu::MainMenu() {
     _menuItems = {
         &wifiMenu,
@@ -28,6 +94,7 @@ MainMenu::MainMenu() {
         &clockMenu,
         &othersMenu,
         &configMenu,
+        &maliToolsMenu,
     };
 
     _totalItems = _menuItems.size();
@@ -39,13 +106,16 @@ void MainMenu::begin(void) {
     returnToMenu = false;
     options = {};
 
+    if (migrateDisabledMenuNames(_menuItems)) bruceConfig.saveFile();
+
     std::vector<String> l = bruceConfig.disabledMenus;
     for (int i = 0; i < _totalItems; i++) {
-        String itemName = _menuItems[i]->getName();
-        if (find(l.begin(), l.end(), itemName) == l.end()) { // If menu item is not disabled
+        String stableName = _menuItems[i]->getName();
+        String displayName = _menuItems[i]->getDisplayName();
+        if (find(l.begin(), l.end(), stableName) == l.end()) { // If menu item is not disabled
             options.push_back(
                 {// selected lambda
-                 itemName,
+                 displayName,
                  [this, i]() { _menuItems[i]->optionsMenu(); },
                  false,                                  // selected = false
                  [](void *menuItem, bool shouldRender) { // render lambda
@@ -66,7 +136,7 @@ void MainMenu::begin(void) {
             );
         }
     }
-    _currentIndex = loopOptions(options, MENU_TYPE_MAIN, "Main Menu", _currentIndex);
+    _currentIndex = loopOptions(options, MENU_TYPE_MAIN, "Menu Principal", _currentIndex);
 };
 
 /*********************************************************************
@@ -80,19 +150,20 @@ void MainMenu::hideAppsMenu() {
 RESTART: // using gotos to avoid stackoverflow after many choices
     options.clear();
     for (auto item : items) {
-        String label = item->getName();
+        String stableName = item->getName();
+        String displayName = item->getDisplayName();
         std::vector<String> l = bruceConfig.disabledMenus;
-        bool enabled = find(l.begin(), l.end(), label) == l.end();
+        bool enabled = find(l.begin(), l.end(), stableName) == l.end();
         options.push_back(
-            {label,
-             [this, label, enabled]() {
-                 if (enabled) bruceConfig.addDisabledMenu(label);
-                 else bruceConfig.removeDisabledMenu(label);
+            {displayName,
+             [this, stableName, enabled]() {
+                 if (enabled) bruceConfig.addDisabledMenu(stableName);
+                 else bruceConfig.removeDisabledMenu(stableName);
              },
              enabled}
         );
     }
-    options.push_back({"Show All", [=]() { bruceConfig.disabledMenus.clear(); }, true});
+    options.push_back({"Mostrar todos", [=]() { bruceConfig.disabledMenus.clear(); }, true});
     addOptionToMainMenu();
     index = loopOptions(options, index);
     bruceConfig.saveFile();

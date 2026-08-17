@@ -18,7 +18,7 @@ void draw_tf_spectrum_grid() {
     tft.setTextSize(1);
     tft.setCursor(3, 2);
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-    tft.printf(" RF - Spectrum (%.2f Mhz)", bruceConfigPins.rfFreq);
+    tft.printf(" RF - Espectro (%.2f Mhz)", bruceConfigPins.rfFreq);
     tft.fillRect(0, 20, tftWidth, tftHeight - 20, bruceConfig.bgColor);
     tft.drawFastHLine(0, 20 + tftHeight / 2, tftWidth, TFT_DARKGREY);
     tft.drawFastVLine((1 * tftWidth) / 4, 20, tftHeight - 20, TFT_DARKGREY);
@@ -143,7 +143,7 @@ PRINT:
     tft.fillScreen(bruceConfig.bgColor);
     tft.setTextSize(1);
     tft.setCursor(3, 2);
-    tft.printf("  RF - SquareWave (%.2f Mhz)", bruceConfigPins.rfFreq);
+    tft.printf("  RF - Onda quadrada (%.2f Mhz)", bruceConfigPins.rfFreq);
 
     while (1) {
         if (rx.poll(durations)) {
@@ -185,7 +185,7 @@ PRINT:
 void rf_CC1101_rssi() {
 #if !defined(LITE_VERSION)
     if (bruceConfigPins.rfModule != CC1101_SPI_MODULE) {
-        displayError("only for CC1101 module", true);
+        displayError("Apenas para modulo CC1101", true);
         return;
     }
     int graph_size = tftWidth - 20;
@@ -206,8 +206,8 @@ void rf_CC1101_rssi() {
             // Fixed frequency sees a dot running grafic, showing RSSI over time
             if (bruceConfigPins.rfFxdFreq) {
                 if (!initRfModule("rx", bruceConfigPins.rfFreq))
-                    displayError("Error setting frequency", true);
-                tft.printf(" RF - RSSI spectrum (%.2f Mhz)", bruceConfigPins.rfFreq);
+                    displayError("Erro ao definir frequencia", true);
+                tft.printf(" RF - Espectro RSSI (%.2f Mhz)", bruceConfigPins.rfFreq);
                 tft.drawFastVLine(20, 20, tftHeight, bruceConfig.priColor);
                 tft.drawString("-95", 0, (tftHeight - 120) + 95);
                 tft.drawString("-80", 0, (tftHeight - 120) + 80);
@@ -220,8 +220,8 @@ void rf_CC1101_rssi() {
             }
             // Range Scan Sees a bargraph simillar to NRF24 grafic, using RSSI across frequencies
             else {
-                if (!initRfModule("rx", bruceConfigPins.rfFreq)) displayError("Error starting module", true);
-                tft.printf(" RF - RSSI spectrum (%s)", subghz_frequency_ranges[bruceConfigPins.rfScanRange]);
+                if (!initRfModule("rx", bruceConfigPins.rfFreq)) displayError("Erro ao iniciar modulo", true);
+                tft.printf(" RF - Espectro RSSI (%s)", subghz_frequency_ranges[bruceConfigPins.rfScanRange]);
                 tft.drawFastHLine(0, tftHeight - 20, tftWidth, bruceConfig.priColor);
                 char buf[7];
                 float var = subghz_frequency_list[range_limits[bruceConfigPins.rfScanRange][0]];
@@ -303,6 +303,6 @@ void rf_CC1101_rssi() {
     }
     deinitRfModule();
 #else
-    displayError("Not available on Launcher version");
+    displayError("Indisponivel na versao Launcher");
 #endif
 }

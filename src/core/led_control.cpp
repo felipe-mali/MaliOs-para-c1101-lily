@@ -392,18 +392,18 @@ void setLedColorConfig() {
     };
 
     constexpr ColorMapping colorMappings[] = {
-        {"OFF",        CRGB::Black    },
-        {"Default",    BrucePurple    },
-        {"White",      CRGB::White    },
-        {"Red",        CRGB::Red      },
-        {"Orange",     CRGB::OrangeRed},
-        {"Yellow",     CRGB::Yellow   },
-        {"Lime Green", CRGB::LawnGreen},
-        {"Green",      CRGB::Green    },
-        {"Cyan",       CRGB::Cyan     },
-        {"Blue",       CRGB::Blue     },
+        {"Desligado",  CRGB::Black    },
+        {"Padrao",     BrucePurple    },
+        {"Branco",     CRGB::White    },
+        {"Vermelho",   CRGB::Red      },
+        {"Laranja",    CRGB::OrangeRed},
+        {"Amarelo",    CRGB::Yellow   },
+        {"Verde lima", CRGB::LawnGreen},
+        {"Verde",      CRGB::Green    },
+        {"Ciano",      CRGB::Cyan     },
+        {"Azul",       CRGB::Blue     },
         {"Magenta",    CRGB::Magenta  },
-        {"Pink",       CRGB::DeepPink },
+        {"Rosa",       CRGB::DeepPink },
     };
 
     while (1) {
@@ -435,7 +435,7 @@ void setLedColorConfig() {
         }
 
         options.push_back(
-            {"Custom Color",
+            {"Cor manual",
              [=]() { setCustomColorMenu(); },
              idx == sizeof(colorMappings) / sizeof(colorMappings[0]),
              [](void *pointer, bool shouldRender) {
@@ -458,10 +458,10 @@ void setLedColorConfig() {
 void setCustomColorMenu() {
     while (1) {
         options = {
-            {"Red Channel",   setCustomColorSettingMenuR},
-            {"Green Channel", setCustomColorSettingMenuG},
-            {"Blue Channel",  setCustomColorSettingMenuB},
-            {"Back",          [=]() {}                  },
+            {"Canal vermelho", setCustomColorSettingMenuR},
+            {"Canal verde",    setCustomColorSettingMenuG},
+            {"Canal azul",     setCustomColorSettingMenuB},
+            {"Voltar",         [=]() {}                  },
         };
 
         int selectedOption = loopOptions(options);
@@ -547,7 +547,7 @@ void setLedEffectConfig() {
 
     while (1) {
         options = {
-            {"Solid Color",
+            {"Cor fixa",
              [=]() { bruceConfig.setLedEffect(LED_EFFECT_SOLID); },
              bruceConfig.ledEffect == LED_EFFECT_SOLID,
              [](void *pointer,                                                                         bool shouldRender) {
@@ -555,14 +555,14 @@ void setLedEffectConfig() {
                  setLedColor(bruceConfig.ledColor);
                  return false;
              }                                                                        },
-            {"Breathe",
+            {"Pulsar",
              [=]() { bruceConfig.setLedEffect(LED_COLOR_BREATHE); },
              bruceConfig.ledEffect == LED_COLOR_BREATHE,
              [](void *pointer,                                                                         bool shouldRender) {
                  setLedEffect(LED_COLOR_BREATHE);
                  return false;
              }                                                                        },
-            {"Color Cycle",
+            {"Ciclo de cores",
              [=]() { bruceConfig.setLedEffect(LED_EFFECT_COLOR_CYCLE); },
              bruceConfig.ledEffect == LED_EFFECT_COLOR_CYCLE,
              [](void *pointer,                                                                         bool shouldRender) {
@@ -570,35 +570,35 @@ void setLedEffectConfig() {
                  return false;
              }                                                                        },
 #if LED_COUNT > 1
-            {"Color Wheel",
+            {"Roda de cores",
              [=]() { bruceConfig.setLedEffect(LED_EFFECT_COLOR_WHEEL); },
              bruceConfig.ledEffect == LED_EFFECT_COLOR_WHEEL,
              [](void *pointer,                                                                         bool shouldRender) {
                  setLedEffect(LED_EFFECT_COLOR_WHEEL);
                  return false;
              }                                                                        },
-            {"Chase",
+            {"Corrida",
              [=]() { bruceConfig.setLedEffect(LED_EFFECT_CHASE); },
              bruceConfig.ledEffect == LED_EFFECT_CHASE,
              [](void *pointer,                                                                         bool shouldRender) {
                  setLedEffect(LED_EFFECT_CHASE);
                  return false;
              }                                                                        },
-            {"Chase Tail",
+            {"Rastro",
              [=]() { bruceConfig.setLedEffect(LED_EFFECT_CHASE_TAIL); },
              bruceConfig.ledEffect == LED_EFFECT_CHASE_TAIL,
              [](void *pointer,                                                                         bool shouldRender) {
                  setLedEffect(LED_EFFECT_CHASE_TAIL);
                  return false;
              }                                                                        },
-            {"Rainbow Chase",
+            {"Rastro arco-iris",
              [=]() { bruceConfig.setLedEffect(LED_EFFECT_RAINBOW_CHASE); },
              bruceConfig.ledEffect == LED_EFFECT_RAINBOW_CHASE,
              [](void *pointer,                                                                         bool shouldRender) {
                  setLedEffect(LED_EFFECT_RAINBOW_CHASE);
                  return false;
              }                                                                        },
-            {"Rainbow Breathe",
+            {"Pulso arco-iris",
              [=]() { bruceConfig.setLedEffect(LED_EFFECT_RAINBOW_BREATHE); },
              bruceConfig.ledEffect == LED_EFFECT_RAINBOW_BREATHE,
              [](void *pointer,                                                                         bool shouldRender) {
@@ -612,7 +612,7 @@ void setLedEffectConfig() {
                  setLedEffect(LED_EFFECT_DISCO);
                  return false;
              }                                                                        },
-            {"Fire",
+            {"Fogo",
              [=]() { bruceConfig.setLedEffect(LED_EFFECT_FIRE); },
              bruceConfig.ledEffect == LED_EFFECT_FIRE,
              [](void *pointer,                                                                         bool shouldRender) {
@@ -620,7 +620,7 @@ void setLedEffectConfig() {
                  return false;
              }                                                                        },
 #endif
-            {"Config - Speed",
+            {"Velocidade",
              setLedEffectSpeedConfig,                                         false,
              [](void *pointer,                                                                         bool shouldRender) {
                  previewLedEffect = bruceConfig.ledEffect;
@@ -628,7 +628,7 @@ void setLedEffectConfig() {
                  previewLedEffectDirection = bruceConfig.ledEffectDirection;
                  return false;
              }                                                                        },
-            {"Config - Direction", setLedEffectDirectionConfig,               false, [](void *pointer, bool shouldRender) {
+            {"Direcao", setLedEffectDirectionConfig,               false, [](void *pointer, bool shouldRender) {
                  previewLedEffect = bruceConfig.ledEffect;
                  previewLedEffectSpeed = bruceConfig.ledEffectSpeed;
                  previewLedEffectDirection = bruceConfig.ledEffectDirection;
@@ -681,7 +681,7 @@ void setLedEffectSpeedConfig() {
 #ifdef HAS_ENCODER_LED
     speedStorage[10] = 11;
     options.emplace_back(
-        "Sync To Encoder",
+        "Seguir encoder",
         []() { bruceConfig.setLedEffectSpeed(11); },
         (bruceConfig.ledEffectSpeed == 11),
         hoverFunction,
@@ -700,14 +700,14 @@ void setLedEffectSpeedConfig() {
 
 void setLedEffectDirectionConfig() {
     options = {
-        {"Clockwise",
+        {"Horario",
          [=]() { bruceConfig.setLedEffectDirection(1); },
          bruceConfig.ledEffectDirection == 1,
          [](void *pointer, bool shouldRender) {
              previewLedEffectDirection = 1;
              return false;
          }},
-        {"Anti-Clockwise",
+        {"Anti-horario",
          [=]() { bruceConfig.setLedEffectDirection(-1); },
          bruceConfig.ledEffectDirection == -1,
          [](void *pointer, bool shouldRender) {
@@ -767,7 +767,7 @@ void setLedBrightnessConfig() {
     else if (bruceConfig.ledBright == 100) idx = 5;
 
     options = {
-        {"OFF",
+        {"Desligado",
          [=]() { bruceConfig.setLedBright(0); },
          bruceConfig.ledBright == 0,
          [](void *pointer, bool shouldRender) {

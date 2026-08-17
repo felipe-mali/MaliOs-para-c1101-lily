@@ -2,7 +2,7 @@
 bool rf_raw_save(RawRecording recorded) {
     FS *fs = nullptr;
     if (!getFsStorage(fs) || fs == nullptr) {
-        displayError("No space left on device", true);
+        displayError("Sem espaco no dispositivo", true);
         return false;
     }
 
@@ -11,7 +11,7 @@ bool rf_raw_save(RawRecording recorded) {
 
     if (!fs->exists("/BruceRF")) {
         if (!fs->mkdir("/BruceRF")) {
-            displayError("Error creating directory", true);
+            displayError("Erro ao criar pasta", true);
             return false;
         }
     }
@@ -20,7 +20,7 @@ bool rf_raw_save(RawRecording recorded) {
 
     File file = fs->open(filename, FILE_WRITE, true);
     if (!file) {
-        displayError("Error creating file", true);
+        displayError("Erro ao criar arquivo", true);
         return false;
     }
 

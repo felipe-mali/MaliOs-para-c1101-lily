@@ -5,7 +5,7 @@
 
 class FileMenu : public MenuItemInterface {
 public:
-    FileMenu() : MenuItemInterface("Arquivos") {}
+    FileMenu() : MenuItemInterface("Files", "Arquivos") {}
 
     void optionsMenu(void);
     void drawIcon(float scale);

@@ -102,12 +102,12 @@ bool startLoraRadio(float bandMHz) {
     if (getLoraCsPin() == GPIO_NUM_NC || bruceConfigPins.LoRa_bus.mosi == GPIO_NUM_NC ||
         bruceConfigPins.LoRa_bus.miso == GPIO_NUM_NC || bruceConfigPins.LoRa_bus.sck == GPIO_NUM_NC) {
         Serial.println("LoRa pins not configured!");
-        displayError("LoRa pins not configured!", true);
+        displayError("Pinos LoRa nao configurados!", true);
         return false;
     }
     if (irqPin == GPIO_NUM_NC) {
         Serial.println("LoRa IRQ pin not configured!");
-        displayError("LoRa IRQ pin not configured!", true);
+        displayError("Pino IRQ LoRa nao configurado!", true);
         return false;
     }
 
@@ -142,7 +142,7 @@ bool startLoraRadio(float bandMHz) {
 
     if (state != RADIOLIB_ERR_NONE) {
         Serial.printf("Starting LoRa failed! Err %d\n", state);
-        displayError("LoRa Init Failed", true);
+        displayError("Falha ao iniciar LoRa", true);
         clearLoraRadio();
         return false;
     }
@@ -168,7 +168,7 @@ bool sendLoraMessage(String &payload) {
     loraInterruptEnabled = true;
     if (state != RADIOLIB_ERR_NONE) {
         Serial.printf("LoRa transmit failed: %d\n", state);
-        displayError("LoRa send failed");
+        displayError("Falha ao enviar por LoRa");
         return false;
     }
     return true;
@@ -209,7 +209,7 @@ void render() {
     tft.setTextSize(1);
     tft.fillScreen(TFT_BLACK);
     tft.setTextColor(0x6DFC);
-    if (!intlora) { tft.drawString("Lora Init Failed", 10, 13); }
+    if (!intlora) { tft.drawString("Falha ao iniciar LoRa", 10, 13); }
     Serial.println(String(displayName));
     tft.drawString("USRN: " + String(displayName), 10, 25);
 
@@ -402,7 +402,7 @@ void lorachat() {
     selectRadioVariant(doc);
     float bandMHz = (BAND > 1000) ? BAND / 1000000.0f : BAND;
     if (bandMHz <= 0) {
-        displayError("Invalid LoRa frequency", true);
+        displayError("Frequencia LoRa invalida", true);
         return;
     }
     tft.fillScreen(TFT_BLACK);
@@ -457,10 +457,10 @@ void chfreq() {
     String freq = num_keyboard(buf, 12, "in Mhz");
     dfreq = freq.toDouble();
     if (dfreq == 0 || freq == "\x1B") {
-        displayError("Invalid value");
+        displayError("Valor invalido");
         return;
     } else if (dfreq > 1000) {
-        displayError("Invalid value, Exceeds 1Ghz");
+        displayError("Valor invalido: acima de 1GHz");
         return;
     }
     dfreq = dfreq * 1000000;

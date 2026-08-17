@@ -61,11 +61,11 @@ void rf_listen() {
     }
 
     if (bruceConfigPins.rfModule != CC1101_SPI_MODULE) {
-        displayError("Listener needs a CC1101!", true);
+        displayError("Escuta requer CC1101!", true);
         return;
     }
     if (!initRfModule("rx", freq)) {
-        displayError("CC1101 not found!", true);
+        displayError("CC1101 nao encontrado!", true);
         return;
     }
 

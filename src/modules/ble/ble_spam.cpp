@@ -522,7 +522,7 @@ void ibeacon(const char *DeviceName, const char *BEACON_UUID, int ManufacturerId
     padprintln("");
     padprintln("UUID:" + String(BEACON_UUID));
     padprintln("");
-    padprintln("Press Any key to STOP.");
+    padprintln("Pressione uma tecla p/ PARAR");
 
     // Main loop - with proper button handling
     bool running = true;
@@ -680,15 +680,15 @@ static const uint32_t BLE_SPAM_BLINK_MS = 250;
 
 static const BleSpamAttackOption BLE_SPAM_ATTACK_OPTIONS[] = {
 #if !defined(LITE_VERSION)
-    {BLE_SPAM_ATTACK_APPLE_PAIRING,         "Apple Pairing Prompt" },
-    {BLE_SPAM_ATTACK_APPLE_ACTION,          "Apple Action Modal"   },
-    {BLE_SPAM_ATTACK_APPLE_NOT_YOUR_DEVICE, "Apple Not Your Device"},
+    {BLE_SPAM_ATTACK_APPLE_PAIRING,         "Aviso de pareamento Apple"},
+    {BLE_SPAM_ATTACK_APPLE_ACTION,          "Acao modal Apple"         },
+    {BLE_SPAM_ATTACK_APPLE_NOT_YOUR_DEVICE, "Apple: nao e seu disp."   },
 #endif
-    {BLE_SPAM_ATTACK_ANDROID_ALERT,         "Android Device Alert" },
+    {BLE_SPAM_ATTACK_ANDROID_ALERT,         "Alerta Android"       },
     {BLE_SPAM_ATTACK_WINDOWS_SWIFT_PAIR,    "Windows Swift Pair"   },
-    {BLE_SPAM_ATTACK_SAMSUNG,               "Samsung BLE Spam"     },
-    {BLE_SPAM_ATTACK_BLE_BEACON,            "BLE Beacon Spam"      },
-    {BLE_SPAM_ATTACK_RANDOM_ALL,            "Random / All"         }
+    {BLE_SPAM_ATTACK_SAMSUNG,               "Spam BLE Samsung"     },
+    {BLE_SPAM_ATTACK_BLE_BEACON,            "Spam de beacon BLE"   },
+    {BLE_SPAM_ATTACK_RANDOM_ALL,            "Aleatorio / Todos"    }
 };
 
 #if !defined(LITE_VERSION)
@@ -780,24 +780,24 @@ static const char *BLE_SPAM_SAMSUNG_DEVICES[] = {
 static const char *bleSpamTxPowerLabel(BleSpamTxPower level) {
     switch (level) {
         case BLE_SPAM_TX_MAX: return "MAX";
-        case BLE_SPAM_TX_HIGH: return "HIGH";
-        case BLE_SPAM_TX_MEDIUM: return "MEDIUM";
-        case BLE_SPAM_TX_LOW: return "LOW";
+        case BLE_SPAM_TX_HIGH: return "ALTA";
+        case BLE_SPAM_TX_MEDIUM: return "MEDIA";
+        case BLE_SPAM_TX_LOW: return "BAIXA";
         default: return "MAX";
     }
 }
 
 static const char *bleSpamMacRandLabel(BleSpamMacRandMode mode) {
     switch (mode) {
-        case BLE_SPAM_MAC_OFF: return "Off";
-        case BLE_SPAM_MAC_EVERY_PACKET: return "Every Packet";
-        case BLE_SPAM_MAC_EVERY_2: return "Every 2 Packets";
-        case BLE_SPAM_MAC_EVERY_3: return "Every 3 Packets";
-        case BLE_SPAM_MAC_EVERY_5: return "Every 5 Packets";
-        case BLE_SPAM_MAC_EVERY_10: return "Every 10 Packets";
-        case BLE_SPAM_MAC_EVERY_25: return "Every 25 Packets";
-        case BLE_SPAM_MAC_EVERY_50: return "Every 50 Packets";
-        default: return "Every Packet";
+        case BLE_SPAM_MAC_OFF: return "Desligado";
+        case BLE_SPAM_MAC_EVERY_PACKET: return "Todo pacote";
+        case BLE_SPAM_MAC_EVERY_2: return "A cada 2 pacotes";
+        case BLE_SPAM_MAC_EVERY_3: return "A cada 3 pacotes";
+        case BLE_SPAM_MAC_EVERY_5: return "A cada 5 pacotes";
+        case BLE_SPAM_MAC_EVERY_10: return "A cada 10 pacotes";
+        case BLE_SPAM_MAC_EVERY_25: return "A cada 25 pacotes";
+        case BLE_SPAM_MAC_EVERY_50: return "A cada 50 pacotes";
+        default: return "Todo pacote";
     }
 }
 
@@ -1055,19 +1055,19 @@ static const char *bleSpamGetDeviceName(BleSpamAttackType type, int index) {
         case BLE_SPAM_ATTACK_APPLE_PAIRING: {
             if (index >= 0 && index < APPLE_PROXIMITY_DEVICE_COUNT)
                 return APPLE_PROXIMITY_DEVICES[index].name;
-            if (index == APPLE_PROXIMITY_DEVICE_COUNT) return "Random / All";
+            if (index == APPLE_PROXIMITY_DEVICE_COUNT) return "Aleatorio / Todos";
             return "Apple";
         }
         case BLE_SPAM_ATTACK_APPLE_ACTION: {
             int staticCount = (int)(sizeof(BLE_SPAM_APPLE_ACTION_DEVICES) / sizeof(BleSpamAppleDevice));
             if (index >= 0 && index < staticCount) return BLE_SPAM_APPLE_ACTION_DEVICES[index].ui_name;
-            if (index == staticCount) return "Random / All";
+            if (index == staticCount) return "Aleatorio / Todos";
             return "Apple";
         }
         case BLE_SPAM_ATTACK_APPLE_NOT_YOUR_DEVICE: {
             if (index >= 0 && index < APPLE_PROXIMITY_DEVICE_COUNT)
                 return APPLE_PROXIMITY_DEVICES[index].name;
-            if (index == APPLE_PROXIMITY_DEVICE_COUNT) return "Random / All";
+            if (index == APPLE_PROXIMITY_DEVICE_COUNT) return "Aleatorio / Todos";
             return "Apple";
         }
 #endif
@@ -1079,7 +1079,7 @@ static const char *bleSpamGetDeviceName(BleSpamAttackType type, int index) {
         case BLE_SPAM_ATTACK_WINDOWS_SWIFT_PAIR: {
             int nPresets = (int)(sizeof(BLE_SPAM_WINDOWS_PRESETS) / sizeof(BLE_SPAM_WINDOWS_PRESETS[0]));
             if (index >= 0 && index < nPresets) return BLE_SPAM_WINDOWS_PRESETS[index];
-            if (index == nPresets) return "Random / All";
+            if (index == nPresets) return "Aleatorio / Todos";
             // saved custom names
             std::vector<String> saved = bleSpamLoadCustomNames("bs_sp");
             int savedBase = nPresets + 1;
@@ -1091,7 +1091,7 @@ static const char *bleSpamGetDeviceName(BleSpamAttackType type, int index) {
                 bleSpamDeviceNameBuf[sizeof(bleSpamDeviceNameBuf) - 1] = '\0';
                 return bleSpamDeviceNameBuf;
             }
-            if (index == addNewIdx) return "+ Add New Custom Name";
+            if (index == addNewIdx) return "+ Adicionar nome";
             return "Windows";
         }
         case BLE_SPAM_ATTACK_SAMSUNG:
@@ -1102,7 +1102,7 @@ static const char *bleSpamGetDeviceName(BleSpamAttackType type, int index) {
         case BLE_SPAM_ATTACK_BLE_BEACON: {
             int nPresets = (int)(sizeof(BLE_SPAM_BEACON_PRESETS) / sizeof(BLE_SPAM_BEACON_PRESETS[0]));
             if (index >= 0 && index < nPresets) return BLE_SPAM_BEACON_PRESETS[index];
-            if (index == nPresets) return "Random Device Spam";
+            if (index == nPresets) return "Spam aleatorio";
             std::vector<String> saved = bleSpamLoadCustomNames("bs_bn");
             int savedBase = nPresets + 1;
             int addNewIdx = savedBase + (int)saved.size();
@@ -1113,11 +1113,11 @@ static const char *bleSpamGetDeviceName(BleSpamAttackType type, int index) {
                 bleSpamDeviceNameBuf[sizeof(bleSpamDeviceNameBuf) - 1] = '\0';
                 return bleSpamDeviceNameBuf;
             }
-            if (index == addNewIdx) return "+ Add New Custom Name";
+            if (index == addNewIdx) return "+ Adicionar nome";
             return "Beacon";
         }
         case BLE_SPAM_ATTACK_RANDOM_ALL:
-        default: return "Random / All";
+        default: return "Aleatorio / Todos";
     }
 }
 
@@ -1699,10 +1699,10 @@ static void bleSpamRenderConfigRows(
         const char *label;
         String value;
     } rows[] = {
-        {"Adv ms",   bleSpamFormatMs(config.adv_ms)           },
-        {"Gap ms",   bleSpamFormatMs(config.gap_ms)           },
-        {"TX Power", bleSpamTxPowerLabel(config.tx_power)     },
-        {"MAC Rand", bleSpamMacRandLabel(config.mac_rand_mode)}
+        {"Anuncio ms", bleSpamFormatMs(config.adv_ms)           },
+        {"Pausa ms",   bleSpamFormatMs(config.gap_ms)           },
+        {"Potencia TX", bleSpamTxPowerLabel(config.tx_power)     },
+        {"MAC aleat.",  bleSpamMacRandLabel(config.mac_rand_mode)}
     };
 
     for (int i = 0; i < 4; i++) {
@@ -1731,7 +1731,7 @@ bleSpamConfigScreen(const BleSpamSelection &selection, BleSpamConfig &config, bo
     while (true) {
         if (!layoutDrawn) {
             String title =
-                String(bleSpamGetDeviceName(selection.attack_type, selection.device_index)) + " > Config";
+                String(bleSpamGetDeviceName(selection.attack_type, selection.device_index)) + " > Ajustes";
             drawMainBorderWithTitle(bleSpamMakeTitle(title));
             layoutDrawn = true;
             redrawRows = true;
@@ -1750,11 +1750,11 @@ bleSpamConfigScreen(const BleSpamSelection &selection, BleSpamConfig &config, bo
             tft.fillRect(10, startRowY, tftWidth - 20, rowH, bruceConfig.bgColor);
             uint16_t startColor = (cursor == 4) ? TFT_YELLOW : bruceConfig.priColor;
             tft.setTextColor(startColor, bruceConfig.bgColor);
-            tft.drawCentreString("[ Start ]", tftWidth / 2, startRowY + 2, 1);
+            tft.drawCentreString("[ Iniciar ]", tftWidth / 2, startRowY + 2, 1);
 
             tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
             tft.fillRect(8, footerY, tftWidth - 16, footerH, bruceConfig.bgColor);
-            tft.drawCentreString("Click=Select  ESC=Back", tftWidth / 2, footerY + 2, 1);
+            tft.drawCentreString("Clique=Selecionar ESC=Voltar", tftWidth / 2, footerY + 2, 1);
 
             redrawRows = false;
         }
@@ -1862,7 +1862,7 @@ static void bleSpamRenderRunningScreen(
 
         tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
         tft.fillRect(8, footerY, tftWidth - 16, footerH, bruceConfig.bgColor);
-        tft.drawCentreString("Click=Edit  ESC=Stop", tftWidth / 2, footerY + 2, 1);
+        tft.drawCentreString("Clique=Editar ESC=Parar", tftWidth / 2, footerY + 2, 1);
     }
 
     if (blinkDirty) {
@@ -1880,7 +1880,7 @@ static void bleSpamRenderRunningScreen(
 
         tft.fillRect(10, statsY, tftWidth - 20, rowH * 2, bruceConfig.bgColor);
         char buf[24];
-        snprintf(buf, sizeof(buf), "Sent:   %06lu", (unsigned long)displaySent);
+        snprintf(buf, sizeof(buf), "Enviados: %06lu", (unsigned long)displaySent);
         tft.drawString(buf, 12, statsY + 2, 1);
 
         snprintf(buf, sizeof(buf), "Pkt/s:  %.1f", displayPkt);
@@ -1898,19 +1898,19 @@ static bool bleSpamStoppedPrompt(const BleSpamSelection &selection, uint32_t sen
     int cursor = 0;
     bool redraw = true;
     bool layoutDrawn = false;
-    const char *options[] = {"Restart", "Back to Config"};
+    const char *options[] = {"Reiniciar", "Voltar aos ajustes"};
     int optionCount = 2;
 
     while (true) {
         if (redraw) {
             if (!layoutDrawn) {
                 String title =
-                    String(bleSpamGetDeviceName(selection.attack_type, selection.device_index)) + " STOPPED";
+                    String(bleSpamGetDeviceName(selection.attack_type, selection.device_index)) + " PARADO";
                 drawMainBorderWithTitle(bleSpamMakeTitle(title));
 
                 tft.setTextSize(FP);
                 char buf[32];
-                snprintf(buf, sizeof(buf), "Sent: %06lu  Pkt/s: 0.0", (unsigned long)sentCount);
+                snprintf(buf, sizeof(buf), "Env: %06lu Pct/s: 0.0", (unsigned long)sentCount);
                 int statsY = BORDER_PAD_Y + FM * LH + 8;
                 tft.fillRect(10, statsY, tftWidth - 20, FP * LH + 6, bruceConfig.bgColor);
                 tft.drawString(buf, 12, statsY + 2, 1);
@@ -1918,7 +1918,7 @@ static bool bleSpamStoppedPrompt(const BleSpamSelection &selection, uint32_t sen
                 tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
                 int footerY = tftHeight - FP * LH - 12;
                 tft.fillRect(8, footerY, tftWidth - 16, FP * LH + 4, bruceConfig.bgColor);
-                tft.drawCentreString("Click=Select  ESC=Back", tftWidth / 2, footerY + 2, 1);
+                tft.drawCentreString("Clique=Selecionar ESC=Voltar", tftWidth / 2, footerY + 2, 1);
                 layoutDrawn = true;
             }
 
@@ -2155,7 +2155,7 @@ static bool bleSpamHandleCustomNameDevice(
 
     if (deviceIndex == addNewIdx) {
         // User tapped "+ Add New Custom Name"
-        String newName = keyboard("", 24, "Enter name");
+        String newName = keyboard("", 24, "Digite o nome");
         if (newName == "\x1B" || newName.length() == 0) return false;
         saved.push_back(newName);
         bleSpamSaveCustomNames(ns, saved);
@@ -2168,7 +2168,7 @@ static bool bleSpamHandleCustomNameDevice(
     if (deviceIndex >= savedBase && deviceIndex < addNewIdx) {
         // It's a saved custom name — show Use/Delete prompt
         int choice = bleSpamTwoOptionPrompt(
-            String(saved[deviceIndex - savedBase]), "Use Saved Name", "Delete Saved Name"
+            String(saved[deviceIndex - savedBase]), "Usar nome salvo", "Excluir nome salvo"
         );
         if (choice == 1) {
             // Delete
@@ -2199,7 +2199,7 @@ static void bleSpamMenuUi() {
             bleSpamGetAttackOptionCount(),
             0,
             [](int idx) { return bleSpamGetAttackLabel(idx); },
-            "Click=Select  ESC=Back"
+            "Clique=Selecionar ESC=Voltar"
         );
 
         if (attackIndex < 0) return;
@@ -2224,11 +2224,11 @@ static void bleSpamMenuUi() {
         while (true) {
             int deviceCount = bleSpamGetDeviceCount(selection.attack_type);
             int deviceIndex = bleSpamListLoop(
-                String(bleSpamGetAttackLabel(attackIndex)) + " > Device",
+                String(bleSpamGetAttackLabel(attackIndex)) + " > Dispositivo",
                 deviceCount,
                 0,
                 [&](int idx) { return bleSpamGetDeviceName(selection.attack_type, idx); },
-                "Click=Select  ESC=Back"
+                "Clique=Selecionar ESC=Voltar"
             );
 
             if (deviceIndex < 0) break;

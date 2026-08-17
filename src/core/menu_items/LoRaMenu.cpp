@@ -7,8 +7,8 @@
 void LoRaMenu::optionsMenu() {
     options = {
         {"Chat",             []() { lorachat(); }      },
-        {"Change username",  []() { changeusername(); }},
-        {"Change Frequency", []() { chfreq(); }        },
+        {"Alterar usuario",    []() { changeusername(); }},
+        {"Alterar frequencia", []() { chfreq(); }        },
     };
     addOptionToMainMenu();
     String txt = "LoRa";

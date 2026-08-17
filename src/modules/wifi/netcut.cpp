@@ -241,7 +241,7 @@ int netcutScanDevices() {
 
     struct netif *iface = _getStaNetif();
     if (!iface) {
-        displayError("WiFi netif not found", true);
+        displayError("Interface WiFi nao encontrada", true);
         return 0;
     }
 
@@ -265,9 +265,9 @@ int netcutScanDevices() {
     uint32_t broadcast = network | ~mask_he;
     uint32_t totalHosts = broadcast - network - 1;
 
-    drawMainBorderWithTitle("NetCut Scan");
+    drawMainBorderWithTitle("Busca NetCut");
     padprintln("");
-    padprintln("Scanning network...");
+    padprintln("Buscando na rede...");
     padprintln("SSID: " + WiFi.SSID());
     padprintln("GW: " + IPAddress(ip_info.gw.addr).toString());
     padprintln("");
@@ -302,7 +302,7 @@ int netcutScanDevices() {
         if (millis() - lastUIUpdate > 400) {
             lastUIUpdate = millis();
             displayRedStripe(
-                String(hostsScanned) + "/" + String(totalHosts) + " | Found: " + String(s_deviceCount),
+                String(hostsScanned) + "/" + String(totalHosts) + " | Achados: " + String(s_deviceCount),
                 getComplementaryColor2(bruceConfig.priColor),
                 bruceConfig.priColor
             );
@@ -442,7 +442,7 @@ void netcutToggleVip(int idx) {
 // ============================================
 static void _activeLoop() {
     if (!s_gwMacValid) {
-        displayError("Gateway MAC unknown", true);
+        displayError("MAC do gateway desconhecido", true);
         return;
     }
 
@@ -460,7 +460,7 @@ static void _activeLoop() {
     };
 
     if (countActive() == 0) {
-        displayWarning("No targets marked", true);
+        displayWarning("Nenhum alvo marcado", true);
         return;
     }
 
@@ -475,12 +475,12 @@ static void _activeLoop() {
     unsigned long lastScanStep = 0;
     int scanTableCount = 0;
 
-    drawMainBorderWithTitle("NETCUT ACTIVE");
+    drawMainBorderWithTitle("NETCUT ATIVO");
     padprintln("");
-    padprintln("Attack running...");
-    padprintln("Targets: " + String(countActive()));
+    padprintln("Ataque em andamento...");
+    padprintln("Alvos: " + String(countActive()));
     padprintln("");
-    padprintln("Press Esc/Back to STOP");
+    padprintln("Esc/Voltar para PARAR");
 
     // Install L2 Bridge Hook
     struct netif *hook_iface = _getStaNetif();
@@ -601,7 +601,7 @@ static void _activeLoop() {
 
             tft.setTextColor(TFT_RED, bruceConfig.bgColor);
             tft.drawString(
-                "CUT:" + String(cutN) + " Dev:" + String(s_deviceCount), 10, tftHeight - 5 * _lh, 1
+                "CORTE:" + String(cutN) + " Disp:" + String(s_deviceCount), 10, tftHeight - 5 * _lh, 1
             );
             tft.setTextColor(TFT_MAGENTA, bruceConfig.bgColor);
             tft.drawString(
@@ -610,10 +610,10 @@ static void _activeLoop() {
 
             // Draw SNIPER count
             for (int i = 0; i < s_deviceCount; i++) tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
-            tft.drawString("Pkts:" + String(packetCount), 10, tftHeight - 3 * _lh, 1);
+            tft.drawString("Pacotes:" + String(packetCount), 10, tftHeight - 3 * _lh, 1);
 
             tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
-            tft.drawString("Esc=Stop", 10, tftHeight - 2 * _lh, 1);
+            tft.drawString("Esc=Parar", 10, tftHeight - 2 * _lh, 1);
         }
 
         vTaskDelay(pdMS_TO_TICKS(10));
@@ -643,7 +643,7 @@ static void _activeLoop() {
         }
     }
 
-    displaySuccess("Stopped. All " + String(restoreCount) + " devices restored.", true);
+    displaySuccess("Parado. " + String(restoreCount) + " disp. restaurados.", true);
 }
 
 // ============================================
@@ -652,7 +652,7 @@ static void _activeLoop() {
 void netcutTrollDevice(int idx) {
     if (idx < 0 || idx >= s_deviceCount) return;
     if (s_devices[idx].isVip) {
-        displayWarning("VIP protected", true);
+        displayWarning("VIP protegido", true);
         return;
     }
 
@@ -697,8 +697,8 @@ void netcutTrollTimingMenu() {
     while (!done) {
         options.clear();
 
-        options.push_back({"Offline: " + String(offSec) + "s  [SET]", [&offSec]() {
-                               String val = num_keyboard(String(offSec), 3, "Offline (sec):");
+        options.push_back({"Offline: " + String(offSec) + "s [DEFINIR]", [&offSec]() {
+                               String val = num_keyboard(String(offSec), 3, "Offline (seg):");
                                if (val == "\x1B") return;
                                if (val.length() > 0) {
                                    unsigned long v = val.toInt();
@@ -708,8 +708,8 @@ void netcutTrollTimingMenu() {
                                while (check(AnyKeyPress))
                                    vTaskDelay(pdMS_TO_TICKS(50)); // drain residual press
                            }});
-        options.push_back({"Online: " + String(onSec) + "s  [SET]", [&onSec]() {
-                               String val = num_keyboard(String(onSec), 3, "Online (sec):");
+        options.push_back({"Online: " + String(onSec) + "s [DEFINIR]", [&onSec]() {
+                               String val = num_keyboard(String(onSec), 3, "Online (seg):");
                                if (val == "\x1B") return;
                                if (val.length() > 0) {
                                    unsigned long v = val.toInt();
@@ -719,12 +719,12 @@ void netcutTrollTimingMenu() {
                                while (check(AnyKeyPress))
                                    vTaskDelay(pdMS_TO_TICKS(50)); // drain residual press
                            }});
-        options.push_back({">> Save & Start <<", [&offSec, &onSec, &done]() {
+        options.push_back({">> Salvar e iniciar <<", [&offSec, &onSec, &done]() {
                                s_trollOfflineMs = offSec * 1000;
                                s_trollOnlineMs = onSec * 1000;
                                done = true;
                            }});
-        options.push_back({"Cancel", [&done]() { done = true; }});
+        options.push_back({"Cancelar", [&done]() { done = true; }});
 
         String title = "Troll: OFF=" + String(offSec) + "s ON=" + String(onSec) + "s";
         loopOptions(options, MENU_TYPE_SUBMENU, title.c_str());
@@ -751,7 +751,7 @@ static void _deviceActionMenu(int idx) {
 
         if (!dev.isVip) {
             // TOGGLE CUT: single button to Cut or Resume
-            String cutLabel = dev.isCut ? ">> Resume <<" : ">> Cut Device <<";
+            String cutLabel = dev.isCut ? ">> Restaurar <<" : ">> Cortar dispositivo <<";
             options.push_back({cutLabel, [idx]() {
                                    NetCutDevice &d = s_devices[idx];
                                    if (d.isCut) {
@@ -760,52 +760,52 @@ static void _deviceActionMenu(int idx) {
                                        d.isTrollOffline = false;
                                        d.restoreUntil = millis() + 5000;
                                        netcutRestoreDevice(idx);
-                                       displaySuccess("Restored: " + d.ip.toString(), true);
+                                       displaySuccess("Restaurado: " + d.ip.toString(), true);
                                    } else {
                                        d.isCut = true;
                                        d.isTroll = false;
                                        netcutPoisonDevice(idx, 20);
-                                       displayWarning("Cut: " + d.ip.toString(), true);
+                                       displayWarning("Cortado: " + d.ip.toString(), true);
                                        _activeLoop();
                                    }
                                }});
 
-            options.push_back({"Troll Mode", [idx, &stayInMenu]() {
+            options.push_back({"Modo troll", [idx, &stayInMenu]() {
                                    netcutTrollDevice(idx);
                                    // After troll active loop exits, stay in menu
                                }});
         } else {
             if (dev.isCut) {
-                options.push_back({">> Resume <<", [idx]() {
+                options.push_back({">> Restaurar <<", [idx]() {
                                        s_devices[idx].isCut = false;
                                        s_devices[idx].isTroll = false;
                                        s_devices[idx].restoreUntil = millis() + 5000;
                                        netcutRestoreDevice(idx);
-                                       displaySuccess("Restored: " + s_devices[idx].ip.toString(), true);
+                                       displaySuccess("Restaurado: " + s_devices[idx].ip.toString(), true);
                                    }});
             }
         }
 
-        options.push_back({"Toggle VIP", [idx]() {
+        options.push_back({"Alternar VIP", [idx]() {
                                netcutToggleVip(idx);
-                               displayInfo(s_devices[idx].isVip ? "VIP: ON" : "VIP: OFF", true);
+                               displayInfo(s_devices[idx].isVip ? "VIP: ATIVO" : "VIP: INATIVO", true);
                            }});
 
-        options.push_back({"Info", [idx]() {
+        options.push_back({"Informacoes", [idx]() {
                                NetCutDevice &d = s_devices[idx];
-                               drawMainBorderWithTitle("Device Info");
+                               drawMainBorderWithTitle("Info do dispositivo");
                                padprintln("");
                                padprintln("IP:  " + d.ip.toString());
                                padprintln("MAC: " + d.macStr);
-                               padprintln("VIP: " + String(d.isVip ? "Yes" : "No"));
-                               padprintln("Cut: " + String(d.isCut ? "Yes" : "No"));
-                               padprintln("Troll: " + String(d.isTroll ? "Yes" : "No"));
+                               padprintln("VIP: " + String(d.isVip ? "Sim" : "Nao"));
+                               padprintln("Corte: " + String(d.isCut ? "Sim" : "Nao"));
+                               padprintln("Troll: " + String(d.isTroll ? "Sim" : "Nao"));
                                padprintln("");
-                               padprintln("Press any key...");
+                               padprintln("Pressione uma tecla...");
                                while (!check(AnyKeyPress)) vTaskDelay(pdMS_TO_TICKS(100));
                            }});
 
-        options.push_back({"<< Back", [&stayInMenu]() { stayInMenu = false; }});
+        options.push_back({"<< Voltar", [&stayInMenu]() { stayInMenu = false; }});
 
         loopOptions(options, MENU_TYPE_SUBMENU, title.c_str());
         options.clear();
@@ -827,16 +827,16 @@ void netcutMenu() {
     // Scan
     drawMainBorderWithTitle("NetCut ARP");
     padprintln("");
-    padprintln("Starting ARP scan...");
+    padprintln("Iniciando busca ARP...");
 
     int found = netcutScanDevices();
 
     if (found == 0) {
-        displayWarning("No devices found", true);
+        displayWarning("Nenhum dispositivo encontrado", true);
         return;
     }
 
-    if (!s_gwMacValid) { displayWarning("Gateway MAC not found!\nAttack may fail.", true); }
+    if (!s_gwMacValid) { displayWarning("MAC do gateway nao encontrado!\nAtaque pode falhar.", true); }
 
 DeviceListMenu:
     options.clear();
@@ -852,23 +852,23 @@ DeviceListMenu:
     }
 
     // Separator + global actions
-    options.push_back({"--- Actions ---", []() {}});
+    options.push_back({"--- Acoes ---", []() {}});
 
-    options.push_back({"Cut All", []() {
+    options.push_back({"Cortar todos", []() {
                            netcutCutAll();
                            _activeLoop();
                        }});
 
-    options.push_back({"Troll All", []() { netcutTrollAll(); }});
+    options.push_back({"Troll em todos", []() { netcutTrollAll(); }});
 
-    options.push_back({"Resume All", []() {
+    options.push_back({"Restaurar todos", []() {
                            netcutResumeAll();
-                           displaySuccess("All devices restored", true);
+                           displaySuccess("Dispositivos restaurados", true);
                        }});
 
-    options.push_back({"Troll Timing", []() { netcutTrollTimingMenu(); }});
+    options.push_back({"Tempo do troll", []() { netcutTrollTimingMenu(); }});
 
-    options.push_back({"Re-Scan", []() { netcutScanDevices(); }});
+    options.push_back({"Buscar novamente", []() { netcutScanDevices(); }});
 
     addOptionToMainMenu();
     loopOptions(options, MENU_TYPE_SUBMENU, "NetCut ARP");

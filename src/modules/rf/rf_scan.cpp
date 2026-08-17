@@ -391,56 +391,56 @@ void RFScan::select_menu_option() {
 
     options = {};
 
-    if (received.protocol != "") options.emplace_back("Replay", [this]() { set_option(REPLAY); });
+    if (received.protocol != "") options.emplace_back("Repetir", [this]() { set_option(REPLAY); });
     if (received.data != "" && received.protocol != "RAW")
-        options.emplace_back("Replay as RAW", [this]() { set_option(REPLAY_RAW); });
+        options.emplace_back("Repetir como RAW", [this]() { set_option(REPLAY_RAW); });
 
-    if (received.protocol != "") options.emplace_back("Save Signal", [this]() { set_option(SAVE); });
+    if (received.protocol != "") options.emplace_back("Salvar sinal", [this]() { set_option(SAVE); });
     if (received.data != "" && received.protocol != "RAW")
-        options.emplace_back("Save as RAW", [this]() { set_option(SAVE_RAW); });
+        options.emplace_back("Salvar como RAW", [this]() { set_option(SAVE_RAW); });
 
-    if (received.protocol != "") options.emplace_back("Reset Signal", [this]() { set_option(RESET); });
+    if (received.protocol != "") options.emplace_back("Limpar sinal", [this]() { set_option(RESET); });
 
     if (bruceConfigPins.rfModule == CC1101_SPI_MODULE)
-        options.emplace_back("Range", [this]() { set_option(RANGE); });
+        options.emplace_back("Faixa", [this]() { set_option(RANGE); });
     if (bruceConfigPins.rfModule == CC1101_SPI_MODULE && !bruceConfigPins.rfFxdFreq)
-        options.emplace_back("Threshold", [this]() { set_option(THRESHOLD); });
+        options.emplace_back("Limiar", [this]() { set_option(THRESHOLD); });
 
     if (ReadRAW)
-        options.emplace_back("Mode = RAW", [&]() {
+        options.emplace_back("Modo = RAW", [&]() {
             ReadRAW = false;
             return select_menu_option();
         });
     else
-        options.emplace_back("Mode = Decode", [&]() {
+        options.emplace_back("Modo = Decodificar", [&]() {
             ReadRAW = true;
             return select_menu_option();
         });
 
     if (ReadRAW && codesOnly)
-        options.emplace_back("Filter = Code", [&]() {
+        options.emplace_back("Filtro = Codigo", [&]() {
             codesOnly = false;
             return select_menu_option();
         });
     else if (ReadRAW)
-        options.emplace_back("Filter = All", [&]() {
+        options.emplace_back("Filtro = Todos", [&]() {
             codesOnly = true;
             return select_menu_option();
         });
 
     if (autoSave)
-        options.emplace_back("Save = Auto", [&]() {
+        options.emplace_back("Salvar = Auto", [&]() {
             autoSave = false;
             return select_menu_option();
         });
     else
-        options.emplace_back("Save = Manual", [&]() {
+        options.emplace_back("Salvar = Manual", [&]() {
             autoSave = true;
             return select_menu_option();
         });
 
-    options.emplace_back("Close Menu", [this]() { set_option(CLOSE_MENU); });
-    options.emplace_back("Main Menu", [this]() { set_option(MAIN_MENU); });
+    options.emplace_back("Fechar menu", [this]() { set_option(CLOSE_MENU); });
+    options.emplace_back("Menu principal", [this]() { set_option(MAIN_MENU); });
 
     loopOptions(options);
 }
@@ -587,7 +587,7 @@ void display_info(
     if (!headless) {
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
         padprintln("");
-        padprintln("Press [NEXT] for options.");
+        padprintln("[NEXT] abre opcoes.");
     }
 }
 
@@ -676,7 +676,7 @@ bool rfSaveSignal(float frequency, RfCodes codes, bool raw, char *key, bool auto
     String filename = "";
 
     if (!getFsStorage(fs)) {
-        displayError("No space left on device", true);
+        displayError("Sem espaco no dispositivo", true);
         return false;
     }
 
@@ -735,7 +735,7 @@ bool rfSaveSignal(float frequency, RfCodes codes, bool raw, char *key, bool auto
         file.println(subfile_out);
         if (!autoSave) displaySuccess(file.path());
     } else {
-        displayError("Error saving file", true);
+        displayError("Erro ao salvar arquivo", true);
     }
 
     file.close();
@@ -746,7 +746,7 @@ String rf_scan(float start_freq, float stop_freq, int max_loops) {
     // derived from https://github.com/mcore1976/cc1101-tool/blob/main/cc1101-tool-esp32.ino#L480
 
     if (bruceConfigPins.rfModule != CC1101_SPI_MODULE) {
-        displayError("rf scanning is available with CC1101 only", true);
+        displayError("Busca RF requer CC1101", true);
         return ""; // only CC1101 is supported for this
     }
     if (!initRfModule("rx", start_freq)) return "";
@@ -818,7 +818,7 @@ String rfReceiveSignal(float frequency, int max_loops, bool raw, bool headless) 
         drawMainBorder();
         tft.setCursor(10, 28);
         tft.setTextSize(FP);
-        tft.println("Waiting for a " + String(frequency) + " MHz " + "signal.");
+        tft.println("Aguardando sinal em " + String(frequency) + " MHz.");
     }
 
     // init native RMT receive

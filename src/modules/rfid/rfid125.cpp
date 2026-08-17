@@ -91,9 +91,9 @@ void RFID125::select_state() {
     if (_tag_read) {
         //     options.push_back({"Clone UID",  [this]() { set_state(CLONE_MODE); }});
         //     options.push_back({"Write data", [this]() { set_state(WRITE_MODE); }});
-        options.push_back({"Save file", [this]() { set_state(SAVE_MODE); }});
+        options.push_back({"Salvar arquivo", [this]() { set_state(SAVE_MODE); }});
     }
-    options.push_back({"Read tag", [this]() { set_state(READ_MODE); }});
+    options.push_back({"Ler tag", [this]() { set_state(READ_MODE); }});
     // options.push_back({"Load file",  [this]() { set_state(LOAD_MODE); }});
     // options.push_back({"Write NDEF", [this]() { set_state(WRITE_NDEF_MODE); }});
     // options.push_back({"Erase tag",  [this]() { set_state(ERASE_MODE); }});
@@ -141,7 +141,7 @@ void RFID125::display_banner() {
 
     switch (_current_state) {
         case READ_MODE:
-            padprintln("             READ MODE");
+            padprintln("            MODO LEITURA");
             padprintln("             ---------");
             break;
         // case LOAD_MODE:
@@ -165,19 +165,19 @@ void RFID125::display_banner() {
         //     padprintln("       ---------------");
         //     break;
         case SAVE_MODE:
-            padprintln("             SAVE MODE");
+            padprintln("            MODO SALVAR");
             padprintln("             ---------");
             break;
     }
 
     tft.setTextSize(FP);
     padprintln("");
-    padprintln("Press [OK] to change mode.");
+    padprintln("[OK] para trocar o modo.");
     padprintln("");
     padprintln("");
 }
 
-void RFID125::dump_card_details() { padprintln("Tag Data: " + _printable_data); }
+void RFID125::dump_card_details() { padprintln("Dados da tag: " + _printable_data); }
 
 void RFID125::read_card() {
     if (!read_card_data()) return;
@@ -232,15 +232,15 @@ void RFID125::clear_stream() {
 void RFID125::save_file() {
     String data = _printable_data;
     data.replace(" ", "");
-    String filename = keyboard(data, 30, "File name:");
+    String filename = keyboard(data, 30, "Nome do arquivo:");
     if (filename == "\x1B") return;
 
     display_banner();
 
     if (write_file(filename)) {
-        displaySuccess("File saved.");
+        displaySuccess("Arquivo salvo.");
     } else {
-        displayError("Error writing file.");
+        displayError("Erro ao gravar arquivo.");
     }
     delay(1000);
     set_state(READ_MODE);

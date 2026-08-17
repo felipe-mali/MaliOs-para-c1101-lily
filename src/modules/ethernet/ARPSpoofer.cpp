@@ -75,9 +75,9 @@ void ARPSpoofer::setup(const Host &host, IPAddress gateway) {
     // TODO: Use toBytes helper
     for (int i = 0; i < 4; i++) gatewayIP[i] = gateway[i];
 
-    drawMainBorderWithTitle("ARP Spoofing");
+    drawMainBorderWithTitle("Falsificacao ARP");
     padprintln("");
-    padprintln("Single Target Attack.");
+    padprintln("Ataque a um alvo.");
 
     if (mitm) {
         tft.setTextSize(FP);
@@ -85,11 +85,11 @@ void ARPSpoofer::setup(const Host &host, IPAddress gateway) {
         // padprintln("/BrucePCAP/ARP_session_" + String(nf) + ".pcap");
         Serial.println("Still in development");
     }
-    padprintln("Tgt:" + host.mac);
-    padprintln("Tgt: " + ipToString(victimIP));
+    padprintln("Alvo:" + host.mac);
+    padprintln("Alvo: " + ipToString(victimIP));
     padprintln("GTW:" + macToString(gatewayMAC));
     padprintln("");
-    padprintln("Press Any key to STOP.");
+    padprintln("Pressione uma tecla p/ PARAR");
 
     loop();
 }
@@ -106,7 +106,7 @@ void ARPSpoofer::loop() {
             sendARPPacket(gatewayIP, gatewayMAC, victimIP, myMAC, pcapFile);
             tmp = millis();
             count++;
-            tft.drawRightString("Spoofed " + String(count) + " times", tftWidth - 12, tftHeight - 16, 1);
+            tft.drawRightString("Falsificado " + String(count) + " vezes", tftWidth - 12, tftHeight - 16, 1);
         }
         vTaskDelay(pdMS_TO_TICKS(1));
     }

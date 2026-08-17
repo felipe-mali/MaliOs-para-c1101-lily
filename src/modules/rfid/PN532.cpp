@@ -362,7 +362,7 @@ bool PN532::begin() {
         // Adafruit_PN532 always talks to the global `Wire` - can't work if
         // bus_HAL remapped i2c_bus to Wire1 to avoid colliding with sys_i2c.
         PN532_DBG("[PN532] begin: FAILED - I2C bus conflicts with system I2C bus\n");
-        displayError("I2C bus conflicts with system I2C bus", true);
+        displayError("Barramento I2C conflita com o I2C do sistema", true);
         return false;
     }
 
@@ -405,7 +405,7 @@ int PN532::read(int cardBaudRate) {
         format_data_felica(idm, pmm, sys_code_res);
     }
 
-    displayInfo("Reading data blocks...");
+    displayInfo("Lendo blocos de dados...");
     pageReadStatus = read_data_blocks();
     pageReadSuccess = pageReadStatus == SUCCESS;
     return SUCCESS;
@@ -436,7 +436,7 @@ int PN532::clone() {
         // Backdoor failed, try direct write
         uint8_t num = 0;
         while ((!nfc.startPassiveTargetIDDetection() || !nfc.readDetectedPassiveTargetID()) && num++ < 5) {
-            displayTextLine("hold on...");
+            displayTextLine("aguarde...");
             delay(10);
         }
         uid.size = nfc.targetUid.size;

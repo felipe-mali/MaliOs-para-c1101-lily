@@ -285,7 +285,7 @@ bool initializeDeauthMode(int channel, WiFiState &savedState) {
 
     if (WiFi.getMode() != WIFI_MODE_AP) {
         if (!WiFi.mode(WIFI_MODE_AP)) {
-            displayError("Failed to set AP mode", true);
+            displayError("Falha ao definir modo AP", true);
             return false;
         }
         vTaskDelay(pdMS_TO_TICKS(100));
@@ -314,7 +314,7 @@ bool initializeDeauthMode(int channel, WiFiState &savedState) {
     }
 
     if (!apStarted) {
-        displayError("Failed to start Deauth AP", true);
+        displayError("Falha ao iniciar AP Deauth", true);
         return false;
     }
 
@@ -357,12 +357,12 @@ void sendDeauthToAP(APInfo &ap, const uint8_t *targetMAC, int &total_frames) {
 void stationDeauth(Host host, const uint8_t *apBssidIn) {
     WiFiState savedState = saveWiFiState();
     bool wasConnected = savedState.was_connected;
-    displayTextLine("Preparing..");
+    displayTextLine("Preparando...");
 
     uint8_t hostMAC[6];
     stringToMAC(host.mac.c_str(), hostMAC);
     if (isMACZero(hostMAC)) {
-        displayError("Invalid MAC address", true);
+        displayError("Endereco MAC invalido", true);
         return;
     }
 
@@ -398,7 +398,7 @@ void stationDeauth(Host host, const uint8_t *apBssidIn) {
     }
 
     if (channel == 0) {
-        displayError("Could not find target AP", true);
+        displayError("AP alvo nao encontrado", true);
         return;
     }
 
@@ -432,16 +432,16 @@ void stationDeauth(Host host, const uint8_t *apBssidIn) {
     buildOptimizedDeauthFrame(deauth_sta_to_ap, apBSSID, targetMAC, apBSSID, 0x07, false);
     buildOptimizedDeauthFrame(disassoc_sta_to_ap, apBSSID, targetMAC, apBSSID, 0x07, true);
 
-    drawMainBorderWithTitle("Station Deauth");
+    drawMainBorderWithTitle("Deauth de estacao");
     tft.setTextSize(FP);
-    padprintln("Target: " + host.mac);
+    padprintln("Alvo: " + host.mac);
     padprintln("AP: " + macToString(apBSSID));
     String bandStr = (band == 1) ? "5GHz" : (band == 2) ? "6GHz" : "2.4GHz";
     padprintln("CH:" + String(channel) + " (" + bandStr + ")");
-    padprintln("Mode: AP");
+    padprintln("Modo: AP");
     if (useMultipleAPs) { padprintln("Mesh: " + String(sameSSID_APs.size()) + " APs"); }
     padprintln("");
-    padprintln("Press BACK to STOP.");
+    padprintln("VOLTAR para PARAR.");
 
     SelPress = false;
     EscPress = false;
@@ -676,8 +676,8 @@ void stationDeauth(Host host, const uint8_t *apBssidIn) {
             tft.fillRect(tftWidth - 100, tftHeight - 40, 100, 40, TFT_BLACK);
             tft.drawRightString(String(fps) + " fps", tftWidth - 12, tftHeight - 36, 1);
             tft.drawRightString("Total: " + String(total_frames), tftWidth - 12, tftHeight - 20, 1);
-            if (storm_active) { tft.drawRightString("STORM", tftWidth - 12, tftHeight - 56, 1); }
-            if (has_multiple_bands) { tft.drawRightString("MULTI-BAND", tftWidth - 12, tftHeight - 72, 1); }
+            if (storm_active) { tft.drawRightString("RAJADA", tftWidth - 12, tftHeight - 56, 1); }
+            if (has_multiple_bands) { tft.drawRightString("MULTIBANDA", tftWidth - 12, tftHeight - 72, 1); }
         }
     }
 
@@ -685,14 +685,14 @@ void stationDeauth(Host host, const uint8_t *apBssidIn) {
     WiFi.mode(savedState.wifi_mode);
 
     tft.fillRect(0, tftHeight - 60, tftWidth, 60, TFT_BLACK);
-    padprintln("Attack stopped.");
-    padprintln("Frames sent: " + String(total_frames));
-    padprintln("Bursts: " + String(burst_counter));
-    if (is_5ghz) { padprintln("5GHz/6GHz mode used"); }
-    if (has_multiple_bands) { padprintln("Multi-band attack used"); }
+    padprintln("Ataque parado.");
+    padprintln("Frames enviados: " + String(total_frames));
+    padprintln("Rajadas: " + String(burst_counter));
+    if (is_5ghz) { padprintln("Modo 5GHz/6GHz usado"); }
+    if (has_multiple_bands) { padprintln("Ataque multibanda usado"); }
 
     if (wasConnected) {
-        padprintln("Restoring WiFi...");
+        padprintln("Restaurando WiFi...");
         restoreWiFiState(savedState);
     }
     delay(1000);
@@ -709,15 +709,15 @@ void runDeauthAll(uint8_t *targetMAC, int channel) {
         return;
     }
 
-    drawMainBorderWithTitle("Deauth All");
+    drawMainBorderWithTitle("Deauth em todos");
     tft.setTextSize(FP);
-    padprintln("Deauthing all clients...");
+    padprintln("Deauth em todos os clientes...");
     String bandStr = (band == 1) ? "5GHz" : (band == 2) ? "6GHz" : "2.4GHz";
-    padprintln("Channel: " + String(channel) + " (" + bandStr + ")");
-    padprintln("Mode: AP");
+    padprintln("Canal: " + String(channel) + " (" + bandStr + ")");
+    padprintln("Modo: AP");
     if (useMultipleAPs) { padprintln("Mesh: " + String(sameSSID_APs.size()) + " APs"); }
     padprintln("");
-    padprintln("Press BACK to STOP.");
+    padprintln("VOLTAR para PARAR.");
 
     SelPress = false;
     EscPress = false;
@@ -791,7 +791,7 @@ void runDeauthAll(uint8_t *targetMAC, int channel) {
             start_time = millis();
             tft.fillRect(tftWidth - 100, tftHeight - 40, 100, 40, TFT_BLACK);
             tft.drawRightString("Total: " + String(total_frames), tftWidth - 12, tftHeight - 20, 1);
-            if (storm_active) { tft.drawRightString("STORM", tftWidth - 12, tftHeight - 56, 1); }
+            if (storm_active) { tft.drawRightString("RAJADA", tftWidth - 12, tftHeight - 56, 1); }
         }
     }
 
@@ -799,11 +799,11 @@ void runDeauthAll(uint8_t *targetMAC, int channel) {
     WiFi.mode(savedState.wifi_mode);
     delay(500);
     tft.fillRect(0, tftHeight - 60, tftWidth, 60, TFT_BLACK);
-    padprintln("Attack stopped.");
-    padprintln("Frames sent: " + String(total_frames));
+    padprintln("Ataque parado.");
+    padprintln("Frames enviados: " + String(total_frames));
 
     if (savedState.was_connected) {
-        padprintln("Restoring WiFi...");
+        padprintln("Restaurando WiFi...");
         restoreWiFiState(savedState);
     }
     delay(1500);
@@ -811,12 +811,12 @@ void runDeauthAll(uint8_t *targetMAC, int channel) {
 
 void deauthAllFromScan() {
     WiFiState savedState = saveWiFiState();
-    drawMainBorderWithTitle("Select AP");
+    drawMainBorderWithTitle("Selecionar AP");
 
-    displayTextLine("Scanning for networks...");
+    displayTextLine("Buscando redes...");
     int n = WiFi.scanNetworks(false, false);
     if (n == 0) {
-        displayError("No networks found", true);
+        displayError("Nenhuma rede encontrada", true);
         return;
     }
 
@@ -827,8 +827,8 @@ void deauthAllFromScan() {
         int channel = WiFi.channel(i);
         int rssi = WiFi.RSSI(i);
 
-        String displayName = ssid.length() > 0 ? ssid : "<Hidden>";
-        String optionText = displayName + " (" + String(rssi) + "dBm|ch" + String(channel) + ")";
+        String displayName = ssid.length() > 0 ? ssid : "<Oculta>";
+        String optionText = displayName + " (" + String(rssi) + "dBm|can" + String(channel) + ")";
 
         options.push_back({optionText.c_str(), [=]() {
                                uint8_t targetMAC[6];
@@ -845,7 +845,7 @@ void deauthAllFromScan() {
                                runDeauthAll(targetMAC, ch);
                            }});
     }
-    options.push_back({"Back", []() { returnToMenu = true; }});
+    options.push_back({"Voltar", []() { returnToMenu = true; }});
 
     addOptionToMainMenu();
     loopOptions(options);
@@ -853,12 +853,12 @@ void deauthAllFromScan() {
 
 void deauthAllByChannel() {
     WiFiState savedState = saveWiFiState();
-    drawMainBorderWithTitle("Select Channel");
+    drawMainBorderWithTitle("Selecionar canal");
 
     options.clear();
     for (int ch = 1; ch <= 14; ch++) {
         String band = (ch >= 1 && ch <= 11) ? "2.4GHz" : (ch >= 36 ? "5GHz" : "2.4GHz");
-        String optionText = "Channel " + String(ch) + " (" + band + ")";
+        String optionText = "Canal " + String(ch) + " (" + band + ")";
         options.push_back({optionText.c_str(), [=]() {
                                uint8_t broadcast_mac[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
@@ -871,19 +871,19 @@ void deauthAllByChannel() {
                                runDeauthAll(broadcast_mac, ch);
                            }});
     }
-    options.push_back({"Back", []() { returnToMenu = true; }});
+    options.push_back({"Voltar", []() { returnToMenu = true; }});
 
     addOptionToMainMenu();
     loopOptions(options);
 }
 
 void deauthAllMenu() {
-    drawMainBorderWithTitle("Deauth All");
+    drawMainBorderWithTitle("Deauth em todos");
 
     options = {
-        {"Select from Scan", [=]() { deauthAllFromScan(); } },
-        {"Select Channel",   [=]() { deauthAllByChannel(); }},
-        {"Back",             [=]() { returnToMenu = true; } },
+        {"Escolher da busca", [=]() { deauthAllFromScan(); } },
+        {"Escolher canal",    [=]() { deauthAllByChannel(); }},
+        {"Voltar",            [=]() { returnToMenu = true; } },
     };
     addOptionToMainMenu();
     loopOptions(options);
@@ -891,7 +891,7 @@ void deauthAllMenu() {
 
 void runDeauthTargetList(const std::vector<Host> &targets, uint8_t *targetMAC, int channel) {
     if (targets.empty()) {
-        displayError("No targets selected", true);
+        displayError("Nenhum alvo selecionado", true);
         return;
     }
     WiFiState savedState = saveWiFiState();
@@ -904,15 +904,15 @@ void runDeauthTargetList(const std::vector<Host> &targets, uint8_t *targetMAC, i
         return;
     }
 
-    drawMainBorderWithTitle("Deauth List");
+    drawMainBorderWithTitle("Lista de deauth");
     tft.setTextSize(FP);
-    padprintln("Deauthing " + String(targets.size()) + " targets...");
+    padprintln("Deauth em " + String(targets.size()) + " alvos...");
     String bandStr = (band == 1) ? "5GHz" : (band == 2) ? "6GHz" : "2.4GHz";
-    padprintln("Channel: " + String(channel) + " (" + bandStr + ")");
-    padprintln("Mode: AP");
+    padprintln("Canal: " + String(channel) + " (" + bandStr + ")");
+    padprintln("Modo: AP");
     if (useMultipleAPs) { padprintln("Mesh: " + String(sameSSID_APs.size()) + " APs"); }
     padprintln("");
-    padprintln("Press BACK to STOP.");
+    padprintln("VOLTAR para PARAR.");
 
     SelPress = false;
     EscPress = false;
@@ -980,7 +980,7 @@ void runDeauthTargetList(const std::vector<Host> &targets, uint8_t *targetMAC, i
             start_time = millis();
             tft.fillRect(tftWidth - 100, tftHeight - 40, 100, 40, TFT_BLACK);
             tft.drawRightString("Total: " + String(total_frames), tftWidth - 12, tftHeight - 20, 1);
-            if (storm_active) { tft.drawRightString("STORM", tftWidth - 12, tftHeight - 56, 1); }
+            if (storm_active) { tft.drawRightString("RAJADA", tftWidth - 12, tftHeight - 56, 1); }
         }
     }
 
@@ -988,11 +988,11 @@ void runDeauthTargetList(const std::vector<Host> &targets, uint8_t *targetMAC, i
     WiFi.mode(savedState.wifi_mode);
     delay(500);
     tft.fillRect(0, tftHeight - 60, tftWidth, 60, TFT_BLACK);
-    padprintln("Attack stopped.");
-    padprintln("Frames sent: " + String(total_frames));
+    padprintln("Ataque parado.");
+    padprintln("Frames enviados: " + String(total_frames));
 
     if (savedState.was_connected) {
-        padprintln("Restoring WiFi...");
+        padprintln("Restaurando WiFi...");
         restoreWiFiState(savedState);
     }
     delay(1000);
@@ -1000,12 +1000,12 @@ void runDeauthTargetList(const std::vector<Host> &targets, uint8_t *targetMAC, i
 
 void showAPSelectionForClientDeauth() {
     WiFiState savedState = saveWiFiState();
-    drawMainBorderWithTitle("Select AP");
+    drawMainBorderWithTitle("Selecionar AP");
 
-    displayTextLine("Scanning for networks...");
+    displayTextLine("Buscando redes...");
     int n = WiFi.scanNetworks(false, false);
     if (n == 0) {
-        displayError("No networks found", true);
+        displayError("Nenhuma rede encontrada", true);
         return;
     }
 
@@ -1016,8 +1016,8 @@ void showAPSelectionForClientDeauth() {
         int channel = WiFi.channel(i);
         int rssi = WiFi.RSSI(i);
 
-        String displayName = ssid.length() > 0 ? ssid : "<Hidden>";
-        String optionText = displayName + " (" + String(rssi) + "dBm|ch" + String(channel) + ")";
+        String displayName = ssid.length() > 0 ? ssid : "<Oculta>";
+        String optionText = displayName + " (" + String(rssi) + "dBm|can" + String(channel) + ")";
 
         options.push_back({optionText.c_str(), [=]() {
                                uint8_t targetMAC[6];
@@ -1034,7 +1034,7 @@ void showAPSelectionForClientDeauth() {
                                scanClientsOnAP(targetMAC, ch);
                            }});
     }
-    options.push_back({"Back", []() { returnToMenu = true; }});
+    options.push_back({"Voltar", []() { returnToMenu = true; }});
 
     addOptionToMainMenu();
     loopOptions(options);
@@ -1082,18 +1082,18 @@ void scanClientsOnAP(uint8_t *targetMAC, int channel) {
     WiFiState savedState = saveWiFiState();
     bool wasConnected = savedState.was_connected;
 
-    drawMainBorderWithTitle("Scanning Clients");
+    drawMainBorderWithTitle("Buscando clientes");
     tft.setTextSize(FP);
-    padprintln("Scanning for clients on CH " + String(channel));
+    padprintln("Buscando clientes no canal " + String(channel));
     padprintln("");
-    padprintln("Press BACK to stop");
+    padprintln("VOLTAR para parar");
 
     detectedClients.clear();
     memcpy(scanTargetBSSID, targetMAC, 6);
     clientScanActive = true;
 
     if (!initializeDeauthMode(channel, savedState)) {
-        displayError("Failed to enter AP mode", true);
+        displayError("Falha ao entrar no modo AP", true);
         clientScanActive = false;
         if (wasConnected) { restoreWiFiState(savedState); }
         return;
@@ -1124,16 +1124,16 @@ void scanClientsOnAP(uint8_t *targetMAC, int channel) {
 
             tft.fillRect(0, 80, tftWidth, tftHeight - 100, TFT_BLACK);
             tft.setCursor(10, 80);
-            padprintln("Scanning... (" + String(scanCount) + "s)");
+            padprintln("Buscando... (" + String(scanCount) + "s)");
             padprintln("");
-            padprintln("Clients found: " + String(detectedClients.size()));
+            padprintln("Clientes: " + String(detectedClients.size()));
             padprintln("");
 
             String spinner = "|/-\\";
             int idx = (scanCount % 4);
-            padprintln("  " + String(spinner[idx]) + " Scanning...");
+            padprintln("  " + String(spinner[idx]) + " Buscando...");
             padprintln("");
-            padprintln("Press BACK to stop");
+            padprintln("VOLTAR para parar");
         }
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
@@ -1171,11 +1171,11 @@ void showClientSelectionForDeauth(const std::vector<Host> &clients, uint8_t *tar
         }
     }
 
-    options.push_back({"Deauth ALL Clients", [=]() { runDeauthAll(targetMAC, channel); }});
+    options.push_back({"Deauth em todos", [=]() { runDeauthAll(targetMAC, channel); }});
 
-    options.push_back({"Rescan", [=]() { scanClientsOnAP(targetMAC, channel); }});
+    options.push_back({"Buscar novamente", [=]() { scanClientsOnAP(targetMAC, channel); }});
 
-    options.push_back({"Back", []() { returnToMenu = true; }});
+    options.push_back({"Voltar", []() { returnToMenu = true; }});
 
     addOptionToMainMenu();
     loopOptions(options);
@@ -1184,13 +1184,13 @@ void showClientSelectionForDeauth(const std::vector<Host> &clients, uint8_t *tar
 void deauthTargetListMenu() { showAPSelectionForClientDeauth(); }
 
 void showTargetSelection() {
-    drawMainBorderWithTitle("Select Target");
+    drawMainBorderWithTitle("Selecionar alvo");
 
-    displayTextLine("Scanning for networks...");
+    displayTextLine("Buscando redes...");
 
     int n = WiFi.scanNetworks(false, true);
     if (n == 0) {
-        displayError("No networks found", true);
+        displayError("Nenhuma rede encontrada", true);
         return;
     }
 
@@ -1201,8 +1201,8 @@ void showTargetSelection() {
         int channel = WiFi.channel(i);
         int rssi = WiFi.RSSI(i);
 
-        String displayName = ssid.length() > 0 ? ssid : "<Hidden>";
-        String optionText = displayName + " (" + String(rssi) + "dBm|ch" + String(channel) + ")";
+        String displayName = ssid.length() > 0 ? ssid : "<Oculta>";
+        String optionText = displayName + " (" + String(rssi) + "dBm|can" + String(channel) + ")";
 
         options.push_back({optionText.c_str(), [=]() {
                                uint8_t mac[6];
@@ -1226,7 +1226,7 @@ void showTargetSelection() {
                                stationDeauth(target);
                            }});
     }
-    options.push_back({"Back", []() { returnToMenu = true; }});
+    options.push_back({"Voltar", []() { returnToMenu = true; }});
 
     addOptionToMainMenu();
     loopOptions(options);

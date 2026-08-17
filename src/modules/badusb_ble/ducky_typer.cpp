@@ -460,12 +460,12 @@ static void queueOrSendKey(
     }
 
     if (queueContainsKey(queuedKeys, key)) {
-        displayWarning("Already queued: " + keyLabel);
+        displayWarning("Ja na fila: " + keyLabel);
         return;
     }
 
     if (!isModifierKeyForQueue(key) && queuedNonModifierCount(queuedKeys) >= 6) {
-        displayWarning("Queue full: max 6 non-modifier keys");
+        displayWarning("Fila cheia: max. 6 teclas");
         return;
     }
 
@@ -530,7 +530,7 @@ sendQueuedKeys(HIDInterface *hid, bool &queueRecording, const std::vector<Queued
     hid->releaseAll();
 
     queueRecording = false;
-    displaySuccess("Sent: " + queueToString(queuedKeys));
+    displaySuccess("Enviado: " + queueToString(queuedKeys));
 }
 
 // ============================================================================
@@ -586,7 +586,7 @@ void ducky_startKb(HIDInterface *&hid, bool ble, int functionId) {
         Serial.printf("Creating new HID instance for BLE=%d\n", ble);
         if (ble) {
             if (!radioHasMemForBle()) {
-                displayError("Low RAM: free WiFi/SD first", true);
+                displayError("Pouca RAM: libere WiFi/SD", true);
                 returnToMenu = true;
                 return;
             }
@@ -656,11 +656,11 @@ void ducky_startKb(HIDInterface *&hid, bool ble, int functionId) {
             USB.begin();
 
             while (!tud_mounted()) {
-                printStatusBadUSBBLE("Waiting USB Host...");
+                printStatusBadUSBBLE("Aguardando host USB...");
                 delay(500);
             }
 
-            printStatusBadUSBBLE("USB Host Connected");
+            printStatusBadUSBBLE("Host USB conectado");
 #else
             mySerial.begin(CH9329_DEFAULT_BAUDRATE, SERIAL_8N1, BAD_RX, BAD_TX);
             delay(100);
@@ -709,7 +709,7 @@ void ducky_setup(HIDInterface *&hid, bool ble) {
     Serial.println("Ducky typer begin");
 
     if (ble && bruceConfig.badUSBBLEKeyDelay < 50) {
-        displayWarning("Key delay is below 50ms. You may experience issues with missing keys.", true);
+        displayWarning("Atraso abaixo de 50ms pode perder teclas.", true);
     }
 
     tft.fillScreen(bruceConfig.bgColor);
@@ -725,23 +725,23 @@ void ducky_setup(HIDInterface *&hid, bool ble) {
         options.push_back({"SD Card", [&]() { fs = &SD; }});
     }
     options.push_back({"LittleFS", [&]() { fs = &LittleFS; }});
-    options.push_back({"Main Menu", [&]() { fs = nullptr; }});
+    options.push_back({"Menu principal", [&]() { fs = nullptr; }});
 
     loopOptions(options);
 
     if (fs != nullptr) {
         bad_script = loopSD(*fs, true);
         if (bad_script == "") {
-            displayWarning("Canceled", true);
+            displayWarning("Cancelado", true);
             returnToMenu = true;
             goto EXIT;
         }
     StartRunningScript:
         printHeaderBadUSBBLE(bad_script);
-        printStatusBadUSBBLE("Preparing");
+        printStatusBadUSBBLE("Preparando");
 
         if (first_time) {
-            printStatusBadUSBBLE("Preparing USB");
+            printStatusBadUSBBLE("Preparando USB");
             // Double cleanup before starting
             if (ble) safeCleanupDuckyBLE(hid);
             ducky_startKb(hid, ble, 2); // functionId 2 = BadUSB
@@ -763,27 +763,27 @@ void ducky_setup(HIDInterface *&hid, bool ble) {
                     }
                 }
 #endif
-                printStatusBadUSBBLE("Preparing USB");
+                printStatusBadUSBBLE("Preparando USB");
                 delay(2000);
             } else {
-                printStatusBadUSBBLE("Waiting Victim");
+                printStatusBadUSBBLE("Aguardando alvo");
                 while (!hid->isConnected() && !check(EscPress)) { vTaskDelay(pdMS_TO_TICKS(1)); }
                 if (hid->isConnected()) {
                     BLEConnected = true;
-                    printStatusBadUSBBLE("Preparing BLE");
+                    printStatusBadUSBBLE("Preparando BLE");
                     delay(1000);
                 } else {
-                    displayWarning("Canceled", true);
+                    displayWarning("Cancelado", true);
                     goto EXIT;
                 }
             }
         }
-        printStatusBadUSBBLE(String(BTN_ALIAS) + " to start");
+        printStatusBadUSBBLE(String(BTN_ALIAS) + " para iniciar");
         if (!waitForButtonPress()) { goto EXIT; }
         delay(200);
         key_input(*fs, bad_script, hid);
 
-        printStatusBadUSBBLE("Finished - " + String(BTN_ALIAS) + " to restart");
+        printStatusBadUSBBLE("Concluido - " + String(BTN_ALIAS) + " reinicia");
         if (!waitForButtonPress()) { goto EXIT; }
 
         goto StartRunningScript;
@@ -822,7 +822,7 @@ void key_input(FS fs, const String &bad_script, HIDInterface *_hid) {
     _hid->releaseAll();
 
     printHeaderBadUSBBLE(bad_script);
-    printStatusBadUSBBLE("Running");
+    printStatusBadUSBBLE("Executando");
 
     tft.setTextSize(FP);
     tft.setTextColor(bruceConfig.priColor);
@@ -897,13 +897,13 @@ void key_input(FS fs, const String &bad_script, HIDInterface *_hid) {
 
                     if (nextStringDelay >= 0) { nextStringDelay = -1; }
                 } else if (PriCmd->type == DuckyCommandType_WaitForButtonPress) {
-                    printStatusBadUSBBLE("Waiting for button press");
+                    printStatusBadUSBBLE("Aguardando botao");
                     bool waitSelect = false;
                     while (!waitSelect) {
                         waitSelect = check(SelPress);
                         delay(50);
                     }
-                    printStatusBadUSBBLE("Running");
+                    printStatusBadUSBBLE("Executando");
                     tft.setTextSize(1);
                 } else if (PriCmd->type == DuckyCommandType_Delay) {
                     if ((int)PriCmd->key > 0) delay(DEF_DELAY);
@@ -964,7 +964,7 @@ void key_input(FS fs, const String &bad_script, HIDInterface *_hid) {
         printDecimalTime(millis() - startMillisBADUSBBLE);
     }
 
-    printStatusBadUSBBLE("Finished");
+    printStatusBadUSBBLE("Concluido");
 
 EXIT:
     tft.setTextSize(FP);
@@ -1021,7 +1021,7 @@ void ducky_keyboard(HIDInterface *&hid, bool ble) {
     drawMainBorder();
     tft.setTextSize(FP);
     tft.setTextColor(bruceConfig.priColor);
-    tft.drawString("Keyboard Started", tftWidth / 2, tftHeight / 2);
+    tft.drawString("Teclado iniciado", tftWidth / 2, tftHeight / 2);
 
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     tft.setTextSize(FP);
@@ -1075,59 +1075,59 @@ void ducky_keyboard(HIDInterface *&hid, bool ble) {
         bool exitKeyboard = false;
         bool queueRecording = false;
         std::vector<QueuedHIDKey> queuedKeys;
-        String menuTitle = ble ? "BLE Keyboard" : "USB Keyboard";
+        String menuTitle = ble ? "Teclado BLE" : "Teclado USB";
 
         while (!exitKeyboard) {
             options = {
-                {"Keyboard",      [&]() { keyboardSectionAction(hid, queueRecording, queuedKeys); }},
-                {"Modifiers",
+                {"Teclado",       [&]() { keyboardSectionAction(hid, queueRecording, queuedKeys); }},
+                {"Modificadoras",
                  [&]() {
                      openKeySection(
                          hid,
-                         "Modifier keys",
+                         "Teclas modificadoras",
                          modifierMenuKeys,
                          sizeof(modifierMenuKeys) / sizeof(modifierMenuKeys[0]),
                          queueRecording,
                          queuedKeys
                      );
                  }                                                                                 },
-                {"Navigation",
+                {"Navegacao",
                  [&]() {
                      openKeySection(
                          hid,
-                         "Navigation keys",
+                         "Teclas de navegacao",
                          navigationMenuKeys,
                          sizeof(navigationMenuKeys) / sizeof(navigationMenuKeys[0]),
                          queueRecording,
                          queuedKeys
                      );
                  }                                                                                 },
-                {"Special keys",
+                {"Teclas especiais",
                  [&]() {
                      openKeySection(
                          hid,
-                         "Special keys",
+                         "Teclas especiais",
                          specialMenuKeys,
                          sizeof(specialMenuKeys) / sizeof(specialMenuKeys[0]),
                          queueRecording,
                          queuedKeys
                      );
                  }                                                                                 },
-                {"Function keys",
+                {"Teclas de funcao",
                  [&]() {
                      openKeySection(
                          hid,
-                         "Function keys",
+                         "Teclas de funcao",
                          functionMenuKeys,
                          sizeof(functionMenuKeys) / sizeof(functionMenuKeys[0]),
                          queueRecording,
                          queuedKeys
                      );
                  }                                                                                 },
-                {"Numpad keys",   [&]() {
+                {"Teclado numerico", [&]() {
                      openKeySection(
                          hid,
-                         "Numpad keys",
+                         "Teclado numerico",
                          numpadMenuKeys,
                          sizeof(numpadMenuKeys) / sizeof(numpadMenuKeys[0]),
                          queueRecording,
@@ -1136,26 +1136,26 @@ void ducky_keyboard(HIDInterface *&hid, bool ble) {
                  }                                                  },
             };
 
-            String startQueueLabel = queueRecording ? "Start Queue [ON]" : "Start Queue";
+            String startQueueLabel = queueRecording ? "Capturar fila [ON]" : "Capturar fila";
             options.push_back({startQueueLabel, [&]() {
                                    queuedKeys.clear();
                                    queueRecording = true;
-                                   displayInfo("Queue capture started");
+                                   displayInfo("Captura da fila iniciada");
                                }});
 
-            String sendQueueLabel = "Send Queue";
+            String sendQueueLabel = "Enviar fila";
             if (!queuedKeys.empty()) sendQueueLabel += " (" + String(queuedKeys.size()) + ")";
             options.push_back({sendQueueLabel, [&]() { sendQueuedKeys(hid, queueRecording, queuedKeys); }});
             options.back().enabled = !queuedKeys.empty();
 
-            options.push_back({"Reset Queue", [&]() {
+            options.push_back({"Limpar fila", [&]() {
                                    queuedKeys.clear();
                                    queueRecording = false;
-                                   displayWarning("Queue cleared");
+                                   displayWarning("Fila limpa");
                                }});
             options.back().enabled = !queuedKeys.empty();
 
-            options.push_back({"Exit Keyboard", [&]() { exitKeyboard = true; }});
+            options.push_back({"Sair do teclado", [&]() { exitKeyboard = true; }});
 
             menuIndex = loopOptions(options, MENU_TYPE_REGULAR, menuTitle.c_str(), menuIndex);
 
@@ -1311,7 +1311,7 @@ void printHeaderBadUSBBLE(const String &bad_script) {
 
     tft.setCursor(BORDER_OFFSET_FROM_SCREEN_EDGE * 2, FP * 8 * 2 + 2 + STATUS_BAR_HEIGHT);
     tft.setTextColor(bruceConfig.priColor);
-    tft.println("Status:");
+    tft.println("Estado:");
 }
 
 void printTFTBadUSBBLE(const String &text, uint16_t color, bool newline) {
@@ -1373,12 +1373,12 @@ bool waitForButtonPress() {
 
 bool handlePauseResume() {
     while (check(SelPress)) { vTaskDelay(pdMS_TO_TICKS(1)); }
-    printStatusBadUSBBLE("Paused - " + String(BTN_ALIAS) + " to resume");
+    printStatusBadUSBBLE("Pausado - " + String(BTN_ALIAS) + " continua");
     if (!waitForButtonPress()) {
-        printStatusBadUSBBLE("Canceled");
+        printStatusBadUSBBLE("Cancelado");
         return false;
     }
-    printStatusBadUSBBLE("Running");
+    printStatusBadUSBBLE("Executando");
     return true;
 }
 

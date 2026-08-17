@@ -127,13 +127,13 @@ static bool parse_pcap_handshake(FS &fs, const String &path, HandshakeData &hs) 
 
     File f = fs.open(path, FILE_READ);
     if (!f) {
-        padprintln("Error: Cannot open PCAP file");
+        padprintln("Erro: nao abriu arquivo PCAP");
         return false;
     }
 
     pcap_hdr_t gh;
     if (f.read((uint8_t *)&gh, sizeof(gh)) != sizeof(gh)) {
-        padprintln("Error: Bad PCAP header");
+        padprintln("Erro: cabecalho PCAP invalido");
         f.close();
         return false;
     }
@@ -145,12 +145,12 @@ static bool parse_pcap_handshake(FS &fs, const String &path, HandshakeData &hs) 
         swapped = true;
         gh.network = swap32(gh.network);
     } else {
-        padprintln("Error: Invalid PCAP magic");
+        padprintln("Erro: magic PCAP invalido");
         f.close();
         return false;
     }
 
-    if (gh.network != 105) padprintf("Warning: Network type %u (expected 105)\n", gh.network);
+    if (gh.network != 105) padprintf("Aviso: rede %u (esperado 105)\n", gh.network);
 
     bool have_m1 = false, have_m2 = false, have_m3 = false, have_beacon = false;
     const size_t MAX_PKT_READ = 8192;
@@ -286,11 +286,11 @@ static bool parse_pcap_handshake(FS &fs, const String &path, HandshakeData &hs) 
     f.close();
 
     if (!have_m2) {
-        padprintln("Error: No M2 in PCAP");
+        padprintln("Erro: sem M2 no PCAP");
         return false;
     }
     if (!have_m1 && !have_m3) {
-        padprintln("Error: Need M1 or M3");
+        padprintln("Erro: precisa de M1 ou M3");
         return false;
     }
     hs.valid = true;
@@ -934,25 +934,25 @@ void wifi_crack_handshake(const String &wordlist_path, const String &pcap_path) 
     setCpuFrequencyMhz(240);
 
     resetTftDisplay();
-    drawMainBorderWithTitle("WiFi Password Recover", true);
+    drawMainBorderWithTitle("Recuperar senha WiFi", true);
     padprintln("");
 
     FS *fs = nullptr;
     if (!getFsStorage(fs)) {
         setCpuFrequencyMhz(CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ);
-        displayError("No filesystem available", true);
+        displayError("Sem sistema de arquivos", true);
         return;
     }
 
     HandshakeData hs;
     if (!parse_pcap_handshake(*fs, pcap_path, hs)) {
         setCpuFrequencyMhz(CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ);
-        displayError("Failed to parse handshake", true);
+        displayError("Falha ao ler handshake", true);
         vTaskDelay(pdMS_TO_TICKS(3000));
         return;
     }
 
-    padprintf("SSID: %s\n", hs.ssid[0] ? hs.ssid : "(not found)");
+    padprintf("SSID: %s\n", hs.ssid[0] ? hs.ssid : "(nao encontrado)");
     padprintf(
         "AP: %02X:%02X:%02X:%02X:%02X:%02X\n",
         hs.ap_mac[0],
@@ -964,16 +964,16 @@ void wifi_crack_handshake(const String &wordlist_path, const String &pcap_path) 
     );
 
     if (hs.ssid[0] == '\0') {
-        padprintln("SSID not found in PCAP");
-        String ssid = keyboard("", 32, "Enter SSID:");
+        padprintln("SSID nao encontrado no PCAP");
+        String ssid = keyboard("", 32, "Digite o SSID:");
         if (ssid.length() == 0 || ssid == "\x1B") {
             setCpuFrequencyMhz(CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ);
-            displayError("SSID required", true);
+            displayError("SSID obrigatorio", true);
             return;
         }
         strncpy(hs.ssid, ssid.c_str(), sizeof(hs.ssid) - 1);
         resetTftDisplay();
-        drawMainBorderWithTitle("WiFi Password Recover", true);
+        drawMainBorderWithTitle("Recuperar senha WiFi", true);
         padprintln("");
         padprintf("SSID: %s\n", hs.ssid);
     }
@@ -981,14 +981,14 @@ void wifi_crack_handshake(const String &wordlist_path, const String &pcap_path) 
     File wf = fs->open(wordlist_path, FILE_READ);
     if (!wf) {
         setCpuFrequencyMhz(CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ);
-        displayError("Cannot open wordlist", true);
+        displayError("Nao abriu a lista de senhas", true);
         return;
     }
 
     WordlistReader reader;
     if (!reader.init(&wf)) {
         setCpuFrequencyMhz(CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ);
-        displayError("Out of memory", true);
+        displayError("Memoria insuficiente", true);
         return;
     }
 
@@ -1003,7 +1003,7 @@ void wifi_crack_handshake(const String &wordlist_path, const String &pcap_path) 
 
     if (!shared.queue || !shared.done_sem) {
         setCpuFrequencyMhz(CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ);
-        displayError("Queue alloc failed", true);
+        displayError("Falha ao alocar fila", true);
         if (shared.queue) vQueueDelete(shared.queue);
         if (shared.done_sem) vSemaphoreDelete(shared.done_sem);
         return;
@@ -1019,8 +1019,8 @@ void wifi_crack_handshake(const String &wordlist_path, const String &pcap_path) 
         0 // core 0
     );
 
-    padprintln("Recovering...");
-    padprintln("(Press SEL to abort)");
+    padprintln("Recuperando...");
+    padprintln("(SEL para abortar)");
     padprintln("");
 
     uint64_t start_time = now_us();
@@ -1035,7 +1035,7 @@ void wifi_crack_handshake(const String &wordlist_path, const String &pcap_path) 
             shared.abort = true;
             g_abortRequested = true;
             padprintln("");
-            padprintln("Aborted by user");
+            padprintln("Abortado pelo usuario");
             break;
         }
 
@@ -1084,13 +1084,13 @@ void wifi_crack_handshake(const String &wordlist_path, const String &pcap_path) 
 
     if (shared.found) {
         resetTftDisplay();
-        drawMainBorderWithTitle("WiFi Password Cracker", true);
+        drawMainBorderWithTitle("Quebra de senha WiFi", true);
         padprintln("");
         tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
-        padprintln("PASSWORD FOUND!");
+        padprintln("SENHA ENCONTRADA!");
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
         padprintln("");
-        padprintf("SSID: %s\n", hs.ssid[0] ? hs.ssid : "(not found)");
+        padprintf("SSID: %s\n", hs.ssid[0] ? hs.ssid : "(nao encontrado)");
 
         String display_pw = String(shared.found_pw);
         const int MAX_DISPLAY = 28;
@@ -1100,16 +1100,16 @@ void wifi_crack_handshake(const String &wordlist_path, const String &pcap_path) 
             display_pw =
                 display_pw.substring(0, 14) + "..." + display_pw.substring(display_pw.length() - tail);
         }
-        padprintf("Password: %s\n", display_pw.c_str());
+        padprintf("Senha: %s\n", display_pw.c_str());
         padprintln("");
-        padprintln("Press any key to continue...");
+        padprintln("Pressione uma tecla...");
         while (!check(AnyKeyPress)) vTaskDelay(pdMS_TO_TICKS(50));
 
     } else if (!g_abortRequested) {
         tft.setTextColor(TFT_RED, bruceConfig.bgColor);
-        padprintln("Password not found");
+        padprintln("Senha nao encontrada");
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-        displayError("No match", true);
+        displayError("Sem correspondencia", true);
         vTaskDelay(pdMS_TO_TICKS(3000));
     }
 
@@ -1127,32 +1127,32 @@ void wifi_recover_menu() {
 
     FS *fs = nullptr;
     if (!getFsStorage(fs)) {
-        displayError("No filesystem", true);
+        displayError("Sem sistema de arquivos", true);
         return;
     }
 
     const String WORDLIST_DIR = "/wordlists";
     if (!(*fs).exists(WORDLIST_DIR)) {
-        if ((*fs).mkdir(WORDLIST_DIR)) padprintf("Created: %s\n", WORDLIST_DIR.c_str());
-        else padprintf("Warning: failed to create %s\n", WORDLIST_DIR.c_str());
+        if ((*fs).mkdir(WORDLIST_DIR)) padprintf("Criado: %s\n", WORDLIST_DIR.c_str());
+        else padprintf("Aviso: falha ao criar %s\n", WORDLIST_DIR.c_str());
     }
 
     String wordlist = loopSD(*fs, true, "txt|lst|csv|*", WORDLIST_DIR);
     if (wordlist.length() == 0) {
-        displayInfo("Cancelled", true);
+        displayInfo("Cancelado", true);
         return;
     }
 
     const String PCAP_DIR = "/BrucePCAP";
     if (!(*fs).exists(PCAP_DIR)) {
-        if ((*fs).mkdir(PCAP_DIR)) padprintf("Created: %s\n", PCAP_DIR.c_str());
-        else padprintf("Warning: failed to create %s\n", PCAP_DIR.c_str());
+        if ((*fs).mkdir(PCAP_DIR)) padprintf("Criado: %s\n", PCAP_DIR.c_str());
+        else padprintf("Aviso: falha ao criar %s\n", PCAP_DIR.c_str());
     }
 
     resetTftDisplay();
     String pcap = loopSD(*fs, true, "pcap|cap|*", PCAP_DIR);
     if (pcap.length() == 0) {
-        displayInfo("Cancelled", true);
+        displayInfo("Cancelado", true);
         return;
     }
 

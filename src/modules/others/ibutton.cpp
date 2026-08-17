@@ -34,7 +34,7 @@ static void displayStatus() {
         padprintln("UID: " + bufferToHexStr(keyBuffer, 8));
         if (!bufferCrcValid()) {
             tft.setTextColor(TFT_RED);
-            padprintln("CRC ERROR!");
+            padprintln("ERRO DE CRC!");
             tft.setTextColor(bruceConfig.priColor);
         } else {
             tft.setTextColor(TFT_GREEN);
@@ -42,11 +42,11 @@ static void displayStatus() {
             tft.setTextColor(bruceConfig.priColor);
         }
     } else {
-        padprintln("No key in buffer");
+        padprintln("Nenhuma chave na memoria");
     }
     padprintln("");
-    padprintln("Waiting for iButton...");
-    padprintln("[NEXT] for options");
+    padprintln("Aguardando iButton...");
+    padprintln("[NEXT] abre opcoes");
 }
 
 // ---------------------------------------------------------------------------
@@ -92,10 +92,10 @@ static bool readKey(int maxRetries = 20) {
 
         tft.fillScreen(bruceConfig.bgColor);
         drawMainBorderWithTitle("iButton");
-        padprintln("Reading... attempt " + String(attempt + 2));
-        padprintln("CRC mismatch, retrying...");
+        padprintln("Lendo... tentativa " + String(attempt + 2));
+        padprintln("CRC diferente, tentando...");
         padprintln("");
-        padprintln("Keep key on the contact!");
+        padprintln("Mantenha a chave no contato!");
         delay(100);
     }
 
@@ -251,7 +251,7 @@ static void setAction(MenuAction a) { selectedAction = a; }
 
 static void doWrite() {
     if (!keyLoaded) {
-        displayError("No key in buffer", true);
+        displayError("Nenhuma chave na memoria", true);
         delay(1500);
         return;
     }
@@ -260,8 +260,8 @@ static void doWrite() {
     drawMainBorderWithTitle("Write iButton");
     padprintln("UID: " + bufferToHexStr(keyBuffer, 8));
     padprintln("");
-    padprintln("Touch blank key to writer...");
-    padprintln("[Esc] Cancel");
+    padprintln("Encoste a chave virgem...");
+    padprintln("[Esc] Cancela");
 
     while (oneWire->reset() == 0) {
         if (check(EscPress)) return;
@@ -269,32 +269,32 @@ static void doWrite() {
     }
 
     writeKey();
-    displaySuccess("Key written!");
+    displaySuccess("Chave gravada!");
     delay(1500);
 }
 
 static void doSave() {
     if (!keyLoaded) {
-        displayError("No key in buffer", true);
+        displayError("Nenhuma chave na memoria", true);
         delay(1500);
         return;
     }
     IButtonResult r = saveKey();
-    if (r == IBUTTON_SUCCESS) displaySuccess("Saved");
-    else displayError("Save failed", true);
+    if (r == IBUTTON_SUCCESS) displaySuccess("Salvo");
+    else displayError("Falha ao salvar", true);
     delay(1500);
 }
 
 static void doLoad() {
     IButtonResult r = loadKey();
     if (r == IBUTTON_SUCCESS) {
-        displaySuccess("Key loaded");
+        displaySuccess("Chave carregada");
         delay(1000);
     } else if (r == IBUTTON_CRC_ERROR) {
-        displayWarning("Loaded (CRC mismatch)", true);
+        displayWarning("Carregada (CRC diferente)", true);
         delay(1500);
     } else {
-        displayError("Load failed", true);
+        displayError("Falha ao carregar", true);
         delay(1500);
     }
 }
@@ -302,7 +302,7 @@ static void doLoad() {
 static void doReset() {
     memset(keyBuffer, 0, sizeof(keyBuffer));
     keyLoaded = false;
-    displaySuccess("Buffer cleared");
+    displaySuccess("Memoria limpa");
     delay(1000);
 }
 
@@ -385,14 +385,14 @@ Restart:
                 displayStatus();
                 padprintln("");
                 tft.setTextColor(TFT_GREEN);
-                padprintln("Key read successfully!");
+                padprintln("Chave lida com sucesso!");
                 tft.setTextColor(bruceConfig.priColor);
             } else if (keyLoaded) {
                 // Read failed CRC but we have data
                 displayStatus();
                 padprintln("");
                 tft.setTextColor(TFT_YELLOW);
-                padprintln("Read with CRC errors");
+                padprintln("Leitura com erros de CRC");
                 tft.setTextColor(bruceConfig.priColor);
             } else {
                 displayStatus();

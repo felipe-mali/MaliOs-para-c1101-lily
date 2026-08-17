@@ -5,7 +5,7 @@
 
 class GpsMenu : public MenuItemInterface {
 public:
-    GpsMenu() : MenuItemInterface("GPS") {}
+    GpsMenu() : MenuItemInterface("GPS", "GPS") {}
 
     void optionsMenu(void);
     void wardrivingMenu(void);

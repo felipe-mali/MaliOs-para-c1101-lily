@@ -8,6 +8,10 @@
 #include <interface.h> //for charging ischarging to print charging indicator
 #include <memory>
 
+#ifndef MALIOS_VERSION
+#define MALIOS_VERSION BRUCE_VERSION
+#endif
+
 #define MAX_MENU_SIZE (int)(tftHeight / 25)
 
 // Send the ST7789 into or out of sleep mode
@@ -69,9 +73,9 @@ void TouchFooter(uint16_t color) {
     tft.drawRoundRect(5, tftHeight + 2, tftWidth - 10, 43, 5, color);
     tft.setTextColor(color);
     tft.setTextSize(FM);
-    tft.drawCentreString("PREV", tftWidth / 6, tftHeight + 4, 1);
+    tft.drawCentreString("ANT", tftWidth / 6, tftHeight + 4, 1);
     tft.drawCentreString("SEL", tftWidth / 2, tftHeight + 4, 1);
-    tft.drawCentreString("NEXT", 5 * tftWidth / 6, tftHeight + 4, 1);
+    tft.drawCentreString("PROX", 5 * tftWidth / 6, tftHeight + 4, 1);
 #endif
 }
 /***************************************************************************************
@@ -82,9 +86,9 @@ void MegaFooter(uint16_t color) {
     tft.drawRoundRect(5, tftHeight + 2, tftWidth - 10, 43, 5, color);
     tft.setTextColor(color);
     tft.setTextSize(FM);
-    tft.drawCentreString("Exit", tftWidth / 6, tftHeight + 4, 1);
-    tft.drawCentreString("UP", tftWidth / 2, tftHeight + 4, 1);
-    tft.drawCentreString("DOWN", 5 * tftWidth / 6, tftHeight + 4, 1);
+    tft.drawCentreString("Sair", tftWidth / 6, tftHeight + 4, 1);
+    tft.drawCentreString("CIMA", tftWidth / 2, tftHeight + 4, 1);
+    tft.drawCentreString("BAIXO", 5 * tftWidth / 6, tftHeight + 4, 1);
 }
 
 /***************************************************************************************
@@ -569,7 +573,7 @@ int loopOptions(
             checkReboot();
             if (devModeCounter >= 5 && !bruceConfig.devMode) {
                 bruceConfig.setDevMode(true);
-                displayInfo("Dev Mode Enabled", true);
+                displayInfo("Modo dev ativo", true);
             }
             if (millis() - _clock_bat_timer > 30000) {
                 _clock_bat_timer = millis();
@@ -938,7 +942,7 @@ void drawStatusBar() {
         tft.print(timeStr);
     } else {
         setTftDisplay(12, 12, bruceConfig.priColor, 1, bruceConfig.bgColor);
-        tft.print("BRUCE " + String(BRUCE_VERSION));
+        tft.print("MaliOS " + String(MALIOS_VERSION));
     }
 
     int iconCount = 0;
@@ -1085,7 +1089,7 @@ void drawBatteryStatus(uint8_t bat) {
     tft.fillRect(tftWidth - 85, 7, 42, 18, bruceConfig.bgColor);
     if (charging) {
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-        tft.drawRightString("CHG", tftWidth - 44, 12, 1);
+        tft.drawRightString("CARG", tftWidth - 44, 12, 1);
     } else {
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
         tft.drawRightString((bat == 100 ? "" : " ") + String(bat) + "%", tftWidth - 44, 12, 1);
@@ -1397,7 +1401,7 @@ bool showJpeg(FS &fs, const String &filename, int x, int y, bool center) {
     if (data_array) {
         decoded = JpegDec.decodeArray(data_array, data_size);
     } else {
-        displayError(filename + " Fail");
+        displayError(filename + " falhou");
         delay(2500);
         delete[] data_array; // free heap before leaving
         return false;

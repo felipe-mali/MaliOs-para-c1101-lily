@@ -21,7 +21,7 @@ void EMVReader::setup() {
     _rfid->begin();
     nfc = &(_rfid->nfc);
 
-    displayInfo("Waiting for EMV card...");
+    displayInfo("Aguardando cartao EMV...");
     EMVCard card = read_emv_card();
     if (_cancelled) return;
     display_emv(card);
@@ -387,7 +387,7 @@ std::string BinToAscii(uint8_t *BinData, size_t size)
 }
 
 void EMVReader::display_emv(EMVCard card) {
-    drawMainBorderWithTitle("Read EMV Card");
+    drawMainBorderWithTitle("Ler cartao EMV");
     std::string aid;
     std::string pan;
     std::string issuedate;
@@ -404,7 +404,7 @@ void EMVReader::display_emv(EMVCard card) {
             }
         }
 
-        if (!found) { padprintln("Unknown card vendor"); }
+        if (!found) { padprintln("Emissor desconhecido"); }
         if (card.pan != nullptr) {
             pan = BinToAscii(card.pan, card.pan_len);
             // Add some spacing
@@ -415,14 +415,14 @@ void EMVReader::display_emv(EMVCard card) {
 
             padprintln(pan.c_str());
         } else {
-            padprintln("Unknown PAN");
+            padprintln("PAN desconhecido");
         }
         if (card.validfrom != nullptr) {
             issuedate = BinToAscii(card.validfrom, 2);
             issuedate.insert(issuedate.begin() + 2, '/');
             padprintln(issuedate.c_str());
         } else {
-            padprintln("Unknown issue date");
+            padprintln("Data de emissao desconhecida");
         }
 
         if (card.validto != nullptr) {
@@ -430,21 +430,21 @@ void EMVReader::display_emv(EMVCard card) {
             validto.insert(validto.begin() + 2, '/');
             padprintln(validto.c_str());
         } else {
-            padprintln("Unknown valid to date");
+            padprintln("Validade desconhecida");
         }
     } else {
-        padprintln("Failed to read EMV Card.");
+        padprintln("Falha ao ler cartao EMV.");
     }
 
-    padprintln("Press any key to continue...");
+    padprintln("Pressione uma tecla para continuar...");
 
     while (!AnyKeyPress) { delay(100); }
 
     options = {};
-    options.emplace_back("Save", [this, aid, pan, issuedate, validto]() {
+    options.emplace_back("Salvar", [this, aid, pan, issuedate, validto]() {
         this->save_emv(aid.c_str(), pan.c_str(), issuedate.c_str(), validto.c_str());
     });
-    options.emplace_back("Exit", [this]() { return; });
+    options.emplace_back("Sair", [this]() { return; });
 
     loopOptions(options);
 }
@@ -465,7 +465,7 @@ void EMVReader::save_emv(const char *aid, const char *pan, const char *validfrom
     File file = (*fs).open("/BruceRFID/Scans/" + filename, FILE_WRITE);
 
     if (!file) {
-        displayError("Error opening file.");
+        displayError("Erro ao abrir arquivo.");
         return;
     }
 
@@ -475,6 +475,6 @@ void EMVReader::save_emv(const char *aid, const char *pan, const char *validfrom
     file.println("Valid To: " + String(validto));
 
     file.close();
-    displaySuccess("EMV data saved.");
+    displaySuccess("Dados EMV salvos.");
 }
 #endif

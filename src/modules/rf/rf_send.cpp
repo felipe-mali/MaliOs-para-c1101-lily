@@ -28,7 +28,7 @@ void sendCustomRF() {
     returnToMenu = true; // make sure menu is redrawn when quitting in any point
 
     options = {
-        {"Recent",   [&]() { selected_code = selectRecentRfMenu(); }},
+        {"Recentes", [&]() { selected_code = selectRecentRfMenu(); }},
         {"LittleFS", [&]() { filesystem = &LittleFS; }              },
     };
     if (setupSdCard()) options.insert(options.begin(), {"SD Card", [&]() { filesystem = &SD; }});
@@ -108,12 +108,12 @@ void select_menu_option(bool keeloq) {
     options = {};
 
     if (keeloq) {
-        options.emplace_back("Counter step", [] { set_option(COUNTER_STEP); });
+        options.emplace_back("Passo contador", [] { set_option(COUNTER_STEP); });
     }
 
-    options.emplace_back("Repeat", [] { set_option(REPEAT); });
-    options.emplace_back("Close Menu", [] { set_option(CLOSE_MENU); });
-    options.emplace_back("Main Menu", [] { set_option(MAIN_MENU); });
+    options.emplace_back("Repetir", [] { set_option(REPEAT); });
+    options.emplace_back("Fechar menu", [] { set_option(CLOSE_MENU); });
+    options.emplace_back("Menu principal", [] { set_option(MAIN_MENU); });
 
     loopOptions(options);
 }
@@ -207,17 +207,17 @@ void display_info(RfCodes &data) {
 
     drawMainBorderWithTitle("RF Emulate");
 
-    padprintln("Frequency: " + String(data.frequency / 1000000.0) + "MHz");
+    padprintln("Frequencia: " + String(data.frequency / 1000000.0) + "MHz");
 
     if (data.serial != 0) {
         padprintln("Protocol: KeeLoq");
-        padprintln("Manufacture: " + data.mf_name);
+        padprintln("Fabricante: " + data.mf_name);
 
         decimalToHexString(data.serial, hexString);
         padprintln("Serial: " + String(hexString));
 
         padprintln("Btn: " + String(data.btn));
-        padprintln("Counter: " + String(data.cnt));
+        padprintln("Contador: " + String(data.cnt));
         padprintln("\n");
 
         decimalToHexString(data.key, hexString);
@@ -234,7 +234,7 @@ void display_info(RfCodes &data) {
     padprintln("");
     padprintln("");
 
-    padprintln("Press [Mid] to send or [Next] for options");
+    padprintln("[Mid] envia; [Next] abre opcoes");
 }
 
 bool readSubFile(FS *fs, const String &filepath, RfCodes &data) {
@@ -249,7 +249,7 @@ bool readSubFile(FS *fs, const String &filepath, RfCodes &data) {
 
     if (!databaseFile) {
         Serial.println("Failed to open database file.");
-        displayError("Fail to open file", true);
+        displayError("Falha ao abrir arquivo", true);
         return false;
     }
     Serial.println("Opened sub file.");

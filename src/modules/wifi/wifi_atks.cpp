@@ -168,11 +168,11 @@ void wsl_bypasser_send_raw_frame(const wifi_ap_record_t *ap_record, uint8_t chan
 void wifi_atk_info(const String &tssid, const String &mac, uint8_t channel) {
     drawMainBorder();
     tft.setTextColor(bruceConfig.priColor);
-    tft.drawCentreString("-=Information=-", tft.width() / 2, 28, SMOOTH_FONT);
+    tft.drawCentreString("-=Informacoes=-", tft.width() / 2, 28, SMOOTH_FONT);
     tft.drawString("AP: " + tssid, 10, 48);
-    tft.drawString("Channel: " + String(channel), 10, 66);
+    tft.drawString("Canal: " + String(channel), 10, 66);
     tft.drawString(mac, 10, 84);
-    tft.drawString("Press " + String(BTN_ALIAS) + " to act", 10, tftHeight - 20);
+    tft.drawString("Pressione " + String(BTN_ALIAS) + " para agir", 10, tftHeight - 20);
     vTaskDelay(200 / portTICK_PERIOD_MS);
     SelPress = false;
 
@@ -198,7 +198,7 @@ bool wifi_atk_setWifi() {
 
     if (WiFi.getMode() != WIFI_MODE_APSTA) {
         if (!WiFi.mode(WIFI_MODE_APSTA)) {
-            displayError("Failed starting WIFI", true);
+            displayError("Falha ao iniciar WiFi", true);
             return false;
         }
         vTaskDelay(pdMS_TO_TICKS(100));
@@ -218,7 +218,7 @@ bool wifi_atk_setWifi() {
         }
 
         if (!apStarted) {
-            displayError("Failed starting AP Attacker", true);
+            displayError("Falha ao iniciar AP atacante", true);
             return false;
         }
         vTaskDelay(pdMS_TO_TICKS(100));
@@ -229,7 +229,7 @@ bool wifi_atk_setWifi() {
 bool wifi_atk_unsetWifi() {
     if (WiFi.softAPSSID() == WIFI_ATK_NAME) {
         if (!WiFi.softAPdisconnect()) {
-            displayError("Failed Stopping AP Attacker", true);
+            displayError("Falha ao parar AP atacante", true);
             return false;
         }
         vTaskDelay(pdMS_TO_TICKS(100));
@@ -248,13 +248,13 @@ void wifi_atk_menu() {
 
     bool scanAtks = false;
     options = {
-        {"Target Atks",     [&]() { scanAtks = true; }     },
+        {"Ataques a alvo",  [&]() { scanAtks = true; }     },
 #ifndef LITE_VERSION
-        {"Karma Attack",    [=]() { karma_setup(); }       },
+        {"Ataque Karma",    [=]() { karma_setup(); }       },
 #endif
-        {"Beacon SPAM",     [=]() { beaconAttack(); }      },
-        {"Deauth Flood",    [=]() { deauthFloodAttack(); } },
-        {"Enhanced Deauth", [=]() { enhancedDeauthMenu(); }},
+        {"Spam de beacon",  [=]() { beaconAttack(); }      },
+        {"Flood de deauth", [=]() { deauthFloodAttack(); } },
+        {"Deauth avancado", [=]() { enhancedDeauthMenu(); }},
     };
     addOptionToMainMenu();
     loopOptions(options);
@@ -263,7 +263,7 @@ void wifi_atk_menu() {
     }
     if (scanAtks) {
         int nets;
-        displayTextLine("Scanning..");
+        displayTextLine("Buscando...");
         nets = WiFi.scanNetworks(false, showHiddenNetworks);
         ap_records.clear();
         options = {};
@@ -289,7 +289,7 @@ void wifi_atk_menu() {
             String encryptionPrefix = (encryptionType == WIFI_AUTH_OPEN) ? "" : "#";
             String encryptionTypeStr;
             switch (encryptionType) {
-                case WIFI_AUTH_OPEN: encryptionTypeStr = "Open"; break;
+                case WIFI_AUTH_OPEN: encryptionTypeStr = "Aberta"; break;
                 case WIFI_AUTH_WEP: encryptionTypeStr = "WEP"; break;
                 case WIFI_AUTH_WPA_PSK: encryptionTypeStr = "WPA/PSK"; break;
                 case WIFI_AUTH_WPA2_PSK: encryptionTypeStr = "WPA2/PSK"; break;
@@ -297,14 +297,14 @@ void wifi_atk_menu() {
                 case WIFI_AUTH_WPA2_ENTERPRISE: encryptionTypeStr = "WPA2/Enterprise"; break;
                 case WIFI_AUTH_WPA3_PSK: encryptionTypeStr = "WPA3/PSK"; break;
                 case WIFI_AUTH_WPA2_WPA3_PSK: encryptionTypeStr = "WPA2/WPA3/PSK"; break;
-                default: encryptionTypeStr = "Unknown"; break;
+                default: encryptionTypeStr = "Desconhecida"; break;
             }
 
             String displaySSID = ssid;
-            if (displaySSID.length() == 0) { displaySSID = "<Hidden SSID> " + WiFi.BSSIDstr(i); }
+            if (displaySSID.length() == 0) { displaySSID = "<SSID oculto> " + WiFi.BSSIDstr(i); }
 
             String optionText = encryptionPrefix + displaySSID + " (" + String(rssi) + "|" +
-                                encryptionTypeStr + "|ch." + String(ch) + ")";
+                                encryptionTypeStr + "|can." + String(ch) + ")";
 
             options.push_back({optionText.c_str(), [=]() {
                                    ap_record = ap_records[i];
@@ -334,7 +334,7 @@ void deauthFloodAttack() {
 
     int nets;
 ScanNets:
-    displayTextLine("Scanning..");
+    displayTextLine("Buscando...");
     nets = WiFi.scanNetworks(false, showHiddenNetworks);
     ap_records.clear();
     for (int i = 0; i < nets; i++) {
@@ -356,13 +356,13 @@ ScanNets:
     uint32_t rescan_counter = millis();
     uint16_t count = 0;
     uint8_t channel = 0;
-    drawMainBorderWithTitle("Deauth Flood");
+    drawMainBorderWithTitle("Flood de deauth");
     while (true) {
         for (const auto &record : ap_records) {
             channel = record.primary;
             wsl_bypasser_send_raw_frame(&record, record.primary, _default_target);
             tft.setCursor(10, tftHeight - 45);
-            tft.println("Channel " + String(record.primary) + "    ");
+            tft.println("Canal " + String(record.primary) + "    ");
             for (int i = 0; i < 100; i++) {
                 send_raw_frame(deauth_frame, sizeof(deauth_frame_default));
                 count += 3;
@@ -371,13 +371,13 @@ ScanNets:
             if (EscPress) break;
         }
         if (millis() - lastTime > 2000) {
-            drawMainBorderWithTitle("Deauth Flood");
+            drawMainBorderWithTitle("Flood de deauth");
             tft.setCursor(10, tftHeight - 25);
             tft.print("Frames:               ");
             tft.setCursor(10, tftHeight - 25);
             tft.println("Frames: " + String(count / 2) + "/s   ");
             tft.setCursor(10, tftHeight - 45);
-            tft.println("Channel " + String(channel) + "    ");
+            tft.println("Canal " + String(channel) + "    ");
             count = 0;
             lastTime = millis();
         }
@@ -412,11 +412,11 @@ void capture_handshake(const String &tssid, const String &mac, uint8_t channel) 
     memcpy(targetBssid, bssid_array, 6);
     ap_record.primary = channel;
 
-    String encryptionTypeStr = "Unknown";
+    String encryptionTypeStr = "Desconhecida";
     for (int i = 0; i < ap_records.size(); i++) {
         if (memcmp(ap_records[i].bssid, bssid_array, 6) == 0) {
             switch (ap_records[i].authmode) {
-                case WIFI_AUTH_OPEN: encryptionTypeStr = "Open"; break;
+                case WIFI_AUTH_OPEN: encryptionTypeStr = "Aberta"; break;
                 case WIFI_AUTH_WEP: encryptionTypeStr = "WEP"; break;
                 case WIFI_AUTH_WPA_PSK: encryptionTypeStr = "WPA/PSK"; break;
                 case WIFI_AUTH_WPA2_PSK: encryptionTypeStr = "WPA2/PSK"; break;
@@ -424,7 +424,7 @@ void capture_handshake(const String &tssid, const String &mac, uint8_t channel) 
                 case WIFI_AUTH_WPA2_ENTERPRISE: encryptionTypeStr = "WPA2/Enterprise"; break;
                 case WIFI_AUTH_WPA3_PSK: encryptionTypeStr = "WPA3/PSK"; break;
                 case WIFI_AUTH_WPA2_WPA3_PSK: encryptionTypeStr = "WPA2/WPA3/PSK"; break;
-                default: encryptionTypeStr = "Unknown"; break;
+                default: encryptionTypeStr = "Desconhecida"; break;
             }
             break;
         }
@@ -484,14 +484,14 @@ void capture_handshake(const String &tssid, const String &mac, uint8_t channel) 
     wifi_complete_cleanup();
 
     if (!WiFi.mode(WIFI_MODE_APSTA)) {
-        displayError("Failed starting WIFI", true);
+        displayError("Falha ao iniciar WiFi", true);
         return;
     }
     vTaskDelay(pdMS_TO_TICKS(100));
     esp_wifi_set_storage(WIFI_STORAGE_RAM);
 
     if (!sniffer_prepare_storage(fs, !isLittleFS)) {
-        displayError("Sniffer queue error", true);
+        displayError("Erro na fila do sniffer", true);
         return;
     }
 
@@ -555,33 +555,33 @@ void capture_handshake(const String &tssid, const String &mac, uint8_t channel) 
         }
 
         if (needRedraw) {
-            drawMainBorderWithTitle("Handshake Capture");
+            drawMainBorderWithTitle("Captura de handshake");
             tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
             padprintln("");
             padprintln("SSID: " + tssid);
             padprintln("BSSID: " + mac);
-            padprintln("Security: " + encryptionTypeStr);
+            padprintln("Seguranca: " + encryptionTypeStr);
 
             if (phase == CAPTURED) {
                 tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
-                padprintln("Status: CAPTURED!");
+                padprintln("Status: CAPTURADO!");
             } else if (hasBeacons) {
                 tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
-                padprintln("Status: " + String(phase == MONITORING ? "Monitoring..." : "Scanning..."));
+                padprintln("Status: " + String(phase == MONITORING ? "Monitorando..." : "Buscando..."));
             } else {
                 tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
-                padprintln("Status: Waiting...");
+                padprintln("Status: Aguardando...");
             }
 
             if (tftHeight > 135) {
                 tft.setTextColor(hsTracker.msg1 ? TFT_GREEN : TFT_RED, bruceConfig.bgColor);
-                padprintln("        EAPOL MSG 1: " + String(hsTracker.msg1 ? "Captured" : "None"));
+                padprintln("        EAPOL MSG 1: " + String(hsTracker.msg1 ? "Capturada" : "Nenhuma"));
                 tft.setTextColor(hsTracker.msg2 ? TFT_GREEN : TFT_RED, bruceConfig.bgColor);
-                padprintln("        EAPOL MSG 2: " + String(hsTracker.msg2 ? "Captured" : "None"));
+                padprintln("        EAPOL MSG 2: " + String(hsTracker.msg2 ? "Capturada" : "Nenhuma"));
                 tft.setTextColor(hsTracker.msg3 ? TFT_GREEN : TFT_RED, bruceConfig.bgColor);
-                padprintln("        EAPOL MSG 3: " + String(hsTracker.msg3 ? "Captured" : "None"));
+                padprintln("        EAPOL MSG 3: " + String(hsTracker.msg3 ? "Capturada" : "Nenhuma"));
                 tft.setTextColor(hsTracker.msg4 ? TFT_GREEN : TFT_RED, bruceConfig.bgColor);
-                padprintln("        EAPOL MSG 4: " + String(hsTracker.msg4 ? "Captured" : "None"));
+                padprintln("        EAPOL MSG 4: " + String(hsTracker.msg4 ? "Capturada" : "Nenhuma"));
                 tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
             } else {
                 tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
@@ -596,25 +596,25 @@ void capture_handshake(const String &tssid, const String &mac, uint8_t channel) 
                 tft.print(" 4");
                 if (hsTracker.msg1 && hsTracker.msg2 && hsTracker.msg3 && hsTracker.msg4) {
                     tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
-                    tft.println(" > All Captured");
+                    tft.println(" > Todas capturadas");
                 } else tft.println("");
             }
 
-            padprint("Deauth sent: " + String(deauthCount));
+            padprint("Deauth enviados: " + String(deauthCount));
             if (phase != CAPTURED) {
                 unsigned long remaining = deauthInterval() - (millis() - autoDeauthTimer);
                 if (remaining > deauthInterval()) remaining = 0;
-                tft.println(", more in " + String(remaining / 1000) + "s  [OK]");
+                tft.println(", mais em " + String(remaining / 1000) + "s [OK]");
             } else tft.println();
 
             if (phase != CAPTURED) {
-                padprintln("Press " + String(BTN_ALIAS) + " to deauth");
+                padprintln("Pressione " + String(BTN_ALIAS) + " p/ deauth");
             } else {
                 tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
-                padprintln("Handshake saved!        ");
+                padprintln("Handshake salvo!        ");
                 tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
             }
-            tft.drawString("Press Esc to exit", 10, tftHeight - 20);
+            tft.drawString("Esc para sair", 10, tftHeight - 20);
 
             needRedraw = false;
         }
@@ -641,14 +641,14 @@ void capture_handshake(const String &tssid, const String &mac, uint8_t channel) 
 void target_atk_menu(const String &tssid, const String &mac, uint8_t channel) {
 AGAIN:
     options = {
-        {"Information",         [=]() { wifi_atk_info(tssid, mac, channel); }      },
+        {"Informacoes",         [=]() { wifi_atk_info(tssid, mac, channel); }      },
         {"Deauth",              [=]() { target_atk(tssid, mac, channel); }         },
 #ifndef LITE_VERSION
-        {"Capture Handshake",   [=]() { capture_handshake(tssid, mac, channel); }  },
+        {"Capturar handshake",  [=]() { capture_handshake(tssid, mac, channel); }  },
 #endif
-        {"Clone Portal",        [=]() { EvilPortal(tssid, channel, false, false); }},
-        {"Deauth+Clone",        [=]() { EvilPortal(tssid, channel, true, false); } },
-        {"Deauth+Clone+Verify", [=]() { EvilPortal(tssid, channel, true, true); }  },
+        {"Clonar portal",       [=]() { EvilPortal(tssid, channel, false, false); }},
+        {"Deauth+clonar",       [=]() { EvilPortal(tssid, channel, true, false); } },
+        {"Deauth+clonar+validar", [=]() { EvilPortal(tssid, channel, true, true); }},
     };
     addOptionToMainMenu();
 
@@ -826,30 +826,30 @@ void beaconAttack() {
     for (int i = 0; i < 32; i++) emptySSID[i] = ' ';
     srand(millis());
     options = {
-        {"Funny SSID",
+        {"SSIDs divertidos",
          [&]() {
              BeaconMode = 0;
-             txt = "Spamming Funny";
+             txt = "Spam de SSIDs divertidos";
          }                        },
-        {"Ricky Roll",
+        {"Rickroll",
          [&]() {
              BeaconMode = 1;
-             txt = "Spamming Ricky";
+             txt = "Spam Rickroll";
          }                        },
-        {"Random SSID",
+        {"SSIDs aleatorios",
          [&]() {
              BeaconMode = 2;
-             txt = "Spamming Random";
+             txt = "Spam de SSIDs aleatorios";
          }                        },
 #if !defined(LITE_VERSION)
-        {"Single SSID",
+        {"SSID unico",
          [&]() {
              BeaconMode = 4;
-             txt = "Spamming Single";
+             txt = "Spam de SSID unico";
          }                        },
-        {"Custom SSIDs", [&]() {
+        {"SSIDs personalizados", [&]() {
              BeaconMode = 3;
-             txt = "Spamming Custom";
+             txt = "Spam personalizado";
          }},
 #endif
     };
@@ -862,12 +862,12 @@ void beaconAttack() {
     FS *fs;
 #if !defined(LITE_VERSION)
     if (BeaconMode == 4) {
-        singleSSID = keyboard("BruceBeacon", 26, "Base SSID:");
+        singleSSID = keyboard("BruceBeacon", 26, "SSID base:");
         if (singleSSID.length() == 0 || singleSSID == "\x1B") { return; }
     }
 #endif
     if (BeaconMode != 3) {
-        drawMainBorderWithTitle("WiFi: Beacon SPAM");
+        drawMainBorderWithTitle("WiFi: SPAM DE BEACON");
         displayTextLine(txt);
     }
 
@@ -889,7 +889,7 @@ void beaconAttack() {
 
                 fs = nullptr;
                 if (setupSdCard()) {
-                    options.push_back({"SD Card", [&]() { fs = &SD; }});
+                    options.push_back({"Cartao SD", [&]() { fs = &SD; }});
                 }
                 options.push_back({"LittleFS", [&]() { fs = &LittleFS; }});
                 addOptionToMainMenu();
@@ -901,7 +901,7 @@ void beaconAttack() {
                 beaconFile = file.readString();
                 beaconFile.replace("\r\n", "\n");
                 tft.drawPixel(0, 0, 0);
-                drawMainBorderWithTitle("WiFi: Beacon SPAM");
+                drawMainBorderWithTitle("WiFi: SPAM DE BEACON");
                 displayTextLine(txt);
             }
 
@@ -921,10 +921,10 @@ void enhancedDeauthMenu() {
     resetGlobalState();
 
     options = {
-        {"Station Deauth (Single)", [=]() { showTargetSelection(); } },
-        {"Deauth All Clients",      [=]() { deauthAllMenu(); }       },
-        {"Deauth Target List",      [=]() { deauthTargetListMenu(); }},
-        {"Back",                    [=]() { returnToMenu = true; }   },
+        {"Deauth individual", [=]() { showTargetSelection(); } },
+        {"Deauth em todos",   [=]() { deauthAllMenu(); }       },
+        {"Lista de alvos",     [=]() { deauthTargetListMenu(); }},
+        {"Voltar",             [=]() { returnToMenu = true; }   },
     };
     addOptionToMainMenu();
     loopOptions(options);

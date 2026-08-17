@@ -204,21 +204,21 @@ void updateHashUI() {
     // 2) User
     tft.setTextSize(FP);
     tft.setCursor(10, tft.getCursorY());
-    tft.print("User: ");
+    tft.print("Usuario: ");
     tft.setTextSize(2);
     tft.println(lastUser);
 
     // 3) Domain
     tft.setTextSize(FP);
     tft.setCursor(10, tft.getCursorY());
-    tft.print("Domain: ");
+    tft.print("Dominio: ");
     tft.setTextSize(2);
     tft.println(lastDomain);
 
     // 4) Client (hostname)
     tft.setTextSize(FP);
     tft.setCursor(10, tft.getCursorY());
-    tft.print("Client: ");
+    tft.print("Cliente: ");
     tft.setTextSize(2);
     tft.println(lastClient);
 
@@ -609,13 +609,13 @@ void responder() {
             if (hashCount == 0) {
                 tft.setCursor(10, BORDER_PAD_Y + FM * LH);
                 tft.setTextSize(FP);
-                tft.println("Waiting LLMNR Interact");
+                tft.println("Aguardando interacao LLMNR");
             } else if (hashCount == 1) {
                 tft.setCursor(10, tftHeight - (7 + 2 * FP * LH));
                 tft.setTextSize(FP);
-                tft.println("Found Interaction!");
+                tft.println("Interacao encontrada!");
                 tft.setCursor(10, tftHeight - (6 + FP * LH));
-                tft.println("thanks 7h30th3r0n3");
+                tft.println("obrigado 7h30th3r0n3");
             }
             lastAnim = now;
         }

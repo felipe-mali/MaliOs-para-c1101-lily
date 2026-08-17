@@ -8,15 +8,15 @@
 
 void NRF24Menu::optionsMenu() {
     options.clear();
-    options.push_back({"Information", nrf_info});
-    options.push_back({"Spectrum", nrf_spectrum});
+    options.push_back({"Informacoes", nrf_info});
+    options.push_back({"Espectro", nrf_spectrum});
     #if !defined(LITE_VERSION)
     options.push_back({"MouseJack", nrf_mousejack});
     #endif
-    options.push_back({"NRF Jammer", nrf_jammer});
+    options.push_back({"Jammer NRF", nrf_jammer});
 
 #if defined(ARDUINO_M5STICK_C_PLUS) || defined(ARDUINO_M5STICK_C_PLUS2)
-    options.push_back({"Config pins", [this]() { configMenu(); }});
+    options.push_back({"Configurar pinos", [this]() { configMenu(); }});
 #endif
 
     addOptionToMainMenu();
@@ -29,12 +29,12 @@ void NRF24Menu::configMenu() {
     int idx = 0;
     if (bruceConfigPins.NRF24_bus.mosi == (gpio_num_t)SDCARD_MOSI) idx = 1;
     options = {
-        {"NRF24 (legacy)",     [&]() { opt = 1; }         },
-        {"NRF24 (shared SPI)", [&]() { opt = 2; }         },
-        {"Back",               [this]() { optionsMenu(); }},
+        {"NRF24 (legado)",        [&]() { opt = 1; }         },
+        {"NRF24 (SPI compart.)",  [&]() { opt = 2; }         },
+        {"Voltar",                [this]() { optionsMenu(); }},
     };
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "RF Config", idx);
+    loopOptions(options, MENU_TYPE_SUBMENU, "Config. RF", idx);
     if (opt == 1) {
         bruceConfigPins.setNrf24Pins(
             {(gpio_num_t)NRF24_SCK_PIN,

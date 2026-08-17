@@ -78,9 +78,9 @@ void PN532KillerTools::displayInitialScreen() {
     if (margin > 24) margin = 24;
     int baseY = tftHeight / 2;
 
-    String line1 = "Connect to PN532/PN532Killer";
-    String line2 = "via UART port.";
-    String line3 = "Press OK to check device type.";
+    String line1 = "Conecte o PN532/PN532Killer";
+    String line2 = "pela porta UART.";
+    String line3 = "OK para verificar o dispositivo.";
 
     int leftX = (tftWidth - line1.length() * 6 * FP) / 2;
     tft.setCursor(leftX, baseY);
@@ -174,8 +174,8 @@ void PN532KillerTools::hardwareProbe() {
         _isPn532killer = false;
         _initializationFailed = true;
         displayBanner();
-        printCenterFootnote("Check PN532/PN532Killer Connection");
-        displayError("Wake Failed");
+        printCenterFootnote("Verifique a conexao PN532/PN532Killer");
+        displayError("Falha ao despertar");
         return;
     }
 
@@ -205,7 +205,7 @@ void PN532KillerTools::loop() {
                 if (_initializationFailed) {
                     failedInitMenu();
                 } else {
-                    displayInfo("Checking device");
+                    displayInfo("Verificando dispositivo");
                     hardwareProbe();
                     if (!_initializationFailed) {
                         _deviceInitialized = true;
@@ -238,7 +238,7 @@ void PN532KillerTools::loop() {
                     _udpRemotePort = _udp.remotePort();
                     _udpHasRemote = true;
                     _udpLastPacketMs = millis();
-                    printCenterFootnote(String("Remote: ") + _udpRemoteIP.toString());
+                    printCenterFootnote(String("Remoto: ") + _udpRemoteIP.toString());
                 } else {
                     _udpLastPacketMs = millis();
                 }
@@ -248,7 +248,7 @@ void PN532KillerTools::loop() {
             } else if (_udpHasRemote) {
                 if (millis() - _udpLastPacketMs > UDP_REMOTE_TIMEOUT_MS) {
                     _udpHasRemote = false;
-                    printCenterFootnote("Waiting for UDP client...");
+                    printCenterFootnote("Aguardando cliente UDP...");
                 }
             }
         }
@@ -266,7 +266,7 @@ void PN532KillerTools::loop() {
             } else if (!_tcpClient.connected()) {
                 _tcpClient.stop();
                 _tcpHasClient = false;
-                printCenterFootnote("Waiting TCP client...");
+                printCenterFootnote("Aguardando cliente TCP...");
                 Serial.println("TCP Client disconnected");
             } else {
                 while (_tcpClient.connected() && _tcpClient.available()) {
@@ -280,7 +280,7 @@ void PN532KillerTools::loop() {
                 if (_tcpHasClient && millis() - _tcpLastPacketMs > TCP_REMOTE_TIMEOUT_MS) {
                     _tcpClient.stop();
                     _tcpHasClient = false;
-                    printCenterFootnote("Waiting TCP client...");
+                    printCenterFootnote("Aguardando cliente TCP...");
                 }
             }
         }
@@ -385,14 +385,14 @@ void PN532KillerTools::drainUartToUdp(bool log) {
 
 void PN532KillerTools::mainMenu() {
     options = {
-        {"Reader", [&]() { readerMenu(); }}
+        {"Leitor", [&]() { readerMenu(); }}
     };
     if (_isPn532killer) {
-        options.push_back({"Emulator", [&]() { emulatorMenu(); }});
+        options.push_back({"Emulador", [&]() { emulatorMenu(); }});
         options.push_back({"Sniffer", [&]() { snifferMenu(); }});
     }
 
-    String netLabel = "Net";
+    String netLabel = "Rede";
     if (bleDataTransferEnabled || _udpEnabled || _tcpEnabled) {
         netLabel += "(";
         bool first = true;
@@ -415,21 +415,21 @@ void PN532KillerTools::mainMenu() {
     }
     options.push_back({netLabel.c_str(), [&]() { netMenu(); }});
     // check device
-    options.push_back({"Reset", [&]() { resetDevice(); }});
-    options.push_back({"Return", [&]() { returnToMenu = true; }});
+    options.push_back({"Reiniciar", [&]() { resetDevice(); }});
+    options.push_back({"Voltar", [&]() { returnToMenu = true; }});
     loopOptions(options);
 }
 
 void PN532KillerTools::failedInitMenu() {
     options = {
-        {"Reader", [&]() { readerMenu(); }}
+        {"Leitor", [&]() { readerMenu(); }}
     };
     if (_isPn532killer) {
-        options.push_back({"Emulator", [&]() { emulatorMenu(); }});
+        options.push_back({"Emulador", [&]() { emulatorMenu(); }});
         options.push_back({"Sniffer", [&]() { snifferMenu(); }});
     }
 
-    String netLabel = "Net";
+    String netLabel = "Rede";
     if (bleDataTransferEnabled || _udpEnabled || _tcpEnabled) {
         netLabel += "(";
         bool first = true;
@@ -451,16 +451,16 @@ void PN532KillerTools::failedInitMenu() {
         netLabel = "BLE/TCP/UDP";
     }
     options.push_back({netLabel.c_str(), [&]() { netMenu(); }});
-    options.push_back({"Reset", [&]() {
+    options.push_back({"Reiniciar", [&]() {
                            resetDevice(false);
-                           displayInfo("Checking device");
+                           displayInfo("Verificando dispositivo");
                            hardwareProbe();
                            if (!_initializationFailed) {
                                _deviceInitialized = true;
                                playDeviceDetectedSound();
                            }
                        }});
-    options.push_back({"Return", [&]() { returnToMenu = true; }});
+    options.push_back({"Voltar", [&]() { returnToMenu = true; }});
 
     // 默认选择Reset项（倒数第二个选项）
     loopOptions(options, options.size() - 2);
@@ -468,11 +468,11 @@ void PN532KillerTools::failedInitMenu() {
 
 void PN532KillerTools::netMenu() {
     std::vector<Option> netOptions;
-    netOptions.push_back({bleDataTransferEnabled ? "BLE:ON" : "BLE:OFF", [&]() {
+    netOptions.push_back({bleDataTransferEnabled ? "BLE:LIG" : "BLE:DES", [&]() {
                               if (bleDataTransferEnabled) disableBleDataTransfer();
                               else enableBleDataTransfer();
                           }});
-    netOptions.push_back({_udpEnabled ? "UDP:ON" : "UDP:OFF", [&]() {
+    netOptions.push_back({_udpEnabled ? "UDP:LIG" : "UDP:DES", [&]() {
                               if (_udpEnabled) disableUdpDataTransfer();
                               else {
                                   if (WiFi.isConnected() || WiFi.getMode() == WIFI_AP ||
@@ -481,7 +481,7 @@ void PN532KillerTools::netMenu() {
                                   else udpWifiSelectMenu();
                               }
                           }});
-    netOptions.push_back({_tcpEnabled ? "TCP:ON" : "TCP:OFF", [&]() {
+    netOptions.push_back({_tcpEnabled ? "TCP:LIG" : "TCP:DES", [&]() {
                               if (_tcpEnabled) disableTcpDataTransfer();
                               else {
                                   if (WiFi.isConnected() || WiFi.getMode() == WIFI_AP ||
@@ -490,13 +490,13 @@ void PN532KillerTools::netMenu() {
                                   else udpWifiSelectMenu();
                               }
                           }});
-    netOptions.push_back({"Return", [&]() { mainMenu(); }});
+    netOptions.push_back({"Voltar", [&]() { mainMenu(); }});
     loopOptions(netOptions);
 }
 void PN532KillerTools::readerMenu() {
     options = {
-        {"Scan UID", [&]() { readTagUid(); }   },
-        {"Return",   [&]() { setReaderMode(); }}
+        {"Buscar UID", [&]() { readTagUid(); }   },
+        {"Voltar",     [&]() { setReaderMode(); }}
     };
 
     loopOptions(options);
@@ -520,7 +520,7 @@ void PN532KillerTools::emulatorMenu() {
              _tagType = PN532KillerCmd::TagType::ISO15693;
              setEmulatorNextSlot(false, true);
          }                            },
-        {"Return",   [&]() { return; }}
+        {"Voltar",   [&]() { return; }}
     };
 
     loopOptions(options);
@@ -538,7 +538,7 @@ void PN532KillerTools::snifferMenu() {
              _snifferType = PN532KillerCmd::SnifferType::MFKey64;
              setSnifferMode();
          }                             },
-        {"Return",    [&]() { return; }}
+        {"Voltar",    [&]() { return; }}
     };
 
     loopOptions(options);
@@ -547,14 +547,14 @@ void PN532KillerTools::snifferMenu() {
 void PN532KillerTools::setSnifferMode() {
     _workMode = PN532KillerCmd::WorkMode::Sniffer;
     displayBanner();
-    printSubtitle("Sniffer Mode");
+    printSubtitle("MODO SNIFFER");
     _pn532Killer.setSnifferMode(_snifferType);
     String tagType = "MFC 1K";
     String snifferType = "";
     if (_snifferType == PN532KillerCmd::SnifferType::MFKey32v2) {
         drawMfkey32Icon(tftWidth / 4 - 40, (tftHeight) / 2 - 5);
         snifferType = "MFKey32v2";
-        printCenterFootnote("Press Next to set UID");
+        printCenterFootnote("Prox para definir UID");
     } else {
         drawMfkey64Icon(tftWidth / 4 - 40, (tftHeight) / 2 - 5);
         snifferType = "MFKey64";
@@ -567,7 +567,7 @@ void PN532KillerTools::setSnifferMode() {
 }
 
 void PN532KillerTools::setSnifferUid() {
-    displayInfo("Scanning UID...");
+    displayInfo("Buscando UID...");
     _pn532Killer.setNormalMode();
     TagTechnology::Iso14aTagInfo hf14aTagInfo = _pn532Killer.hf14aScan();
     if (!hf14aTagInfo.uid.empty()) {
@@ -577,12 +577,12 @@ void PN532KillerTools::setSnifferUid() {
         setSnifferMode();
         return;
     }
-    displayError("No tag found");
+    displayError("Nenhuma tag encontrada");
 }
 
 void PN532KillerTools::setReaderMode() {
     displayBanner();
-    printSubtitle("Reader Mode");
+    printSubtitle("MODO LEITOR");
     // Regular PN532 does not display ISO15693 text (if not supported)
     drawCreditCard(tftWidth / 4 - 40, (tftHeight) / 2 - 10);
     tft.setTextSize(FM);
@@ -592,7 +592,7 @@ void PN532KillerTools::setReaderMode() {
         tft.setCursor(tftWidth / 2 - 20, tftHeight / 2 + FM * 10);
         tft.print("ISO15693");
     }
-    printCenterFootnote("Press OK to select mode");
+    printCenterFootnote("OK para selecionar o modo");
     _pn532Killer.setNormalMode();
 }
 
@@ -600,8 +600,8 @@ void PN532KillerTools::readTagUid() {
     _workMode = PN532KillerCmd::WorkMode::Reader;
     _pn532Killer.setNormalMode();
     displayBanner();
-    printSubtitle("UID Reader");
-    printCenterFootnote("Scanning ISO14443...");
+    printSubtitle("LEITOR DE UID");
+    printCenterFootnote("Buscando ISO14443...");
     auto hf14aTagInfo = _pn532Killer.hf14aScan();
     bool tagFound = false;
     if (!hf14aTagInfo.uid.empty()) {
@@ -610,7 +610,7 @@ void PN532KillerTools::readTagUid() {
         playUidFoundSound(); // Play sound when UID is found
     }
     if (_isPn532killer && !tagFound) {
-        printCenterFootnote("Scanning ISO15693...");
+        printCenterFootnote("Buscando ISO15693...");
         auto hf15TagInfo = _pn532Killer.hf15Scan();
         if (!hf15TagInfo.uid.empty()) {
             printUid("ISO15693", hf15TagInfo.uid_hex.c_str());
@@ -619,10 +619,10 @@ void PN532KillerTools::readTagUid() {
         }
     }
     if (tagFound) {
-        printCenterFootnote("Press Next/Down to scan again");
+        printCenterFootnote("Prox/Baixo para buscar de novo");
         return;
     }
-    displayError("No tag found");
+    displayError("Nenhuma tag encontrada");
 }
 
 void PN532KillerTools::printUid(const char *protocol, const char *uid) {
@@ -661,7 +661,7 @@ void PN532KillerTools::setEmulatorNextSlot(bool reverse, bool redrawTypeName) {
 
     if (redrawTypeName) {
         displayBanner();
-        printSubtitle("Emulator Mode");
+        printSubtitle("MODO EMULADOR");
         drawCreditCard(tftWidth / 4 - 40, (tftHeight) / 2 - 5);
         tft.setTextSize(FM);
         String typeName;
@@ -670,7 +670,7 @@ void PN532KillerTools::setEmulatorNextSlot(bool reverse, bool redrawTypeName) {
             case PN532KillerCmd::TagType::NTAG: typeName = "NTAG"; break;
             case PN532KillerCmd::TagType::ISO15693: typeName = "ISO15693"; break;
             case PN532KillerCmd::TagType::EM4100: typeName = "EM4100"; break;
-            default: typeName = "Unknown"; break;
+            default: typeName = "Desconhecido"; break;
         }
         tft.setCursor(tftWidth / 2 - 20, tftHeight / 2 + 5);
         tft.print(typeName);
@@ -730,7 +730,7 @@ bool PN532KillerTools::enableBleDataTransfer() {
     BLEDevice::init("BRUCE-PN532-BLE");
     pServer = BLEDevice::createServer();
     if (!pServer) {
-        displayError("BLE Server Fail");
+        displayError("Falha no servidor BLE");
         return false;
     }
 
@@ -739,7 +739,7 @@ bool PN532KillerTools::enableBleDataTransfer() {
 
     pService = pServer->createService("0000fff0-0000-1000-8000-00805f9b34fb");
     if (!pService) {
-        displayError("BLE Service Fail");
+        displayError("Falha no servico BLE");
         return false;
     }
 
@@ -748,7 +748,7 @@ bool PN532KillerTools::enableBleDataTransfer() {
     );
 
     if (!pTxCharacteristic) {
-        displayError("BLE TX Fail");
+        displayError("Falha no BLE TX");
         return false;
     }
 
@@ -757,7 +757,7 @@ bool PN532KillerTools::enableBleDataTransfer() {
     );
 
     if (!pRxCharacteristic) {
-        displayError("BLE RX Fail");
+        displayError("Falha no BLE RX");
         return false;
     }
 
@@ -775,7 +775,7 @@ bool PN532KillerTools::enableBleDataTransfer() {
     pAdvertising->start();
 
     bleDataTransferEnabled = true;
-    displayInfo("BLE Enabled");
+    displayInfo("BLE ativado");
     delay(100);
     return true;
 }
@@ -795,7 +795,7 @@ bool PN532KillerTools::disableBleDataTransfer() {
 
     bleDataTransferEnabled = false;
     BLEConnected = false;
-    displayInfo("BLE Disabled");
+    displayInfo("BLE desativado");
     delay(100);
     return true;
 }
@@ -804,11 +804,11 @@ bool PN532KillerTools::enableUdpDataTransfer() {
     if (_udpEnabled) return true;
     // Ensure WiFi active
     if (!(WiFi.isConnected() || WiFi.getMode() == WIFI_AP || WiFi.getMode() == WIFI_AP_STA)) {
-        displayError("No WiFi");
+        displayError("Sem WiFi");
         return false;
     }
     if (!_udp.begin(18888)) {
-        displayError("UDP Fail");
+        displayError("Falha no UDP");
         return false;
     }
     _udpEnabled = true;
@@ -817,7 +817,7 @@ bool PN532KillerTools::enableUdpDataTransfer() {
 
     // UI display
     displayBanner();
-    printSubtitle("UDP Reader Mode");
+    printSubtitle("UDP MODO LEITOR");
 
     IPAddress ip;
     if (WiFi.isConnected()) {
@@ -828,7 +828,7 @@ bool PN532KillerTools::enableUdpDataTransfer() {
         ip = IPAddress(0, 0, 0, 0);
     }
     String ipLine = String("UDP:") + ip.toString();
-    String portLine = String("Port: 18888");
+    String portLine = String("Porta: 18888");
 
     tft.setTextSize(FM);
     int margin = tftWidth / 16;
@@ -841,7 +841,7 @@ bool PN532KillerTools::enableUdpDataTransfer() {
     tft.print(ipLine);
     tft.setCursor(margin, baseY + FM * 12);
     tft.print(portLine);
-    printCenterFootnote("Waiting for UDP client...");
+    printCenterFootnote("Aguardando cliente UDP...");
 
     delay(150);
     return true;
@@ -852,7 +852,7 @@ bool PN532KillerTools::disableUdpDataTransfer() {
     _udp.stop();
     _udpEnabled = false;
     _udpHasRemote = false;
-    displayInfo("UDP Off");
+    displayInfo("UDP desligado");
     delay(100);
     return true;
 }
@@ -860,7 +860,7 @@ bool PN532KillerTools::disableUdpDataTransfer() {
 bool PN532KillerTools::enableTcpDataTransfer() {
     if (_tcpEnabled) return true;
     if (!(WiFi.isConnected() || WiFi.getMode() == WIFI_AP || WiFi.getMode() == WIFI_AP_STA)) {
-        displayError("No WiFi");
+        displayError("Sem WiFi");
         return false;
     }
     _tcpServer.begin();
@@ -870,7 +870,7 @@ bool PN532KillerTools::enableTcpDataTransfer() {
     _tcpLastPacketMs = millis();
 
     displayBanner();
-    printSubtitle("TCP Reader Mode");
+    printSubtitle("TCP MODO LEITOR");
     IPAddress ip = WiFi.isConnected() ? WiFi.localIP() : WiFi.softAPIP();
     tft.setTextSize(FM);
     int margin = tftWidth / 16;
@@ -881,8 +881,8 @@ bool PN532KillerTools::enableTcpDataTransfer() {
     tft.setCursor(margin, baseY);
     tft.print(String("TCP:") + ip.toString());
     tft.setCursor(margin, baseY + FM * 12);
-    tft.print("Port: 18889");
-    printCenterFootnote("Waiting TCP client...");
+    tft.print("Porta: 18889");
+    printCenterFootnote("Aguardando cliente TCP...");
     delay(150);
     return true;
 }
@@ -893,7 +893,7 @@ bool PN532KillerTools::disableTcpDataTransfer() {
     _tcpServer.stop();
     _tcpEnabled = false;
     _tcpHasClient = false;
-    displayInfo("TCP Off");
+    displayInfo("TCP desligado");
     delay(100);
     return true;
 }
@@ -904,27 +904,27 @@ void PN532KillerTools::udpWifiSelectMenu() {
         return;
     }
     displayBanner();
-    printSubtitle("UDP Network");
-    printCenterFootnote("Select WiFi mode");
+    printSubtitle("REDE UDP");
+    printCenterFootnote("Selecione o modo WiFi");
     std::vector<Option> selOptions;
-    selOptions.push_back({"My Network", [&]() {
-                              displayInfo("Connecting...");
+    selOptions.push_back({"Minha rede", [&]() {
+                              displayInfo("Conectando...");
                               uint32_t t = millis();
                               while (!WiFi.isConnected() && millis() - t < 5000) delay(100);
                               if (!WiFi.isConnected()) {
-                                  displayError("Fail WiFi");
+                                  displayError("Falha no WiFi");
                                   return;
                               }
                               enableUdpDataTransfer();
                           }});
-    selOptions.push_back({"AP Mode", [&]() {
-                              displayInfo("Starting AP...");
+    selOptions.push_back({"Modo AP", [&]() {
+                              displayInfo("Iniciando AP...");
                               WiFi.mode(WIFI_AP);
                               WiFi.softAP("BRUCE-UDP", "", 6);
                               delay(200);
                               enableUdpDataTransfer();
                           }});
-    selOptions.push_back({"Return", [&]() { return; }});
+    selOptions.push_back({"Voltar", [&]() { return; }});
     loopOptions(selOptions);
 }
 #endif

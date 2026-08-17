@@ -7,11 +7,11 @@ float m_rf_waterfall_end_freq = 435.0;
 
 void rf_waterfall() {
     if (bruceConfigPins.rfModule != CC1101_SPI_MODULE) {
-        displayError("Waterfall needs a CC1101!", true);
+        displayError("Cascata requer CC1101!", true);
         return;
     }
     if (!initRfModule("rx", m_rf_waterfall_start_freq)) {
-        displayError("CC1101 not found!", true);
+        displayError("CC1101 nao encontrado!", true);
         return;
     }
 
@@ -21,10 +21,10 @@ select:
 
     option = 0;
     options = {
-        {"Start Waterfall", [&]() { option = 3; }},
-        {"Start Freq.",     [&]() { option = 1; }},
-        {"End Freq.",       [&]() { option = 2; }},
-        {"Main Menu",       [&]() { option = 4; }},
+        {"Iniciar cascata", [&]() { option = 3; }},
+        {"Freq. inicial",   [&]() { option = 1; }},
+        {"Freq. final",     [&]() { option = 2; }},
+        {"Menu principal",  [&]() { option = 4; }},
     };
     idx = loopOptions(options, idx);
 

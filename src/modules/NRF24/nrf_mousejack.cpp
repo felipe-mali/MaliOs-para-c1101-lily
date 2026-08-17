@@ -907,7 +907,7 @@ static void mj_attackMenu(int targetIndex) {
 
 static void mj_targetListMenu() {
     if (mj_targetCount == 0) {
-        displayWarning("No targets found", true);
+        displayWarning("Nenhum alvo encontrado", true);
         return;
     }
 
@@ -920,10 +920,10 @@ static void mj_targetListMenu() {
             int idx = i;
             options.push_back({label.c_str(), [idx]() { mj_attackMenu(idx); }});
         }
-        options.push_back({"Rescan", [&]() { mj_scan(); }});
-        options.push_back({"Back", [&]() { inList = false; }});
+        options.push_back({"Buscar novamente", [&]() { mj_scan(); }});
+        options.push_back({"Voltar", [&]() { inList = false; }});
 
-        loopOptions(options, MENU_TYPE_SUBMENU, "Targets");
+        loopOptions(options, MENU_TYPE_SUBMENU, "Alvos");
         if (returnToMenu) return;
     }
 }
@@ -934,21 +934,21 @@ static void mj_targetListMenu() {
 
 void nrf_mousejack() {
     options = {
-        {"Set NRF Mode",
+        {"Definir modo NRF",
          [=]() {
              NRF24_MODE selected = nrf_setMode();
              if (selected != NRF_MODE_DISABLED) mj_nrfMode = selected;
          }                                             },
-        {"Scan Devices",
+        {"Buscar dispositivos",
          [=]() {
              if (mj_scan()) {
                  mj_targetListMenu();
              } else {
-                 displayInfo("No devices found", true);
+                 displayInfo("Nenhum dispositivo", true);
              }
          }                                             },
-        {"View Targets", [=]() { mj_targetListMenu(); }},
-        {"Main Menu",    [=]() { returnToMenu = true; }},
+        {"Ver alvos",      [=]() { mj_targetListMenu(); }},
+        {"Menu principal", [=]() { returnToMenu = true; }},
     };
 
     loopOptions(options, MENU_TYPE_SUBMENU, "MouseJack");

@@ -5,7 +5,7 @@
 
 class FMMenu : public MenuItemInterface {
 public:
-    FMMenu() : MenuItemInterface("Rádio FM") {}
+    FMMenu() : MenuItemInterface("FM", "Radio FM") {}
 
     void optionsMenu(void);
     void drawIcon(float scale);

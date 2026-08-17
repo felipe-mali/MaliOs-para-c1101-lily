@@ -19,7 +19,7 @@ Wigle::~Wigle() {}
 
 bool Wigle::_check_token() {
     if (bruceConfig.wigleBasicToken == "") {
-        displayError("Wigle token not found", true);
+        displayError("Token Wigle nao encontrado", true);
         return false;
     }
 
@@ -34,7 +34,7 @@ bool Wigle::get_user() {
     if (!_check_token()) return false;
 
     display_banner();
-    padprintln("Connecting to Wigle...");
+    padprintln("Conectando ao Wigle...");
 
     WiFiClientSecure client;
     client.setInsecure();
@@ -72,13 +72,13 @@ bool Wigle::get_user() {
 }
 
 void Wigle::display_banner() {
-    drawMainBorderWithTitle("Wigle Upload");
+    drawMainBorderWithTitle("Envio Wigle");
     padprintln("\n");
 }
 
 void Wigle::dump_wigle_info() {
     display_banner();
-    padprintln("Logged into Wigle as " + wigle_user);
+    padprintln("Wigle conectado: " + wigle_user);
     padprintln("");
 }
 
@@ -119,20 +119,20 @@ bool Wigle::upload(FS *fs, const String &filepath, bool auto_delete) {
 
     File file = fs->open(filepath);
     if (!file) {
-        displayError("Failed to open Wigle file", true);
+        displayError("Erro ao abrir arquivo Wigle", true);
         return false;
     }
 
-    if (!_upload_file(file, "Uploading...")) {
+    if (!_upload_file(file, "Enviando...")) {
         file.close();
-        displayError("File upload error", true);
+        displayError("Erro ao enviar arquivo", true);
         return false;
     }
 
     file.close();
     if (auto_delete) fs->remove(filepath);
 
-    displaySuccess("File upload success", true);
+    displaySuccess("Arquivo enviado", true);
     return true;
 }
 
@@ -169,9 +169,9 @@ bool Wigle::upload_all(FS *fs, const String &folder, bool auto_delete) {
                 File file = fs->open(fullPath);
 
                 if (file) {
-                    if (!_upload_file(file, "Uploading " + String(i) + "...")) {
+                    if (!_upload_file(file, "Enviando " + String(i) + "...")) {
                         file.close();
-                        displayError("File upload error", true);
+                        displayError("Erro ao enviar arquivo", true);
                         return false;
                     }
                     i++;
@@ -185,8 +185,7 @@ bool Wigle::upload_all(FS *fs, const String &folder, bool auto_delete) {
     }
     root.close();
 
-    String plural = i > 2 ? "s" : "";
-    displaySuccess(String(i - 1) + " file" + plural + " uploaded", true);
+    displaySuccess(String(i - 1) + " arquivo(s) enviado(s)", true);
     return true;
 }
 
@@ -194,7 +193,7 @@ bool Wigle::_upload_file(File file, const String &upload_message) {
     WiFiClientSecure client;
     client.setInsecure();
     if (!client.connect(host, 443)) {
-        displayError("Wigle API connection failed", true);
+        displayError("Falha ao conectar na API Wigle", true);
         return false;
     }
 

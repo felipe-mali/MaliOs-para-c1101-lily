@@ -775,8 +775,8 @@ static bool deauthCaptureEnabled() {
 
 static String currentModeString() {
     switch (currentMode) {
-        case SnifferMode::Full: return "Full Sniff";
-        case SnifferMode::DeauthOnly: return "Deauth Frames";
+        case SnifferMode::Full: return "Captura completa";
+        case SnifferMode::DeauthOnly: return "Frames deauth";
         default: return "EAPOL/Handshakes";
     }
 }
@@ -1127,7 +1127,7 @@ static void sendDeauthNow() {
     if (deauth_sent) {
         tft.setTextSize(1);
         tft.setTextDatum(0);
-        tft.drawString("Deauth sent.", DEAUTH_MSG_X, DEAUTH_MSG_Y);
+        tft.drawString("Deauth enviado.", DEAUTH_MSG_X, DEAUTH_MSG_Y);
         deauth_displayed = true;
         deauth_display_ts = millis();
     }
@@ -1145,7 +1145,7 @@ void sniffer_setup() {
     bool deauth = false;
     unsigned long lastLittleFsCheck = 0;
     start_time = millis();
-    drawMainBorderWithTitle("pcap sniffer");
+    drawMainBorderWithTitle("Sniffer PCAP");
     lastRedraw = millis();
     // closeSdCard();
 
@@ -1161,7 +1161,7 @@ void sniffer_setup() {
     rawFileIndex = 0;
     deauthFileIndex = 0;
     if (!sniffer_prepare_storage(Fs, !isLittleFS)) {
-        displayError("Sniffer queue error", true);
+        displayError("Erro na fila do sniffer", true);
         return;
     }
 
@@ -1171,7 +1171,7 @@ void sniffer_setup() {
     tft.setTextSize(FP);
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     tft.setCursor(10, BORDER_PAD_Y + FM * LH);
-    tft.println("Sniffing Started");
+    tft.println("Captura iniciada");
 
     sniffer_reset_handshake_cache(); // Need to clear to restart HS count
     registeredBeacons.clear();
@@ -1227,7 +1227,7 @@ void sniffer_setup() {
         if (returnToMenu) {
             if (littleFsWasFull) {
                 Serial.println("Not enough space on LittleFS");
-                displayError("LittleFS Full", true);
+                displayError("LittleFS cheia", true);
             }
             break; // user exit or storage exit — either way stop loop
         }
@@ -1304,7 +1304,7 @@ void sniffer_setup() {
 
         if (check(SelPress)) { // pressed ok - show menu
             options = {
-                {"New File",
+                {"Novo arquivo",
                  [=]() {
                      sniffer_wait_for_flush(1000);
                      if (sniffer_get_mode() == SnifferMode::Full) {
@@ -1315,26 +1315,26 @@ void sniffer_setup() {
                          openDeauthFile(*Fs);
                      }
                  }                                                                                        },
-                {"Capture Mode",
+                {"Modo de captura",
                  [&]() {
                      std::vector<Option> modeOptions;
                      if (sniffer_full_mode_available()) {
-                         modeOptions.push_back({"Full Sniff", [&]() {
+                         modeOptions.push_back({"Captura completa", [&]() {
                                                     sniffer_set_mode(SnifferMode::Full);
                                                 }});
                      }
-                     modeOptions.push_back({"Only EAPOL/HS", [&]() {
+                     modeOptions.push_back({"So EAPOL/HS", [&]() {
                                                 sniffer_set_mode(SnifferMode::HandshakesOnly);
                                             }});
-                     modeOptions.push_back({"Sniff Deauth", [&]() {
+                     modeOptions.push_back({"Capturar deauth", [&]() {
                                                 sniffer_set_mode(SnifferMode::DeauthOnly);
                                             }});
-                     loopOptions(modeOptions, MENU_TYPE_SUBMENU, "Capture Mode");
+                     loopOptions(modeOptions, MENU_TYPE_SUBMENU, "Modo de captura");
                      redraw = true;
                  }                                                                                        },
-                {deauth ? "Disable deauth attack" : "Enable deauth attack", [&]() { deauth = !deauth; }   },
-                {"Deauth Now",                                              [&]() { sendDeauthNow(); }    },
-                {"Reset Counters",
+                {deauth ? "Desativar ataque deauth" : "Ativar ataque deauth", [&]() { deauth = !deauth; }},
+                {"Deauth agora", [&]() { sendDeauthNow(); }},
+                {"Zerar contadores",
                  [&]() {
                      packet_counter = 0;
                      num_EAPOL = 0;
@@ -1347,7 +1347,7 @@ void sniffer_setup() {
                      sniffer_reset_handshake_cache();
                      deauth_tmp = millis();
                  }                                                                                        },
-                {"Exit Sniffer",                                            [&]() { returnToMenu = true; }},
+                {"Sair do sniffer", [&]() { returnToMenu = true; }},
             };
             loopOptions(options);
             clearScreen = true;
@@ -1366,37 +1366,37 @@ void sniffer_setup() {
 
             if (returnToMenu) goto Exit;
             tft.drawPixel(0, 0, 0);
-            drawMainBorderWithTitle("pcap sniffer", clearScreen); // Clear Screen and redraw border
+            drawMainBorderWithTitle("Sniffer PCAP", clearScreen); // Clear Screen and redraw border
             clearScreen = false;
             tft.setTextSize(FP);
             tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-            String activeFile = "File: ";
+            String activeFile = "Arquivo: ";
             if (sniffer_get_mode() == SnifferMode::Full && rawCaptureEnabled()) {
                 activeFile += FileSys + ":" + filename;
             } else if (sniffer_get_mode() == SnifferMode::DeauthOnly && deauthCaptureEnabled()) {
                 activeFile += FileSys + ":" + deauthFilename;
             } else {
-                activeFile += "handshake pcaps";
+                activeFile += "PCAPs de handshake";
             }
             padprintln(activeFile);
-            padprintln("Sniffer Mode: " + currentModeString());
+            padprintln("Modo do sniffer: " + currentModeString());
             if (deauth) {
                 tft.setTextColor(bruceConfig.bgColor, bruceConfig.priColor);
                 padprintln(
-                    "Deauth: in " + String((DEAUTH_INTERVAL - (millis() - deauth_tmp)) / 1000) + "s, total " +
-                    String(deauth_counter) + " pkts sent"
+                    "Deauth: em " + String((DEAUTH_INTERVAL - (millis() - deauth_tmp)) / 1000) + "s, total " +
+                    String(deauth_counter) + " pacotes"
                 );
                 tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
 
-            } else padprintln("Silent mode.");
+            } else padprintln("Modo silencioso.");
 
-            padprintln("Run time " + String(runtime / 60) + ":" + String(runtime % 60));
+            padprintln("Tempo " + String(runtime / 60) + ":" + String(runtime % 60));
 
             // New: show beacon counts and recent SSIDs
             size_t activeOnChannel = countActiveBeaconsOnChannel(all_wifi_channels[ch]);
             padprintln(
-                "Beacons " + String(beacon_frames) + " tot. /" + String(registeredBeacons.size()) +
-                " cached / ch " + String(activeOnChannel) + " active"
+                "Beacons " + String(beacon_frames) + " total /" + String(registeredBeacons.size()) +
+                " cache / canal " + String(activeOnChannel) + " ativos"
             );
 
             // show a short list of recent SSIDs on this channel (comma-separated)
@@ -1419,7 +1419,7 @@ void sniffer_setup() {
                         : all_wifi_channels[ch] < 100 ? " "
                                                       : ""
                     ) +
-                    String(all_wifi_channels[ch]) + " (Next)",
+                    String(all_wifi_channels[ch]) + " (Prox)",
                 tftWidth - 10,
                 tftHeight - 18,
                 1
@@ -1427,7 +1427,7 @@ void sniffer_setup() {
             tft.drawString(
                 " EAPOL: " + String(num_EAPOL) + " HS: " + String(num_HS) + " ", 10, tftHeight - 18
             );
-            tft.drawCentreString("Packets " + String(packet_counter), tftWidth / 2, tftHeight - 26, 1);
+            tft.drawCentreString("Pacotes " + String(packet_counter), tftWidth / 2, tftHeight - 26, 1);
         }
 
         if (currentTime - lastTime > 100) tft.drawPixel(0, 0, 0);

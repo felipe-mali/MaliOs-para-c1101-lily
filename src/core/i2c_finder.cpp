@@ -7,17 +7,17 @@
 #define LAST_I2C_ADDRESS 0x7F
 
 void find_i2c_addresses() {
-    drawMainBorderWithTitle("I2C Finder");
+    drawMainBorderWithTitle("Busca I2C");
     padprintln("");
     padprintln("");
 
     bool first_found = true;
     TwoWire *Wire = acquireI2CBus();
 
-    padprintln("Checking I2C addresses ...\n\n");
+    padprintln("Procurando enderecos I2C...\n\n");
     delay(300);
 
-    padprint("Found: ");
+    padprint("Encontrados: ");
 
     for (uint8_t i = FIRST_I2C_ADDRESS; i <= LAST_I2C_ADDRESS; i++) {
         Wire->beginTransmission(i);

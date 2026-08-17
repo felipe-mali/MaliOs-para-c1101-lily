@@ -9,7 +9,7 @@ void chfreq();
 
 class LoRaMenu : public MenuItemInterface {
 public:
-    LoRaMenu() : MenuItemInterface("LoRa") {}
+    LoRaMenu() : MenuItemInterface("LoRa", "LoRa") {}
 
     void optionsMenu(void);
     void drawIcon(float scale);

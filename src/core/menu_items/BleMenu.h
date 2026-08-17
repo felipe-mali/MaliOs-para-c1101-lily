@@ -5,7 +5,7 @@
 
 class BleMenu : public MenuItemInterface {
 public:
-    BleMenu() : MenuItemInterface("Bluetooth") {}
+    BleMenu() : MenuItemInterface("BLE", "Bluetooth") {}
 
     void optionsMenu(void);
     void drawIcon(float scale);

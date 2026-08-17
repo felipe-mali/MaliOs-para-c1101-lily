@@ -44,10 +44,10 @@ static String payloadToHex(const std::vector<uint8_t> &payload) {
 }
 
 static String parseManufacturerData(const std::vector<uint8_t> &payload) {
-    if (payload.size() < 2) return "Unknown";
+    if (payload.size() < 2) return "Desconhecido";
 
     uint16_t companyId = (payload[1] << 8) | payload[0];
-    String info = "Company: 0x" + String(companyId, HEX) + " ";
+    String info = "Empresa: 0x" + String(companyId, HEX) + " ";
 
     switch (companyId) {
         case 0x004C:
@@ -56,8 +56,8 @@ static String parseManufacturerData(const std::vector<uint8_t> &payload) {
                 uint8_t type = payload[2];
                 uint8_t subtype = payload[3];
                 if (type == 0x07 && subtype == 0x19) info += " Continuity";
-                else if (type == 0x04 && subtype == 0x04) info += " Continuity Action";
-                else if (type == 0x0F && subtype == 0x05) info += " Nearby Action";
+                else if (type == 0x04 && subtype == 0x04) info += " Acao Continuity";
+                else if (type == 0x0F && subtype == 0x05) info += " Acao Proxima";
                 else if (type == 0x10 && subtype == 0x14) info += " iBeacon";
             }
             break;
@@ -72,22 +72,22 @@ static String parseManufacturerData(const std::vector<uint8_t> &payload) {
             info += "(Google FastPair)";
             if (payload.size() >= 6) {
                 uint32_t modelId = (payload[4] << 16) | (payload[5] << 8) | payload[6];
-                info += " Model: 0x" + String(modelId, HEX);
+                info += " Modelo: 0x" + String(modelId, HEX);
             }
             break;
         case 0x0600: info += "(Microsoft)"; break;
-        default: info += "(Unknown)";
+        default: info += "(Desconhecido)";
     }
     return info;
 }
 
 void BLE_Sniffer() {
-    drawMainBorderWithTitle("BLE SNIFFER");
+    drawMainBorderWithTitle("CAPTURA BLE");
     padprintln("");
-    padprintln("Press [SEL] to start/stop capture");
-    padprintln("Press [ESC] to exit");
+    padprintln("[SEL] inicia/para captura");
+    padprintln("[ESC] para sair");
     padprintln("");
-    padprintln("Status: READY");
+    padprintln("Status: PRONTO");
 
     bool isCapturing = false;
     bool firstRun = true;
@@ -118,7 +118,7 @@ void BLE_Sniffer() {
                     vTaskDelay(10 / portTICK_PERIOD_MS);
                     pSnifferScan = NimBLEDevice::getScan();
                     if (!pSnifferScan) {
-                        displayError("Failed to init scanner");
+                        displayError("Falha ao iniciar scanner");
                         NimBLEDevice::deinit(true);
                         break;
                     }
@@ -132,8 +132,8 @@ void BLE_Sniffer() {
                 snifferPacketCount = 0;
                 snifferPackets.clear();
                 padprintln("");
-                padprintln("Status: CAPTURING...");
-                padprintln("Press [SEL] to stop");
+                padprintln("Status: CAPTURANDO...");
+                padprintln("[SEL] para parar");
 
                 NimBLEScanResults results = pSnifferScan->getResults(10 * 1000, true);
 
@@ -143,7 +143,7 @@ void BLE_Sniffer() {
                     SnifferPacket packet;
                     packet.address = String(device->getAddress().toString().c_str());
                     packet.name = String(device->getName().c_str());
-                    if (packet.name.isEmpty()) packet.name = "Unknown";
+                    if (packet.name.isEmpty()) packet.name = "Desconhecido";
                     packet.rssi = device->getRSSI();
                     packet.timestamp = String(millis() / 1000);
 
@@ -159,12 +159,12 @@ void BLE_Sniffer() {
                 pSnifferScan->stop();
                 isCapturing = false;
                 padprintln("");
-                padprintln("Status: DONE");
-                padprintln("Captured: " + String(snifferPacketCount) + " packets");
+                padprintln("Status: CONCLUIDO");
+                padprintln("Capturados: " + String(snifferPacketCount) + " pacotes");
                 padprintln("");
-                padprintln("Press [SEL] to view packets");
-                padprintln("Press [NEXT] to save to SD/LittleFS");
-                padprintln("Press [ESC] to exit");
+                padprintln("[SEL] ver pacotes");
+                padprintln("[NEXT] salvar em SD/LittleFS");
+                padprintln("[ESC] sair");
             }
         }
 
@@ -180,7 +180,7 @@ void BLE_Sniffer() {
                 }
 
                 tft.fillScreen(bruceConfig.bgColor);
-                drawMainBorderWithTitle("CAPTURED PACKETS");
+                drawMainBorderWithTitle("PACOTES CAPTURADOS");
 
                 int y = BORDER_PAD_Y + FM * LH + 4;
                 int lineH = max(14, tftHeight / 12);
@@ -189,7 +189,7 @@ void BLE_Sniffer() {
                 tft.setTextSize(FP);
                 tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
                 tft.setCursor(10, y);
-                tft.println("Packets: " + String(snifferPacketCount));
+                tft.println("Pacotes: " + String(snifferPacketCount));
                 y += lineH;
 
                 for (int i = 0; i < visibleItems && (scrollOffset + i) < snifferPacketCount && i < 5; i++) {
@@ -222,7 +222,7 @@ void BLE_Sniffer() {
 
                 tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
                 tft.setCursor(10, tftHeight - 20);
-                tft.drawString("PREV/NEXT: Navigate  SEL: View Details  ESC: Back", 10, tftHeight - 20, 1);
+                tft.drawString("PREV/NEXT: Navegar SEL: Detalhes ESC: Voltar", 10, tftHeight - 20, 1);
 
                 if (check(NextPress)) {
                     if (selected < snifferPacketCount - 1) {
@@ -241,22 +241,22 @@ void BLE_Sniffer() {
                 if (check(SelPress)) {
                     SnifferPacket &pkt = snifferPackets[selected];
 
-                    drawMainBorderWithTitle("PACKET DETAILS");
+                    drawMainBorderWithTitle("DETALHES DO PACOTE");
                     int dy = BORDER_PAD_Y + FM * LH + 4;
                     int dlh = max(12, tftHeight / 14);
                     tft.setTextSize(FP);
                     tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
 
                     tft.setCursor(10, dy);
-                    tft.println("Device: " + pkt.name);
+                    tft.println("Dispositivo: " + pkt.name);
                     dy += dlh;
-                    tft.println("Address: " + pkt.address);
+                    tft.println("Endereco: " + pkt.address);
                     dy += dlh;
                     tft.println("RSSI: " + String(pkt.rssi) + " dBm");
                     dy += dlh;
-                    tft.println("Channel: " + String(pkt.channel));
+                    tft.println("Canal: " + String(pkt.channel));
                     dy += dlh;
-                    tft.println("Timestamp: " + pkt.timestamp + "s");
+                    tft.println("Tempo: " + pkt.timestamp + "s");
                     dy += dlh;
                     tft.println("Payload (" + String(pkt.payload.size()) + " bytes):");
                     dy += dlh;
@@ -268,12 +268,12 @@ void BLE_Sniffer() {
 
                     tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
                     String hexDump = pkt.payloadHex;
-                    if (hexDump.length() > 400) hexDump = hexDump.substring(0, 400) + "...\n(truncated)";
+                    if (hexDump.length() > 400) hexDump = hexDump.substring(0, 400) + "...\n(truncado)";
                     tft.println(hexDump);
 
                     tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
                     tft.setCursor(10, tftHeight - 20);
-                    tft.drawString("Press any key to continue", 10, tftHeight - 20, 1);
+                    tft.drawString("Pressione uma tecla para continuar", 10, tftHeight - 20, 1);
 
                     while (!check(EscPress) && !check(SelPress) && !check(PrevPress) && !check(NextPress)) {
                         delay(50);
@@ -323,12 +323,12 @@ void BLE_Sniffer() {
                         file.println("\n");
                     }
                     file.close();
-                    displaySuccess("Saved to " + storageType);
+                    displaySuccess("Salvo em " + storageType);
                 } else {
-                    displayError("Failed to save");
+                    displayError("Falha ao salvar");
                 }
             } else {
-                displayError("No storage available");
+                displayError("Sem armazenamento disponivel");
             }
             delay(1000);
         }
@@ -339,9 +339,9 @@ void BLE_Sniffer() {
 
 void BLE_SnifferMenu() {
     std::vector<Option> snifferOptions;
-    snifferOptions.push_back({"Start Sniffer", BLE_Sniffer});
-    snifferOptions.push_back({"Back", []() { returnToMenu = true; }});
-    loopOptions(snifferOptions, MENU_TYPE_SUBMENU, "BLE Sniffer");
+    snifferOptions.push_back({"Iniciar captura", BLE_Sniffer});
+    snifferOptions.push_back({"Voltar", []() { returnToMenu = true; }});
+    loopOptions(snifferOptions, MENU_TYPE_SUBMENU, "Captura BLE");
 }
 
 #endif

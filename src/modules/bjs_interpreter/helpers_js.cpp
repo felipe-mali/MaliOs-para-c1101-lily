@@ -6,16 +6,16 @@
 #include <math.h>
 #include <string.h>
 
-void print_errorMessage(const char *msg, const char *stackTrace) {
+void print_errorMessage(const char *msg, const char *stackTrace, const char *displayMsg) {
     tft.fillScreen(bruceConfig.bgColor);
     tft.setTextSize(FM);
     tft.setTextColor(TFT_RED, bruceConfig.bgColor);
-    tft.drawCentreString("Error", tftWidth / 2, 10, 1);
+    tft.drawCentreString("Erro", tftWidth / 2, 10, 1);
     tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
     tft.setTextSize(FP);
     tft.setCursor(0, 33);
 
-    tft.printf("%s\n%s\n", msg, stackTrace);
+    tft.printf("%s\n%s\n", displayMsg != NULL ? displayMsg : msg, stackTrace);
     Serial.printf("%s\n%s\n", msg, stackTrace);
     Serial.flush();
 
@@ -34,7 +34,7 @@ void js_fatal_error_handler(JSContext *ctx) {
     tft.fillScreen(bruceConfig.bgColor);
     tft.setTextSize(FM);
     tft.setTextColor(TFT_RED, bruceConfig.bgColor);
-    tft.drawCentreString("Error", tftWidth / 2, 10, 1);
+    tft.drawCentreString("Erro", tftWidth / 2, 10, 1);
     tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
     tft.setTextSize(FP);
     tft.setCursor(0, 33);
@@ -51,7 +51,7 @@ void js_fatal_error_handler(JSContext *ctx) {
     JS_PrintValueF(ctx, obj, JS_DUMP_LONG);
     const char *msg = JS_ToCString(ctx, obj, &sb);
 
-    print_errorMessage(msg != NULL ? msg : "JS Error", stackTrace);
+    print_errorMessage(msg != NULL ? msg : "JS Error", stackTrace, msg != NULL ? NULL : "Erro JS");
 }
 
 bool JS_IsTypedArray(JSContext *ctx, JSValue val) {

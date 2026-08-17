@@ -60,7 +60,7 @@ int RFID2::read(int cardBaudRate) {
 
     if (!PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial()) return TAG_NOT_PRESENT;
 
-    displayInfo("Reading data blocks...");
+    displayInfo("Lendo blocos de dados...");
     pageReadStatus = read_data_blocks();
     pageReadSuccess = pageReadStatus == SUCCESS;
     format_data();
@@ -507,7 +507,7 @@ int RFID2::write_data_blocks() {
 
         if (!blockWriteSuccess) return FAILURE;
 
-        progressHandler(totalSize - strAllPages.length(), totalSize, "Writing data blocks...");
+        progressHandler(totalSize - strAllPages.length(), totalSize, "Gravando blocos...");
     }
 
     return SUCCESS;

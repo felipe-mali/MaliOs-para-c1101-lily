@@ -618,7 +618,7 @@ bool parseShellPromptLine(const String &line, String &context, String &prompt) {
     location.trim();
     if (location.isEmpty()) return false;
 
-    context = "usr: " + userHost + " on: " + location;
+    context = "usr: " + userHost + " em: " + location;
     prompt = location + " > ";
     return true;
 }
@@ -748,7 +748,7 @@ void finishSessionUi(const String &title) {
     while (getClientTaskHandle() != nullptr) { vTaskDelay(pdMS_TO_TICKS(20)); }
 
     String status = getSessionStatus();
-    if (status.isEmpty()) { status = (title == "SSH") ? "SSH session closed." : "Telnet session closed."; }
+    if (status.isEmpty()) { status = (title == "SSH") ? "Sessao SSH encerrada." : "Sessao Telnet encerrada."; }
 
     appendSessionLog("\n[STATUS] " + status + "\n");
     withClientLock([&]() { closeSessionLogUnlocked(); });
@@ -767,7 +767,7 @@ void sshWorkerTask(void *pvParameters) {
     bool stdoutPollingEnabled = true;
     bool stderrPollingEnabled = true;
     if (!buffer) {
-        markSessionClosed("SSH buffer allocation failed.", true);
+        markSessionClosed("Falha ao alocar buffer SSH.", true);
         goto SSH_EXIT;
     }
 
@@ -775,7 +775,7 @@ void sshWorkerTask(void *pvParameters) {
 
     sshSession = ssh_new();
     if (sshSession == nullptr) {
-        markSessionClosed("SSH session creation failed.", true);
+        markSessionClosed("Falha ao criar sessao SSH.", true);
         goto SSH_EXIT;
     }
 
@@ -787,7 +787,7 @@ void sshWorkerTask(void *pvParameters) {
     ssh_options_set(sshSession, SSH_OPTIONS_STRICTHOSTKEYCHECK, &strictHostKeyChecking);
 
     if (!WiFi.isConnected()) {
-        markSessionClosed("WiFi disconnected before SSH connect.", true);
+        markSessionClosed("WiFi caiu antes da conexao SSH.", true);
         goto SSH_EXIT;
     }
 
@@ -798,32 +798,32 @@ void sshWorkerTask(void *pvParameters) {
         sessionUser.c_str()
     );
     if (ssh_connect(sshSession) != SSH_OK) {
-        markSessionClosed("SSH connect error.", true);
+        markSessionClosed("Erro de conexao SSH.", true);
         goto SSH_EXIT;
     }
     Serial.printf("[SSHDBG] connect ok\n");
 
     if (ssh_userauth_password(sshSession, nullptr, ssh_password.c_str()) != SSH_AUTH_SUCCESS) {
-        markSessionClosed("SSH authentication error.", true);
+        markSessionClosed("Erro de autenticacao SSH.", true);
         goto SSH_EXIT;
     }
     Serial.printf("[SSHDBG] auth ok\n");
 
     sshChannel = ssh_channel_new(sshSession);
     if (sshChannel == nullptr || ssh_channel_open_session(sshChannel) != SSH_OK) {
-        markSessionClosed("SSH channel open error.", true);
+        markSessionClosed("Erro ao abrir canal SSH.", true);
         goto SSH_EXIT;
     }
     Serial.printf("[SSHDBG] channel open ok\n");
 
     if (ssh_channel_request_pty_size(sshChannel, "vt100", getTerminalCols(), getTerminalRows()) != SSH_OK) {
-        markSessionClosed("SSH PTY request error.", true);
+        markSessionClosed("Erro ao solicitar PTY SSH.", true);
         goto SSH_EXIT;
     }
     Serial.printf("[SSHDBG] pty ok cols=%d rows=%d\n", getTerminalCols(), getTerminalRows());
 
     if (ssh_channel_request_shell(sshChannel) != SSH_OK) {
-        markSessionClosed("SSH shell request error.", true);
+        markSessionClosed("Erro ao solicitar shell SSH.", true);
         goto SSH_EXIT;
     }
     Serial.printf("[SSHDBG] shell ok\n");
@@ -832,14 +832,14 @@ void sshWorkerTask(void *pvParameters) {
 
     while (!isStopRequested()) {
         if (!WiFi.isConnected()) {
-            markSessionClosed("WiFi disconnected during SSH session.", true);
+            markSessionClosed("WiFi caiu durante sessao SSH.", true);
             goto SSH_EXIT;
         }
 
         String outbound = takeQueuedCommand();
         if (sshChannel == nullptr || sshSession == nullptr) {
             Serial.printf("[SSHDBG] session invalid. channel=%p session=%p\n", sshChannel, sshSession);
-            markSessionClosed("SSH session closed.", false);
+            markSessionClosed("Sessao SSH encerrada.", false);
             goto SSH_EXIT;
         }
 
@@ -851,7 +851,7 @@ void sshWorkerTask(void *pvParameters) {
                 ssh_channel_is_closed(sshChannel),
                 ssh_channel_is_eof(sshChannel)
             );
-            markSessionClosed("SSH channel closed.", false);
+            markSessionClosed("Canal SSH encerrado.", false);
             goto SSH_EXIT;
         }
 
@@ -861,7 +861,7 @@ void sshWorkerTask(void *pvParameters) {
             if (written == SSH_AGAIN) {
                 // Channel temporarily can't accept more data in nonblocking mode.
             } else if (written == SSH_ERROR) {
-                markSessionClosed("SSH write error.", true);
+                markSessionClosed("Erro de escrita SSH.", true);
                 goto SSH_EXIT;
             }
         }
@@ -896,7 +896,7 @@ void sshWorkerTask(void *pvParameters) {
                 Serial.printf(
                     "[SSHDBG] poll rc=%d stderr=%d err='%s'\n", available, isStderr, sshError ? sshError : ""
                 );
-                markSessionClosed("SSH poll error.", true);
+                markSessionClosed("Erro de consulta SSH.", true);
                 return false;
             }
 
@@ -927,7 +927,7 @@ void sshWorkerTask(void *pvParameters) {
 
             if (nbytes == 0) {
                 if (ssh_channel_is_eof(sshChannel) || ssh_channel_is_closed(sshChannel)) {
-                    markSessionClosed("SSH session closed.", false);
+                    markSessionClosed("Sessao SSH encerrada.", false);
                     return false;
                 }
                 return true;
@@ -937,12 +937,12 @@ void sshWorkerTask(void *pvParameters) {
                 Serial.printf(
                     "[SSHDBG] read end-of-channel stderr=%d err='%s'\n", isStderr, ssh_get_error(sshSession)
                 );
-                markSessionClosed("SSH session closed.", false);
+                markSessionClosed("Sessao SSH encerrada.", false);
             } else {
                 Serial.printf(
                     "[SSHDBG] read error stderr=%d err='%s'\n", isStderr, ssh_get_error(sshSession)
                 );
-                markSessionClosed("SSH read error.", true);
+                markSessionClosed("Erro de leitura SSH.", true);
             }
             return false;
         };
@@ -957,14 +957,14 @@ void sshWorkerTask(void *pvParameters) {
 
         if (ssh_channel_is_eof(sshChannel) && ssh_channel_poll(sshChannel, 0) <= 0 &&
             ssh_channel_poll(sshChannel, 1) <= 0) {
-            markSessionClosed("SSH session closed.", false);
+            markSessionClosed("Sessao SSH encerrada.", false);
             goto SSH_EXIT;
         }
 
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 
-    markSessionClosed("SSH session closed.", false);
+    markSessionClosed("Sessao SSH encerrada.", false);
 
 SSH_EXIT:
     if (sshChannel != nullptr) {
@@ -989,7 +989,7 @@ void telnetWorkerTask(void *pvParameters) {
     struct timeval timeout = {.tv_sec = 0, .tv_usec = 100000};
 
     if (!buffer) {
-        markSessionClosed("Telnet buffer allocation failed.", true);
+        markSessionClosed("Falha ao alocar buffer Telnet.", true);
         goto TELNET_EXIT;
     }
 
@@ -1001,14 +1001,14 @@ void telnetWorkerTask(void *pvParameters) {
 
     telnetSock = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
     if (telnetSock < 0) {
-        markSessionClosed("Unable to create socket.", true);
+        markSessionClosed("Nao foi possivel criar socket.", true);
         goto TELNET_EXIT;
     }
 
     setsockopt(telnetSock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 
     if (connect(telnetSock, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) != 0) {
-        markSessionClosed("Socket connection failed.", true);
+        markSessionClosed("Falha na conexao do socket.", true);
         goto TELNET_EXIT;
     }
 
@@ -1016,7 +1016,7 @@ void telnetWorkerTask(void *pvParameters) {
 
     while (!isStopRequested()) {
         if (!WiFi.isConnected()) {
-            markSessionClosed("WiFi disconnected during Telnet session.", true);
+            markSessionClosed("WiFi caiu durante sessao Telnet.", true);
             goto TELNET_EXIT;
         }
 
@@ -1033,17 +1033,17 @@ void telnetWorkerTask(void *pvParameters) {
                 appendSessionOutput(buffer.get(), len);
             }
         } else if (len == 0) {
-            markSessionClosed("Telnet session closed.", false);
+            markSessionClosed("Sessao Telnet encerrada.", false);
             goto TELNET_EXIT;
         } else if (errno != EWOULDBLOCK && errno != EAGAIN) {
-            markSessionClosed("Telnet receive error.", true);
+            markSessionClosed("Erro de recepcao Telnet.", true);
             goto TELNET_EXIT;
         }
 
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 
-    markSessionClosed("Telnet session closed.", false);
+    markSessionClosed("Sessao Telnet encerrada.", false);
 
 TELNET_EXIT:
     if (telnetSock >= 0) {
@@ -1059,7 +1059,7 @@ void runSessionUiLoop(const String &title) {
     resetCommandBufferToPrompt();
     resetClientScreen(title.c_str());
 
-    displayTextLine("Connecting...");
+    displayTextLine("Conectando...");
     while (isSessionConnecting() && !isSessionClosed() && !returnToMenu) {
         if (check(EscPress)) {
             finishSessionUi(title);
@@ -1160,7 +1160,7 @@ void runSessionUiLoop(const String &title) {
         }
 #else
         if (check(SelPress)) {
-            String message = keyboard("", 76, title + " Command:");
+            String message = keyboard("", 76, title + " - comando:");
 
             if (message == "cls" || message == "clear") {
                 appendSessionCommandToLog(message);
@@ -1180,7 +1180,7 @@ void runSessionUiLoop(const String &title) {
 #endif
 
         if (check(EscPress) && isDelPressed == false) {
-            if (isSessionConnecting()) { displayWarning("Closing session...", false); }
+            if (isSessionConnecting()) { displayWarning("Encerrando sessao...", false); }
             break;
         }
         vTaskDelay(pdMS_TO_TICKS(20));
@@ -1200,7 +1200,7 @@ char *stringTochar(const String &s) {
 void ssh_setup(String host) {
     if (!wifiConnected) wifiConnectMenu();
     if (!initClientMutex()) {
-        displayError("SSH mutex creation failed.", true);
+        displayError("Falha ao criar mutex SSH.", true);
         returnToMenu = true;
         return;
     }
@@ -1211,22 +1211,22 @@ void ssh_setup(String host) {
     } else {
         String my_net =
             WiFi.gatewayIP().toString().substring(0, WiFi.gatewayIP().toString().lastIndexOf(".") + 1);
-        ssh_host = keyboard(my_net, 100, "SSH HOST (IP or Hostname)");
+        ssh_host = keyboard(my_net, 100, "HOST SSH (IP ou nome)");
         if (ssh_host == "\x1B") return;
     }
 
-    ssh_port = num_keyboard("22", 5, "SSH PORT");
+    ssh_port = num_keyboard("22", 5, "PORTA SSH");
     if (ssh_port == "\x1B") return;
-    ssh_user = keyboard("", 76, "SSH USER");
+    ssh_user = keyboard("", 76, "USUARIO SSH");
     if (ssh_user == "\x1B") return;
-    ssh_password = keyboard("", 76, "SSH PASSWORD", true);
+    ssh_password = keyboard("", 76, "SENHA SSH", true);
     if (ssh_password == "\x1B") return;
 
     IPAddress resolvedIp;
     if (WiFi.hostByName(ssh_host.c_str(), resolvedIp)) {
         ssh_host = resolvedIp.toString();
     } else {
-        displayError("Failed to resolve hostname.", true);
+        displayError("Falha ao resolver host.", true);
         Serial.printf("Failed to resolve hostname: %s", ssh_host.c_str());
         returnToMenu = true;
         return;
@@ -1242,7 +1242,7 @@ void ssh_setup(String host) {
     setClientTaskHandle(workerHandle);
 
     if (workerHandle == nullptr) {
-        displayError("SSH Task creation failed.", true);
+        displayError("Falha ao criar tarefa SSH.", true);
         returnToMenu = true;
         return;
     }
@@ -1258,7 +1258,7 @@ void telnet_loop() { telnetWorkerTask(nullptr); }
 void telnet_setup() {
     if (!wifiConnected) wifiConnectMenu();
     if (!initClientMutex()) {
-        displayError("Telnet mutex creation failed.", true);
+        displayError("Falha ao criar mutex Telnet.", true);
         returnToMenu = true;
         return;
     }
@@ -1267,9 +1267,9 @@ void telnet_setup() {
     Serial.begin(115200);
     Serial.println("Starting Telnet Setup");
 
-    telnet_server_string = keyboard("", 76, "TELNET_SERVER");
+    telnet_server_string = keyboard("", 76, "SERVIDOR TELNET");
     if (telnet_server_string == "\x1B") return;
-    telnet_port_string = num_keyboard("23", 5, "TELNET PORT");
+    telnet_port_string = num_keyboard("23", 5, "PORTA TELNET");
     if (telnet_port_string == "\x1B") return;
     telnet_server_port = telnet_port_string.toInt();
 
@@ -1277,7 +1277,7 @@ void telnet_setup() {
     if (WiFi.hostByName(telnet_server_string.c_str(), resolvedIp)) {
         sessionHost = resolvedIp.toString();
     } else {
-        displayError("Failed to resolve hostname.", true);
+        displayError("Falha ao resolver host.", true);
         returnToMenu = true;
         return;
     }
@@ -1289,7 +1289,7 @@ void telnet_setup() {
     setClientTaskHandle(workerHandle);
 
     if (workerHandle == nullptr) {
-        displayError("Telnet Task creation failed.", true);
+        displayError("Falha ao criar tarefa Telnet.", true);
         returnToMenu = true;
         return;
     }

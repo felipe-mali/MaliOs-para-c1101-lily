@@ -58,7 +58,7 @@ void Wardriving::setup() {
     PPM.enableOTG();
 #endif
     display_banner();
-    padprintln("Initializing...");
+    padprintln("Iniciando...");
 
     loadAlertMACs();
     begin_wifi();
@@ -82,13 +82,13 @@ bool Wardriving::begin_gps() {
     );
 
     int count = 0;
-    padprintln("Waiting for GPS data");
+    padprintln("Aguardando dados GPS");
     while (GPSserial.available() <= 0) {
         if (check(EscPress)) {
             end();
             return false;
         }
-        displayTextLine("Waiting GPS: " + String(count) + "s");
+        displayTextLine("Aguardando GPS: " + String(count) + "s");
         count++;
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
@@ -129,11 +129,11 @@ void Wardriving::loop() {
             // }
             // Serial.println(txt);
             if (gps.location.isUpdated()) {
-                padprintln("GPS location updated");
+                padprintln("Posicao GPS atualizada");
                 set_position();
                 scanWiFiBLE();
             } else {
-                padprintln("GPS location not updated");
+                padprintln("Posicao GPS sem atualizar");
                 dump_gps_data();
 
                 if (filename == "" && gps.date.year() >= CURRENT_YEAR && gps.date.year() < CURRENT_YEAR + 5)
@@ -141,10 +141,10 @@ void Wardriving::loop() {
             }
         } else {
             if (count > 5) {
-                displayError("GPS not Found!");
+                displayError("GPS nao encontrado!");
                 return end();
             }
-            padprintln("No GPS data available");
+            padprintln("Sem dados GPS");
             count++;
         }
 
@@ -171,12 +171,12 @@ void Wardriving::display_banner() {
     drawMainBorderWithTitle("Wardriving");
 
     padprintln("");
-    if (filename != "") padprintln("File: " + filename.substring(0, filename.length() - 4));
-    String txt = "Found";
+    if (filename != "") padprintln("Arquivo: " + filename.substring(0, filename.length() - 4));
+    String txt = "Encontrados";
     if (scanWiFi) txt += " WiFi: " + String(wifiNetworkCount);
     if (scanBLE) txt += " BLE: " + String(bluetoothDeviceCount);
     padprint(txt);
-    if (foundMACAddressCount) padprint(" Alert: " + String(foundMACAddressCount));
+    if (foundMACAddressCount) padprint(" Alerta: " + String(foundMACAddressCount));
 
     padprintln("");
     uint32_t elapsedMs = millis() - sessionStartMs;
@@ -184,18 +184,18 @@ void Wardriving::display_banner() {
     uint32_t hours = elapsedSeconds / 3600;
     uint32_t minutes = (elapsedSeconds / 60) % 60;
     uint32_t seconds = elapsedSeconds % 60;
-    padprintf("Distance: %.2fkm  ET: %02lu:%02lu:%02lu\n", distance / 1000, hours, minutes, seconds);
+    padprintf("Dist: %.2fkm  Tempo: %02lu:%02lu:%02lu\n", distance / 1000, hours, minutes, seconds);
     // Serial.printf("Wardrive Elapsed Time: %02lu:%02lu:%02lu\n", hours, minutes, seconds);
 }
 
 void Wardriving::dump_gps_data() {
     if (!date_time_updated && (!gps.date.isUpdated() || !gps.time.isUpdated())) {
-        padprintln("Waiting for valid GPS data");
+        padprintln("Aguardando GPS valido");
         return;
     }
     date_time_updated = true;
-    padprintf(2, "Date: %02d-%02d-%02d\n", gps.date.year(), gps.date.month(), gps.date.day());
-    padprintf(2, "Time: %02d:%02d:%02d\n", gps.time.hour(), gps.time.minute(), gps.time.second());
+    padprintf(2, "Data: %02d-%02d-%02d\n", gps.date.year(), gps.date.month(), gps.date.day());
+    padprintf(2, "Hora: %02d:%02d:%02d\n", gps.time.hour(), gps.time.minute(), gps.time.second());
     padprintf(2, "Sat:  %d\n", gps.satellites.value());
     padprintf(2, "HDOP: %.2f\n", gps.hdop.hdop());
 }
@@ -218,8 +218,8 @@ String Wardriving::auth_mode_to_string(wifi_auth_mode_t authMode) {
 void Wardriving::scanWiFiBLE() {
     FS *fs;
     if (!getFsStorage(fs)) {
-        padprintln("Storage setup error");
-        displayError("Storage setup error", true);
+        padprintln("Erro no armazenamento");
+        displayError("Erro no armazenamento", true);
         returnToMenu = true;
         return;
     }
@@ -233,8 +233,8 @@ void Wardriving::scanWiFiBLE() {
     File file = (*fs).open("/BruceWardriving/" + filename, is_new_file ? FILE_WRITE : FILE_APPEND);
 
     if (!file) {
-        padprintln("Failed to open file for writing");
-        displayError("Failed to open file for writing", true);
+        padprintln("Erro ao abrir arquivo");
+        displayError("Erro ao abrir arquivo", true);
         returnToMenu = true;
         return;
     }
@@ -252,7 +252,7 @@ void Wardriving::scanWiFiBLE() {
     }
 
     padprintf("Coord: %.6f, %.6f\n", gps.location.lat(), gps.location.lng());
-    padprintln("Start Scanning...");
+    padprintln("Iniciando busca...");
 
     if (scanBLE && pBLEScan != nullptr && pBLEScan->isScanning()) {
         pBLEScan->stop();
@@ -421,7 +421,7 @@ void Wardriving::scanWiFiBLE() {
 
 scan_summary:
     if (scanWiFi || scanBLE) {
-        String summary = "Scan done.";
+        String summary = "Busca concluida.";
         if (scanWiFi) summary += " WiFi: " + String(networksFound);
         if (scanBLE) summary += " BLE: " + String(bleFound);
         padprintln(summary);
@@ -435,7 +435,7 @@ void Wardriving::enforceRegisteredMACLimit() {
 
     registeredMACs.clear();
     macCacheClears++;
-    padprintln("MAC cache cleared to prevent heap overflow");
+    padprintln("Cache MAC limpa: memoria baixa");
 }
 
 int Wardriving::scanWiFiNetworks() {
@@ -463,7 +463,7 @@ void Wardriving::loadAlertMACs() {
                 }
             }
             alertFile.close();
-            if (alertMACs.size() > 0) { padprintln("Loaded " + String(alertMACs.size()) + " alert MACs"); }
+            if (alertMACs.size() > 0) { padprintln(String(alertMACs.size()) + " MACs de alerta"); }
         }
     } else {
         // Create sample alert file
@@ -514,8 +514,8 @@ void Wardriving::checkForAlert(const String &macAddress, const String &deviceTyp
     macLower.toLowerCase();
 
     if (alertMACs.find(macLower) != alertMACs.end()) {
-        String alertMsg = "ALERT: " + deviceType + " found!";
-        if (deviceName.length() > 0) { alertMsg += " Name: " + deviceName; }
+        String alertMsg = "ALERTA: " + deviceType + " encontrado!";
+        if (deviceName.length() > 0) { alertMsg += " Nome: " + deviceName; }
         alertMsg += " MAC: " + macAddress;
 
         foundMACAddressCount++;

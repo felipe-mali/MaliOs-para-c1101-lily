@@ -12,7 +12,7 @@ extern "C" {
 #include <string.h>
 
 extern "C" {
-void print_errorMessage(const char *msg, const char *stackTrace = NULL);
+void print_errorMessage(const char *msg, const char *stackTrace = NULL, const char *displayMsg = NULL);
 void js_fatal_error_handler(JSContext *ctx);
 bool JS_IsTypedArray(JSContext *ctx, JSValue val);
 JSValue js_fill(JSContext *ctx, JSValue *this_val, int argc, JSValue *argv);

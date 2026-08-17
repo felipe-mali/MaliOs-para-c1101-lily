@@ -10,7 +10,7 @@
 static const uint32_t MAX_SEQUENCE = 50;
 static const uint32_t DURATION_CYCLES = 3;
 
-static const char *JAM_MODE_NAMES[] = {"FULL POWER", "INTERMITTENT", "NOISE STORM", "FREQ SWEEP"};
+static const char *JAM_MODE_NAMES[] = {"POTENCIA TOTAL", "INTERMITENTE", "TEMPESTADE RUIDO", "VARREDURA FREQ"};
 
 RFJammer::RFJammer(bool full) {
     jamMode = full ? RF_JAM_FULL : RF_JAM_ITMT;
@@ -32,7 +32,7 @@ RFJamMode RFJammer::showModeMenu(bool defaultFull) {
         if (check(EscPress)) return (RFJamMode)255; // Cancel
 
         if (redraw) {
-            drawMainBorderWithTitle("RF JAMMER MODE");
+            drawMainBorderWithTitle("MODO JAMMER RF");
             tft.setTextSize(FP);
 
             int y = BORDER_PAD_Y + FM * LH + 4;
@@ -53,10 +53,10 @@ RFJamMode RFJammer::showModeMenu(bool defaultFull) {
             tft.fillRect(7, descY, tftWidth - 14, lineH * 2, bruceConfig.bgColor);
             tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
             const char *descs[] = {
-                "Max duty cycle continuous TX",
-                "Varied pulse patterns + bursts",
-                "CC1101 HW random noise (PN9)",
-                "Sweep +/-5MHz around target"
+                "TX continuo no ciclo maximo",
+                "Padroes de pulso e rajadas",
+                "Ruido aleatorio HW CC1101 (PN9)",
+                "Varre +/-5MHz ao redor do alvo"
             };
             tft.drawCentreString(descs[menuIdx], tftWidth / 2, descY + 2, 1);
 
@@ -64,7 +64,7 @@ RFJamMode RFJammer::showModeMenu(bool defaultFull) {
             int footerY = tftHeight - BORDER_PAD_X - FP * LH - 2;
             tft.fillRect(7, footerY, tftWidth - 14, FP * LH, bruceConfig.bgColor);
             tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-            tft.drawCentreString("[OK]Select [ESC]Back", tftWidth / 2, footerY, 1);
+            tft.drawCentreString("[OK]Seleciona [ESC]Volta", tftWidth / 2, footerY, 1);
 
             redraw = false;
         }
@@ -151,9 +151,9 @@ void RFJammer::display_banner() {
     tft.drawString("00:00", 12, y + 2, 1);
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     if (jamMode == RF_JAM_SWEEP) {
-        tft.drawRightString("Sweeps: 0", tftWidth - 12, y + 2, 1);
+        tft.drawRightString("Varreduras: 0", tftWidth - 12, y + 2, 1);
     } else {
-        tft.drawRightString("Pulses: 0", tftWidth - 12, y + 2, 1);
+        tft.drawRightString("Pulsos: 0", tftWidth - 12, y + 2, 1);
     }
     y += lineH;
 
@@ -162,12 +162,12 @@ void RFJammer::display_banner() {
     // Line 5: ACTIVE indicator with dot
     tft.fillCircle(tftWidth / 2 - 50, y + lineH / 2, 4, accent);
     tft.setTextColor(accent, bruceConfig.bgColor);
-    tft.drawString("JAMMING ACTIVE", tftWidth / 2 - 38, y + 2, 1);
+    tft.drawString("JAMMER ATIVO", tftWidth / 2 - 38, y + 2, 1);
 
     // Footer
     int footerY = tftHeight - BORDER_PAD_X - FP * LH - 2;
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-    tft.drawCentreString("[ESC] Stop", tftWidth / 2, footerY, 1);
+    tft.drawCentreString("[ESC] Parar", tftWidth / 2, footerY, 1);
 }
 
 void RFJammer::update_display(uint32_t elapsedMs) {

@@ -18,7 +18,7 @@ WDGoWars::~WDGoWars() {}
 
 bool WDGoWars::_check_api_key() {
     if (bruceConfig.wdgwarsApiKey.length() != 64) {
-        displayError("Set API key in bruce.conf\nGet it at wdgwars.pl", true);
+        displayError("Defina a chave no bruce.conf\nObtenha em wdgwars.pl", true);
         return false;
     }
 
@@ -28,7 +28,7 @@ bool WDGoWars::_check_api_key() {
 }
 
 void WDGoWars::_display_banner() {
-    drawMainBorderWithTitle("WDG Upload");
+    drawMainBorderWithTitle("Envio WDG");
     padprintln("\n");
 }
 
@@ -65,24 +65,24 @@ bool WDGoWars::upload(FS *fs, const String &filepath, bool auto_delete) {
 
     if (!fs || !_check_api_key()) return false;
 
-    padprintln("Uploading to WDGoWars...");
+    padprintln("Enviando ao WDGoWars...");
 
     File file = fs->open(filepath);
     if (!file) {
-        displayError("Failed to open file", true);
+        displayError("Erro ao abrir arquivo", true);
         return false;
     }
 
-    if (!_upload_file(file, "Uploading...")) {
+    if (!_upload_file(file, "Enviando...")) {
         file.close();
-        displayError("File upload error", true);
+        displayError("Erro ao enviar arquivo", true);
         return false;
     }
 
     file.close();
     if (auto_delete) fs->remove(filepath);
 
-    displaySuccess("File upload success", true);
+    displaySuccess("Arquivo enviado", true);
     return true;
 }
 
@@ -94,7 +94,7 @@ bool WDGoWars::upload_all(FS *fs, const String &folder, bool auto_delete) {
     File root = fs->open(folder);
     if (!root || !root.isDirectory()) return false;
 
-    padprintln("Uploading all to WDGoWars...");
+    padprintln("Enviando tudo ao WDGoWars...");
     int i = 1;
     bool success;
 
@@ -113,9 +113,9 @@ bool WDGoWars::upload_all(FS *fs, const String &folder, bool auto_delete) {
             if (ext.equals("CSV")) {
                 File file = fs->open(fullPath);
                 if (file) {
-                    if (!_upload_file(file, "Uploading " + String(i) + "...")) {
+                    if (!_upload_file(file, "Enviando " + String(i) + "...")) {
                         file.close();
-                        displayError("File upload error", true);
+                        displayError("Erro ao enviar arquivo", true);
                         return false;
                     }
                     i++;
@@ -128,8 +128,7 @@ bool WDGoWars::upload_all(FS *fs, const String &folder, bool auto_delete) {
     }
     root.close();
 
-    String plural = i > 2 ? "s" : "";
-    displaySuccess(String(i - 1) + " file" + plural + " uploaded", true);
+    displaySuccess(String(i - 1) + " arquivo(s) enviado(s)", true);
     return true;
 }
 
@@ -137,7 +136,7 @@ bool WDGoWars::_upload_file(File file, const String &upload_message) {
     WiFiClientSecure client;
     client.setInsecure();
     if (!client.connect(host, 443)) {
-        displayError("WDGoWars connection failed", true);
+        displayError("Falha ao conectar no WDGoWars", true);
         return false;
     }
 

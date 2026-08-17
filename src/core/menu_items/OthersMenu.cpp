@@ -18,7 +18,7 @@ void OthersMenu::optionsMenu() {
         {"Megalodon",    shark_setup                  },
 
 #if defined(MIC_SPM1423) || defined(MIC_INMP441)
-        {"Microphone",   [this]() { micMenu(); }      }, //@deveclipse
+        {"Microfone",    [this]() { micMenu(); }      }, //@deveclipse
 #endif
 
 // New consolidated BadUSB & HID submenu
@@ -41,15 +41,15 @@ void OthersMenu::badUsbHidMenu() {
     options = {
 #ifndef LITE_VERSION
         {"BadUSB",       [=]() { ducky_setup(hid_usb, false); }   },
-        {"USB Keyboard", [=]() { ducky_keyboard(hid_usb, false); }},
+        {"Teclado USB",  [=]() { ducky_keyboard(hid_usb, false); }},
 #endif
 
 #ifdef USB_as_HID
-        {"USB Clicker",  clicker_setup                            },
+        {"Clicker USB",  clicker_setup                            },
         {"USB U2F",      u2f_setup                                },
 #endif
 
-        {"Back",         [this]() { optionsMenu(); }              },
+        {"Voltar",       [this]() { optionsMenu(); }              },
     };
 
     loopOptions(options, MENU_TYPE_SUBMENU, "BadUSB & HID");
@@ -58,13 +58,13 @@ void OthersMenu::badUsbHidMenu() {
 void OthersMenu::micMenu() {
     options = {
 #if defined(MIC_SPM1423) || defined(MIC_INMP441)
-        {"Spectrum", mic_test                   },
-        {"Record",   mic_record_app             },
+        {"Espectro", mic_test                   },
+        {"Gravar",   mic_record_app             },
 #endif
-        {"Back",     [this]() { optionsMenu(); }},
+        {"Voltar",   [this]() { optionsMenu(); }},
     };
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "Microphone");
+    loopOptions(options, MENU_TYPE_SUBMENU, "Microfone");
 }
 
 void OthersMenu::drawIcon(float scale) {

@@ -59,7 +59,7 @@ String phyModes2String(wifi_ap_record_t record) {
         if (record.ftm_initiator) modes += "INIT ";
     }
 
-    return modes.isEmpty() ? "None" : modes;
+    return modes.isEmpty() ? "Nenhum" : modes;
 }
 
 String getChannelWidth(wifi_second_chan_t secondChannel) {
@@ -67,7 +67,7 @@ String getChannelWidth(wifi_second_chan_t secondChannel) {
         case WIFI_SECOND_CHAN_NONE: return "HT20";   // 20 MHz channel width (no secondary channel)
         case WIFI_SECOND_CHAN_ABOVE: return "HT40+"; // 40 MHz channel width with secondary channel above
         case WIFI_SECOND_CHAN_BELOW: return "HT40-"; // 40 MHz channel width with secondary channel below
-        default: return "Unknown";
+        default: return "Desconhecido";
     }
 }
 
@@ -77,9 +77,9 @@ void fillInfo(ScrollableTextArea &area) {
     if ((res = esp_wifi_sta_get_ap_info(&ap_info)) != ESP_OK) {
         String err;
         switch (res) {
-            case ESP_ERR_WIFI_CONN: err = "iface is not initialized"; break;
-            case ESP_ERR_WIFI_NOT_CONNECT: err = "station disconnected"; break;
-            default: err = "failed with" + String(res); break;
+            case ESP_ERR_WIFI_CONN: err = "Interface nao iniciada"; break;
+            case ESP_ERR_WIFI_NOT_CONNECT: err = "Estacao desconectada"; break;
+            default: err = "Falha: " + String(res); break;
         }
 
         area.addLine(err);
@@ -91,29 +91,29 @@ void fillInfo(ScrollableTextArea &area) {
 
     const auto mac = MAC(ap_info.bssid);
 
-    displayTextLine("Gathering...");
+    displayTextLine("Coletando...");
 
     // in promiscius mode also Rx/Tx can be gathered
     // organized in the most to least usable
     area.addLine("SSID: " + String((char *)ap_info.ssid));
     area.addLine("PSK: " + bruceConfig.getWifiPassword((char *)ap_info.ssid));
-    area.addLine("Internet: " + String(internetConnection() ? "avail" : "unavail"));
-    area.addLine("Modes: " + phyModes2String(ap_info));
-    area.addLine("Signal strength: " + String(ap_info.rssi) + "db");
+    area.addLine("Internet: " + String(internetConnection() ? "disponivel" : "indisponivel"));
+    area.addLine("Modos: " + phyModes2String(ap_info));
+    area.addLine("Sinal: " + String(ap_info.rssi) + "db");
     // AP might not have assigned IP and gateway ip might differ from an ap ip
     area.addLine("Gateway: " + WiFi.gatewayIP().toString());
-    area.addLine("My IP:" + WiFi.localIP().toString());
-    area.addLine("Channel: " + String(ap_info.primary) + " " + getChannelWidth(ap_info.second));
+    area.addLine("Meu IP: " + WiFi.localIP().toString());
+    area.addLine("Canal: " + String(ap_info.primary) + " " + getChannelWidth(ap_info.second));
     area.addLine("BSSID: " + mac); // sometimes MAC != BSSID (but we ignore that case)
-    area.addLine("Manufacturer: " + getManufacturer(mac));
+    area.addLine("Fabricante: " + getManufacturer(mac));
     area.addLine(
-        "Auth mode: " + autoMode2String(ap_info.authmode) + " WPA: " + String(ap_info.wps ? "enbld" : "dsbld")
+        "Autenticacao: " + autoMode2String(ap_info.authmode) + " WPS: " + String(ap_info.wps ? "ativo" : "inativo")
     );
     area.addLine(
-        "Cypher uni: " + cypherType2String(ap_info.pairwise_cipher) +
-        " mulit: " + cypherType2String(ap_info.group_cipher)
+        "Cifra uni: " + cypherType2String(ap_info.pairwise_cipher) +
+        " multi: " + cypherType2String(ap_info.group_cipher)
     );
-    area.addLine("Antenna: " + String(ap_info.ant));
+    area.addLine("Antena: " + String(ap_info.ant));
 }
 
 void displayAPInfo() {

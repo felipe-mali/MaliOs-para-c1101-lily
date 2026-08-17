@@ -67,8 +67,8 @@ void drawTime() {
     int sr = ellapsed % 3600;
     int8_t m = sr / 60;
     int8_t s = sr % 60;
-    char right_str[50] = "UPS 0%  UP 00:00:00";
-    sprintf(right_str, "UPS %i%% UP %02d:%02d:%02d", getBattery(), h, m, s);
+    char right_str[50] = "BAT 0% TEMPO 00:00:00";
+    sprintf(right_str, "BAT %i%% TEMPO %02d:%02d:%02d", getBattery(), h, m, s);
     tft.drawString(right_str, display_w, 3);
 }
 
@@ -80,9 +80,9 @@ void drawFooterData(uint8_t friends_run, uint8_t friends_tot, const String &last
     tft.setTextDatum(TL_DATUM);
 
     String rssi_bars = getRssiBars(rssi);
-    String stats = "FRND 0 (0)";
+    String stats = "AMIG 0 (0)";
     if (friends_run > 0) {
-        stats = "FRND " + String(friends_run) + " (" + String(friends_tot) + ")" + " [" +
+        stats = "AMIG " + String(friends_run) + " (" + String(friends_tot) + ")" + " [" +
                 last_friend_name.substring(0, 13) + "] " + rssi_bars;
     }
 
@@ -121,7 +121,7 @@ void drawTopCanvas() {
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     tft.setTextDatum(TL_DATUM);
     char buffer[32];
-    sprintf(buffer, "CH %02d, HS %d", ch, num_HS);
+    sprintf(buffer, "CAN %02d, HS %d", ch, num_HS);
     // draw screen
     tft.drawPixel(0, 0, 0);
     tft.fillRect(0, 0, display_w, canvas_top_h, bruceConfig.bgColor);
@@ -137,7 +137,7 @@ void drawBottomCanvas() {
     // draw screen
     tft.drawPixel(0, 0, 0);
     tft.fillRect(0, canvas_bot_h, display_w, canvas_bot_h + 10, bruceConfig.bgColor);
-    tft.drawString("NOT AI", display_w, canvas_bot_h + 5);
+    tft.drawString("SEM IA", display_w, canvas_bot_h + 5);
     tft.drawLine(0, canvas_bot_h, display_w, canvas_bot_h, bruceConfig.priColor);
 }
 

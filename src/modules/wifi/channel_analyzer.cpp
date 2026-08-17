@@ -117,8 +117,8 @@ ca_draw(const uint8_t *load, const uint8_t *peak, const int8_t *rssi, uint8_t cu
 
     // footer: current channel detail + signal meter + dwell
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-    String foot = "Ch" + String(curCh) + " " + String(load[curCh]) + "% pk" + String(peak[curCh]) + "% " +
-                  String(rssi[curCh]) + "dBm  dwell " + String(dwell) + "ms  ";
+    String foot = "Can" + String(curCh) + " " + String(load[curCh]) + "% pico" + String(peak[curCh]) + "% " +
+                  String(rssi[curCh]) + "dBm  pausa " + String(dwell) + "ms  ";
     tft.drawString(foot, x0, bottom, 1);
 }
 
@@ -136,11 +136,11 @@ void channel_analyzer_setup() {
     ca_start_wifi();
 
     tft.fillScreen(bruceConfig.bgColor);
-    drawMainBorderWithTitle("Channel Analyzer");
+    drawMainBorderWithTitle("Analise de canais");
     tft.setTextSize(FP);
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     padprintln("");
-    padprintln(" sweeping 1-11 ...");
+    padprintln(" varrendo 1-11...");
     delay(1000);
     drawMainBorder(true);
     for (;;) {

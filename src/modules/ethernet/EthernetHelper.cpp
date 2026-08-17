@@ -49,23 +49,23 @@ static void ethernet_event_handler(arduino_event_id_t event, arduino_event_info_
                 mac_addr[4],
                 mac_addr[5]
             );
-            displaySuccess("Ethernet Link Up");
+            displaySuccess("Link Ethernet ativo");
             break;
         }
         case ARDUINO_EVENT_ETH_DISCONNECTED:
             Serial.println("Ethernet Link Down");
-            displayError("Ethernet Link Down");
+            displayError("Link Ethernet inativo");
             connected = false;
             break;
         case ARDUINO_EVENT_ETH_START: Serial.println("Ethernet Started"); break;
         case ARDUINO_EVENT_ETH_STOP:
             Serial.println("Ethernet Stopped");
-            displayError("Ethernet Stopped");
+            displayError("Ethernet parada");
             connected = false;
             break;
         case ARDUINO_EVENT_ETH_LOST_IP:
             Serial.println("Ethernet Lost IP");
-            displayError("Ethernet Lost IP");
+            displayError("Ethernet perdeu o IP");
             connected = false;
             break;
         case ARDUINO_EVENT_ETH_GOT_IP: {
@@ -80,7 +80,7 @@ static void ethernet_event_handler(arduino_event_id_t event, arduino_event_info_
             Serial.print("ETHGW:");
             Serial.println(IPAddress(ip_info.gw.addr));
             Serial.println("~~~~~~~~~~~");
-            displaySuccess("Ethernet Got IP");
+            displaySuccess("Ethernet obteve IP");
             break;
         }
         default: break;
@@ -99,7 +99,7 @@ void EthernetHelper::generate_mac() {
 bool EthernetHelper::setup() {
     if (bruceConfigPins.W5500_bus.cs == GPIO_NUM_NC || bruceConfigPins.W5500_bus.sck == GPIO_NUM_NC ||
         bruceConfigPins.W5500_bus.miso == GPIO_NUM_NC || bruceConfigPins.W5500_bus.mosi == GPIO_NUM_NC) {
-        displayError("W5500 Pins not set", true);
+        displayError("Pinos W5500 nao definidos", true);
         Serial.println("W5500 pins not configured, skipping Ethernet setup.");
         return false;
     }
@@ -121,7 +121,7 @@ bool EthernetHelper::setup() {
         (bruceConfigPins.W5500_bus.io2 == GPIO_NUM_NC) ? -1 : static_cast<int>(bruceConfigPins.W5500_bus.io2);
 
     if (!ETH.begin(ETH_PHY_W5500, 1, csPin, irqPin, rstPin, *ethSpi)) {
-        displayError("Ethernet start failed", true);
+        displayError("Falha ao iniciar Ethernet", true);
         Serial.println("ETH.begin failed");
         return false;
     }

@@ -98,13 +98,13 @@ void HostInfo::setup(const Host &host) {
     drawMainBorder();
     tft.setTextSize(FP);
 
-    ScrollableTextArea area = ScrollableTextArea("HOST INFO");
+    ScrollableTextArea area = ScrollableTextArea("INFO DO HOST");
 
     area.addLine("Host: " + host.ip.toString());
     area.addLine("Mac: " + host.mac);
-    area.addLine("Manufacturer: " + getManufacturer(host.mac));
-    area.addLine("Scanning Ports... Wait");
-    area.addLine("Open TCP Ports: ");
+    area.addLine("Fabricante: " + getManufacturer(host.mac));
+    area.addLine("Verificando portas...");
+    area.addLine("Portas TCP abertas: ");
 
     area.draw();
 

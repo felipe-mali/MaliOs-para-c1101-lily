@@ -31,7 +31,7 @@ void GPSTracker::setup() {
     PPM.enableOTG();
 #endif
     display_banner();
-    padprintln("Initializing...");
+    padprintln("Iniciando...");
 
     if (!begin_gps()) return;
 
@@ -46,13 +46,13 @@ bool GPSTracker::begin_gps() {
     );
 
     int count = 0;
-    padprintln("Waiting for GPS data");
+    padprintln("Aguardando dados GPS");
     while (GPSserial.available() <= 0) {
         if (check(EscPress)) {
             end();
             return false;
         }
-        displayTextLine("Waiting GPS: " + String(count) + "s");
+        displayTextLine("Aguardando GPS: " + String(count) + "s");
         count++;
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
@@ -82,11 +82,11 @@ void GPSTracker::loop() {
             while (GPSserial.available() > 0) gps.encode(GPSserial.read());
 
             if (gps.location.isUpdated()) {
-                padprintln("GPS location updated");
+                padprintln("Posicao GPS atualizada");
                 set_position();
                 add_coord();
             } else {
-                padprintln("GPS location not updated");
+                padprintln("Posicao GPS sem atualizar");
                 dump_gps_data();
 
                 if (filename == "" && gps.date.year() >= CURRENT_YEAR && gps.date.year() < CURRENT_YEAR + 5)
@@ -94,10 +94,10 @@ void GPSTracker::loop() {
             }
         } else {
             if (count > 5) {
-                displayError("GPS not Found!");
+                displayError("GPS nao encontrado!");
                 return end();
             }
-            padprintln("No GPS data available");
+            padprintln("Sem dados GPS");
             count++;
         }
 
@@ -122,13 +122,13 @@ void GPSTracker::set_position() {
 }
 
 void GPSTracker::display_banner() {
-    drawMainBorderWithTitle("GPS Tracker");
+    drawMainBorderWithTitle("Rastreador GPS");
     padprintln("");
 
     if (gpsCoordCount > 0) {
-        padprintln("File: " + filename.substring(0, filename.length() - 4), 2);
-        padprintln("GPS Coordinates: " + String(gpsCoordCount), 2);
-        padprintf(2, "Distance: %.2fkm\n", distance / 1000);
+        padprintln("Arquivo: " + filename.substring(0, filename.length() - 4), 2);
+        padprintln("Coordenadas: " + String(gpsCoordCount), 2);
+        padprintf(2, "Distancia: %.2fkm\n", distance / 1000);
     }
 
     padprintln("");
@@ -136,12 +136,12 @@ void GPSTracker::display_banner() {
 
 void GPSTracker::dump_gps_data() {
     if (!date_time_updated && (!gps.date.isUpdated() || !gps.time.isUpdated())) {
-        padprintln("Waiting for valid GPS data");
+        padprintln("Aguardando GPS valido");
         return;
     }
     date_time_updated = true;
-    padprintf(2, "Date: %02d-%02d-%02d\n", gps.date.year(), gps.date.month(), gps.date.day());
-    padprintf(2, "Time: %02d:%02d:%02d\n", gps.time.hour(), gps.time.minute(), gps.time.second());
+    padprintf(2, "Data: %02d-%02d-%02d\n", gps.date.year(), gps.date.month(), gps.date.day());
+    padprintf(2, "Hora: %02d:%02d:%02d\n", gps.time.hour(), gps.time.minute(), gps.time.second());
     padprintf(2, "Sat:  %d\n", gps.satellites.value());
     padprintf(2, "HDOP: %.2f\n", gps.hdop.hdop());
 }
@@ -204,7 +204,7 @@ void GPSTracker::add_final_file_data() {
 void GPSTracker::add_coord() {
     FS *fs;
     if (!getFsStorage(fs)) {
-        padprintln("Storage setup error");
+        padprintln("Erro ao iniciar armazenamento");
         returnToMenu = true;
         return;
     }
@@ -218,7 +218,7 @@ void GPSTracker::add_coord() {
     File file = (*fs).open("/BruceGPS/" + filename, is_new_file ? FILE_WRITE : FILE_APPEND);
 
     if (!file) {
-        padprintln("Failed to open file for writing");
+        padprintln("Erro ao abrir arquivo");
         returnToMenu = true;
         return;
     }

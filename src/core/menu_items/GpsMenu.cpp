@@ -10,9 +10,9 @@ void GpsMenu::optionsMenu() {
     options = {
         {"Wardriving",  [this]() { wardrivingMenu(); }},
 #if !defined(LITE_VERSION)
-        {"GPS Tracker", [=]() { GPSTracker(); }       },
+        {"Rastreador GPS", [=]() { GPSTracker(); }       },
 #endif
-        {"Config",      [this]() { configMenu(); }    },
+        {"Configurar",  [this]() { configMenu(); }    },
     };
     addOptionToMainMenu();
 
@@ -22,10 +22,10 @@ void GpsMenu::optionsMenu() {
 
 void GpsMenu::wardrivingMenu() {
     options = {
-        {"Scan WiFi Networks", []() { Wardriving(true, false); }},
-        {"Scan BLE Devices",   []() { Wardriving(false, true); }},
-        {"Scan Both",          []() { Wardriving(true, true); } },
-        {"Back",               [this]() { optionsMenu(); }      },
+        {"Procurar redes Wi-Fi", []() { Wardriving(true, false); }},
+        {"Procurar disp. BLE",   []() { Wardriving(false, true); }},
+        {"Procurar ambos",       []() { Wardriving(true, true); } },
+        {"Voltar",               [this]() { optionsMenu(); }      },
     };
 
     loopOptions(options, MENU_TYPE_SUBMENU, "Wardriving");
@@ -33,11 +33,11 @@ void GpsMenu::wardrivingMenu() {
 void GpsMenu::configMenu() {
     options = {
         {"Baudrate", setGpsBaudrateMenu                                 },
-        {"GPS Pins", [=]() { setUARTPinsMenu(bruceConfigPins.gps_bus); }},
-        {"Back",     [this]() { optionsMenu(); }                        },
+        {"Pinos GPS", [=]() { setUARTPinsMenu(bruceConfigPins.gps_bus); }},
+        {"Voltar",   [this]() { optionsMenu(); }                        },
     };
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "GPS Config");
+    loopOptions(options, MENU_TYPE_SUBMENU, "Config. GPS");
 }
 
 void GpsMenu::drawIcon(float scale) {

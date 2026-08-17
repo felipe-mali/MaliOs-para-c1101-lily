@@ -145,13 +145,13 @@ void advertise(uint8_t channel) {
     esp_err_t result = pwngridAdvertise(channel, getCurrentMoodFace());
 
     if (result == ESP_ERR_WIFI_IF) {
-        setMood(19, "", "Error: invalid interface", true);
+        setMood(19, "", "Erro: interface invalida", true);
     } else if (result == ESP_ERR_INVALID_ARG) {
-        setMood(19, "", "Error: invalid argument", true);
+        setMood(19, "", "Erro: argumento invalido", true);
     } else if (result == ESP_ERR_NO_MEM) {
-        setMood(19, "", "Error: not enough memory", true);
+        setMood(19, "", "Erro: memoria insuficiente", true);
     } else if (result != ESP_OK) {
-        setMood(19, "", "Error: unknown", true);
+        setMood(19, "", "Erro desconhecido", true);
     }
 }
 
@@ -202,7 +202,7 @@ static void reconPhase(BruceState &s) {
 
         int totalAPs = registeredBeacons.size();
         char buf[48];
-        snprintf(buf, sizeof(buf), "Found %d APs on %d channels", totalAPs, (int)s.sortedChannels.size());
+        snprintf(buf, sizeof(buf), "%d APs em %d canais", totalAPs, (int)s.sortedChannels.size());
         setMood(8, "(-@_@)", buf);
         updateUi(true);
         vTaskDelay(600 / portTICK_PERIOD_MS);
@@ -256,7 +256,7 @@ static void interactPhase(BruceState &s) {
             if (s.didDeauth) {
                 char buf[48];
                 int attempted = apCount - skipped;
-                snprintf(buf, sizeof(buf), "Deauthing ch%d (%d/%d APs)", currentChan, attempted, apCount);
+                snprintf(buf, sizeof(buf), "Deauth canal %d (%d/%d APs)", currentChan, attempted, apCount);
                 setMood(8, "(-@_@)", buf);
                 updateUi(true);
             }
@@ -272,7 +272,7 @@ static void interactPhase(BruceState &s) {
             if (remaining > 0 && s.interactIdx < s.sortedChannels.size()) {
                 char buf[48];
                 snprintf(
-                    buf, sizeof(buf), "Next: ch%d (%d left)", s.sortedChannels[s.interactIdx], (int)remaining
+                    buf, sizeof(buf), "Prox: canal %d (%d restam)", s.sortedChannels[s.interactIdx], (int)remaining
                 );
                 setMood(8, "(-@_@)", buf);
                 updateUi(true);
@@ -284,7 +284,7 @@ static void interactPhase(BruceState &s) {
         s.phase = BrucePhase::ADVERTISE;
         s.phaseStart = millis();
         s.lastAdvertise = 0;
-        setMood(10, "(^__^)", "Making friends!");
+        setMood(10, "(^__^)", "Fazendo amigos!");
         updateUi(true);
     }
 }
@@ -308,7 +308,7 @@ static void advertisePhase(BruceState &s) {
 
         ch = active_channels[0];
         esp_wifi_set_channel(ch, WIFI_SECOND_CHAN_NONE);
-        setMood(14, "(@__@)", "Scanning...");
+        setMood(14, "(@__@)", "Buscando...");
         updateUi(true);
         s.phaseStart = millis();
     }
@@ -368,7 +368,7 @@ void brucegotchi_start() {
     // First iteration: set initial channel immediately
     ch = active_channels[0];
     esp_wifi_set_channel(ch, WIFI_SECOND_CHAN_NONE);
-    setMood(14, "(@__@)", "Scanning...");
+    setMood(14, "(@__@)", "Buscando...");
     updateUi(true);
     s.phaseStart = millis();
     s.reconIdx = 0;
@@ -379,12 +379,12 @@ void brucegotchi_start() {
 
         // --- Menu trigger ---
         if (check(SelPress)) {
-            String channel_status = use_all_channels ? "All Ch: ON" : "All Ch: OFF";
+            String channel_status = use_all_channels ? "Todos canais: ON" : "Todos canais: OFF";
             options = {
-                {"Find friends", yield},
+                {"Buscar amigos", yield},
                 {"Pwngrid spam", send_pwnagotchi_beacon_main},
                 {channel_status.c_str(), toggle_all_channels},
-                {"Main Menu", lambdaHelper(set_pwnagotchi_exit, true)},
+                {"Menu principal", lambdaHelper(set_pwnagotchi_exit, true)},
             };
             loopOptions(options);
             tft.fillScreen(bruceConfig.bgColor);
@@ -398,7 +398,7 @@ void brucegotchi_start() {
         // --- Handshake celebration ---
         if (num_HS > s.prevHS) {
             s.prevHS = num_HS;
-            setMood(0, "(0__0)", "Got handshake!");
+            setMood(0, "(0__0)", "Handshake capturado!");
             updateUi(true);
             vTaskDelay(800 / portTICK_PERIOD_MS);
         }

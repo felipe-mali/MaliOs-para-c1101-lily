@@ -168,7 +168,7 @@ void displaySpamStatus() {
     tft.setTextSize(1.5);
     tft.setCursor(0, 20);
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-    tft.println("PwnGrid Spam Running...");
+    tft.println("Spam PwnGrid ativo...");
 
 #if defined(HAS_TOUCH)
     TouchFooter();
@@ -214,24 +214,24 @@ void displaySpamStatus() {
         tft.setCursor(45, 45);
         tft.printf("Flood:%s", change_identity ? "1" : "0");
         tft.setCursor(125, 45);
-        tft.printf("DoScreen:%s", dos_pwnd ? "1" : "0");
+        tft.printf("TelaDoS:%s", dos_pwnd ? "1" : "0");
 
         if (!dos_pwnd) {
             tft.setCursor(0, 50);
-            tft.printf("Face: \n%s                                              ", faces[current_face_index]);
+            tft.printf("Rosto: \n%s                                              ", faces[current_face_index]);
             tft.setCursor(0, 80);
             tft.printf(
-                "Name:                  \n%s                                              ",
+                "Nome:                  \n%s                                              ",
                 names[current_name_index]
             );
         } else {
             tft.setCursor(0, 50);
-            tft.printf("Face:\nNOPWND!■■■■■■■■■■■■■■■■■");
+            tft.printf("Rosto:\nNOPWND!#################");
             tft.setCursor(0, 80);
-            tft.printf("Name:\n■■■■■■■■■■■■■■■■■■■■■■");
+            tft.printf("Nome:\n######################");
         }
         tft.setCursor(0, 110);
-        tft.printf("Channel: %d  ", channels[current_channel_index]);
+        tft.printf("Canal: %d  ", channels[current_channel_index]);
 
         // Update indices for next display
         current_face_index = (current_face_index + 1) % num_faces;
@@ -241,7 +241,7 @@ void displaySpamStatus() {
         vTaskDelay(200 / portTICK_RATE_MS);
         ; // Update the display every 200 ms
     }
-    displayWarning("Stopping.."); // Wait for 1 second for the beacon_task to stop running
+    displayWarning("Parando..."); // Wait for 1 second for the beacon_task to stop running
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 }
 
@@ -252,18 +252,18 @@ void loadFacesAndNames() {
     num_names = 0;
     bool look_for_file = false;
     options = {
-        {"Default faces", [&]() { look_for_file = false; }},
+        {"Rostos padrao", [&]() { look_for_file = false; }},
     };
     if (setupSdCard()) {
         look_for_file = true;
-        options.push_back({"SD Card", [&]() {
+        options.push_back({"Cartao SD", [&]() {
                                fs = &SD;
                                look_for_file = true;
                            }});
     }
     if (checkLittleFsSizeNM()) {
         look_for_file = true;
-        options.push_back({"LittleFS faces", [&]() {
+        options.push_back({"Rostos LittleFS", [&]() {
                                fs = &LittleFS;
                                look_for_file = true;
                            }});
@@ -387,7 +387,7 @@ void send_pwnagotchi_beacon_main() {
 
     // Check if file was loaded
     if (num_faces == 0 or num_names == 0) {
-        displayTextLine("No config file");
+        displayTextLine("Sem arquivo de config");
         vTaskDelay(1000 / portTICK_RATE_MS);
         return;
     }

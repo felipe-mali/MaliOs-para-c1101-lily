@@ -10,7 +10,7 @@ private:
     void start_ethernet();
 
 public:
-    EthernetMenu() : MenuItemInterface("Ethernet") {}
+    EthernetMenu() : MenuItemInterface("Ethernet", "Ethernet") {}
 
     void optionsMenu(void);
     void drawIcon(float scale);

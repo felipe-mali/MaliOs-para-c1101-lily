@@ -65,14 +65,14 @@ buildModelOptions(NimBLERemoteCharacteristic *pTXChar, std::vector<Option> &devi
         const PayloadDef &pd = payloads[i];
         charOptions.push_back({pd.label, [pTXChar, &deviceSelection, &pd](void) {
                                    bool success = pTXChar->writeValue(pd.data, pd.len, true);
-                                   displayTextLine(success ? "Write success!" : "Write failed!");
+                                   displayTextLine(success ? "Gravacao concluida!" : "Falha ao gravar!");
                                    delay(UI_READ_DELAY);
                                    std::vector<Option> nextOpts = buildModelOptions(pTXChar, deviceSelection);
                                    loopOptions(nextOpts);
                                }});
     }
 
-    charOptions.push_back({"Back", [&](void) {
+    charOptions.push_back({"Voltar", [&](void) {
                                pClient->disconnect();
                                scooterDisconnected = true;
                                delay(CMD_DELAY);
@@ -115,7 +115,7 @@ void BLENinebot::setup() {
 
 void BLENinebot::redrawMainBorder() {
     drawMainBorder();
-    tft.drawString("-=Ninebot Tuning=-", (tftWidth / 2) - ((18 * 6) / 2), 12);
+    tft.drawString("-=Ajuste Ninebot=-", (tftWidth / 2) - ((18 * 6) / 2), 12);
 }
 
 void BLENinebot::loop() {
@@ -123,12 +123,12 @@ void BLENinebot::loop() {
 
     while (!check(EscPress)) {
         redrawMainBorder();
-        displayTextLine("Scanning...");
+        displayTextLine("Procurando...");
         NimBLEScanResults results = pBLEScan->getResults(SCAN_TIME * 1000, false);
         if (check(EscPress)) return;
 
         if (results.getCount() == 0) {
-            displayTextLine("No Scooter found. Retry...");
+            displayTextLine("Nenhum patinete. Tentando...");
             delay(UI_READ_DELAY);
             pBLEScan->clearResults();
             deviceSelection.clear();
@@ -146,20 +146,20 @@ void BLENinebot::loop() {
             deviceSelection.push_back(
                 {name, [&, adv](void) mutable {
                      redrawMainBorder();
-                     displayTextLine("Connecting...");
+                     displayTextLine("Conectando...");
                      scooterDisconnected = false;
                      if (!pClient->connect(adv->getAddress()))
                      {
-                         displayTextLine("Connection failed.");
+                         displayTextLine("Falha na conexao.");
                          delay(UI_READ_DELAY);
                          clientDisconnect();
                          loopOptions(deviceSelection);
                          return;
                      }
 
-                     displayTextLine("Connected!");
+                     displayTextLine("Conectado!");
                      if (!pClient->discoverAttributes()) {
-                         displayTextLine("Discover failed.");
+                         displayTextLine("Falha ao descobrir.");
                          clientDisconnect();
                          loopOptions(deviceSelection);
                          return;
@@ -175,10 +175,10 @@ void BLENinebot::loop() {
                              loopOptions(deviceSelection);
                              return;
                          } else {
-                             displayTextLine("TX not writable");
+                             displayTextLine("TX sem permissao de escrita");
                          }
                      } else {
-                         displayTextLine("Not a scooter");
+                         displayTextLine("Nao e um patinete");
                      }
 
                      clientDisconnect();
@@ -188,8 +188,8 @@ void BLENinebot::loop() {
         }
 
         bool returnToMenu = false;
-        deviceSelection.push_back({"Scan again", [&]() { returnToMenu = false; }});
-        deviceSelection.push_back({"Main Menu", [&]() { returnToMenu = true; }});
+        deviceSelection.push_back({"Buscar novamente", [&]() { returnToMenu = false; }});
+        deviceSelection.push_back({"Menu principal", [&]() { returnToMenu = true; }});
         loopOptions(deviceSelection);
 
         if (returnToMenu) return;

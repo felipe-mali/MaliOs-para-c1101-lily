@@ -143,7 +143,7 @@ void ARPScanner::setup() {
 
     if (ip_info.ip.addr == 0 || ip_info.netmask.addr == 0) {
         Serial.println("Ethernet has no IP/netmask, aborting ARP scan");
-        displayError("Ethernet not ready", true);
+        displayError("Ethernet nao esta pronta", true);
         return;
     }
 
@@ -178,7 +178,7 @@ void ARPScanner::setup() {
         hostsScanned++;
         if (millis() - lastUpdate > 500) { // Update display every 500ms
             displayRedStripe(
-                "Probing " + String(hostsScanned) + " of " + String(totalHosts) + " hosts",
+                "Testando " + String(hostsScanned) + " de " + String(totalHosts) + " hosts",
                 getComplementaryColor2(bruceConfig.priColor),
                 bruceConfig.priColor
             );
@@ -232,7 +232,7 @@ void ARPScanner::setup() {
 
 ScanHostMenu:
     if (hostslist_eth.empty()) {
-        tft.println("No hosts found");
+        tft.println("Nenhum host encontrado");
         delay(2000);
         return;
     }
@@ -283,24 +283,24 @@ void ARPScanner::afterScanOptions(const Host &host) {
     int opt = 0;
     IPAddress gw = gateway;
     options = {
-        {"Host info",
+        {"Info do host",
          [=]() {
              HostInfo(
                  host, wifiConnected
              ); // At this point we are sure that if user use WiFi is connected for sure
          }},
 #ifndef LITE_VERSION
-        {"SSH Connect", lambdaHelper(ssh_setup, host.ip.toString())},
+        {"Conectar via SSH", lambdaHelper(ssh_setup, host.ip.toString())},
 #endif
-        {"Station Deauth",
+        {"Desautenticar estacao",
          [=]() {
              if (!wifiConnected) {
-                 displayError("Station deauth not available on ethernet");
+                 displayError("Desaut. indisponivel na Ethernet");
              } else {
                  stationDeauth(host);
              }
          }},
-        {"ARP Spoofing",
+        {"Falsificacao ARP",
          [this, host, gw]() {
              auto it = std::find_if(hostslist_eth.begin(), hostslist_eth.end(), [this](const Host &host) {
                  return host.ip == gateway;
@@ -317,9 +317,9 @@ void ARPScanner::afterScanOptions(const Host &host) {
              }
          }},
 #if !defined(LITE_VERSION)
-        {"ARP Poisoning", [this]() { ARPoisoner{gateway}; }},
-        {"DHCP Starvation", [=]() { DHCPStarvation(); }},
-        {"MAC Flooding", [=]() { MACFlooding(); }},
+        {"Envenenamento ARP", [this]() { ARPoisoner{gateway}; }},
+        {"Esgotamento DHCP", [=]() { DHCPStarvation(); }},
+        {"Inundacao MAC", [=]() { MACFlooding(); }},
 #endif
     };
     // if(sdcardMounted && bruceConfig.devMode) options.push_back({"ARP MITM (WIP)",  [&](){ opt=5;  }});

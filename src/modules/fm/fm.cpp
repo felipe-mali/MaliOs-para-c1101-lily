@@ -129,7 +129,7 @@ void fm_options(uint16_t f_min, uint16_t f_max, bool reserved) {
 
     options = {};
     if (!reserved) {
-        options.push_back({"Auto", [=]() { set_auto_scan(true); }});
+        options.push_back({"Automatico", [=]() { set_auto_scan(true); }});
     }
     for (uint16_t f = f_min; f < f_max; f += 10) {
         sprintf(f_str, "%d MHz", f);
@@ -239,7 +239,7 @@ bool fm_setup(bool traffic_alert, bool silent) {
         fm_banner();
         tft.setCursor(10, 30);
         Serial.println("Setup Si4713");
-        tft.println(" Setup Si4713");
+        tft.println(" Configurando Si4713");
         delay(1000);
     }
 
@@ -283,13 +283,13 @@ bool fm_setup(bool traffic_alert, bool silent) {
 
     if (!silent) {
         Serial.println("RDS on!");
-        tft.println(" RDS on!");
+        tft.println(" RDS ligado!");
     }
     // Set traffic announcement
     if (traffic_alert) {
         if (!silent) {
             Serial.println("TA on!");
-            tft.println(" TA on!");
+            tft.println(" TA ligado!");
         }
         radio.setProperty(SI4713_PROP_TX_RDS_PS_MISC, 0x1018);
     } else {

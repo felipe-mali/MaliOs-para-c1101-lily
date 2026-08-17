@@ -39,27 +39,27 @@ const String palnagotchi_moods[] = {
 const String palnagotchi_moods_desc[] = {
     "Zzzz...",                              // 0 - sleeping
     "...",                                  // 1 - awakening
-    "Let's MAKE FRIEDNS!",                  // 2 - awake
-    "WANTED: FRIENDS",                      // 3 - observing (neutral) right
-    "WANTED: FRIENDS",                      // 4 - observig (neutral) left
-    "Looking for friends that pwn.",        // 5 - observing (happy) right
-    "Looking for friends that pwn.",        // 6 - observing (happy) left
-    "YEAH! So many pwnagotchis!",           // 7 - intense
-    "The coolest pal in the neighbourhood", // 8 - cool
-    "Can we have even more friends?",       // 9 - happy
-    "I LOVE PWNAGOTCHIS!",                  // 10 - grateful
-    "When I grow up, I'll PWN myself!!",    // 11 - excited
+    "Vamos fazer amigos!",                  // 2 - awake
+    "PROCURO AMIGOS",                       // 3 - observing (neutral) right
+    "PROCURO AMIGOS",                       // 4 - observig (neutral) left
+    "Buscando amigos que pwnam.",            // 5 - observing (happy) right
+    "Buscando amigos que pwnam.",            // 6 - observing (happy) left
+    "SIM! Muitos pwnagotchis!",              // 7 - intense
+    "O mais legal da vizinhanca",            // 8 - cool
+    "Podemos ter mais amigos?",              // 9 - happy
+    "AMO PWNAGOTCHIS!",                      // 10 - grateful
+    "Quando crescer, vou me PWNAR!",         // 11 - excited
     "3.1415926535897932384626433832795",    // 12 - smart
-    "HEY YOU! LETS BE FRIENDS!",            // 13 - friendly
-    "IT RUNS! PWND!",                       // 14 - motivated
-    "I don't PWN, therefore i don't am.",   // 15 - demotivated
-    "Seriously, let's go for a walk...",    // 16 - bored
-    "Really? This hardware? can't PWN...",  // 17 - sad
-    "Where are all the Pwnagotchis?",       // 18 - lonely
-    "It works on my end.",                  // 19 - broken
-    "My friends pwn.",                      // 20 - debugging
-    "SO ANGERY, BUT CANT PWN",              // 21 - angry
-    "Helping Pwnagotchis be sane since 2024",
+    "EI! VAMOS SER AMIGOS!",                // 13 - friendly
+    "RODOU! PWND!",                         // 14 - motivated
+    "Nao PWNo, logo nao existo.",            // 15 - demotivated
+    "Vamos dar uma volta...",                // 16 - bored
+    "Serio? Este hardware nao PWNa...",      // 17 - sad
+    "Onde estao os Pwnagotchis?",            // 18 - lonely
+    "Aqui funciona.",                        // 19 - broken
+    "Meus amigos pwnam.",                    // 20 - debugging
+    "BRAVO, MAS NAO POSSO PWNAR",            // 21 - angry
+    "Ajudando Pwnagotchis desde 2024",
 };
 
 uint8_t current_mood = 0;

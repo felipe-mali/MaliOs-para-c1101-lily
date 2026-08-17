@@ -66,7 +66,7 @@ void TagOMatic::setup() {
     set_rfid_module();
 
     if (!_rfid->begin()) {
-        displayError("RFID module not found!", true);
+        displayError("Modulo RFID nao encontrado!", true);
         return;
     }
 
@@ -145,7 +145,7 @@ void TagOMatic::set_state(RFID_State state) {
         case CHECK_MODE:
             _sourceUID = _rfid->printableUID.uid;
             _sourcePages = _rfid->strAllPages;
-            padprintln("Source UID: " + _sourceUID);
+            padprintln("UID de origem: " + _sourceUID);
             padprintln("");
             break;
         case CLONE_MODE:
@@ -154,8 +154,8 @@ void TagOMatic::set_state(RFID_State state) {
             padprintln("");
             break;
         case WRITE_MODE:
-            if (!_rfid->pageReadSuccess) padprintln("[!] Data blocks are incomplete");
-            padprintln(String(_rfid->dataPages) + " pages of data to write");
+            if (!_rfid->pageReadSuccess) padprintln("[!] Blocos de dados incompletos");
+            padprintln(String(_rfid->dataPages) + " paginas para gravar");
             padprintln("");
             break;
         case WRITE_NDEF_MODE: _ndef_created = false; break;
@@ -165,8 +165,8 @@ void TagOMatic::set_state(RFID_State state) {
             // ST25R3916 needs an explicit T4T request to synthesize a UID; PN532
             // ignores emuMode and always serves NDEF over ISO-DEP regardless.
             _rfid->emuMode = "t4t";
-            padprintln("Choose NDEF content, then wait for a reader.");
-            padprintln("Press [BACK] to stop.");
+            padprintln("Escolha o NDEF e aguarde o leitor.");
+            padprintln("[BACK] para parar.");
             padprintln("");
             break;
         case EMULATE_MODE:
@@ -174,15 +174,15 @@ void TagOMatic::set_state(RFID_State state) {
                 padprintln("UID: " + _rfid->printableUID.uid);
                 padprintln("Type: " + _rfid->printableUID.picc_type);
             } else {
-                padprintln("Using loaded/read NDEF");
-                padprintln("(fallback: test URL)");
+                padprintln("Usando NDEF lido/carregado");
+                padprintln("(reserva: URL de teste)");
             }
             {
                 String caveat = _rfid->emulationCaveat();
                 if (caveat.length() > 0) padprintln("[!] " + caveat);
             }
-            padprintln("Waiting for an NFC reader...");
-            padprintln("Press [BACK] to stop.");
+            padprintln("Aguardando leitor NFC...");
+            padprintln("[BACK] para parar.");
             padprintln("");
             break;
         case SAVE_MODE:
@@ -213,19 +213,19 @@ void TagOMatic::display_banner() {
     tft.setTextSize(FP);
     padprintln("");
     tft.setTextColor(getColorVariation(bruceConfig.priColor), bruceConfig.bgColor);
-    padprintln("Press [OK] to change mode.");
+    padprintln("[OK] altera o modo.");
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     padprintln("");
 }
 
 void TagOMatic::dump_card_details() {
-    padprintln("Device type: " + _rfid->printableUID.picc_type);
+    padprintln("Tipo do dispositivo: " + _rfid->printableUID.picc_type);
     if (_rfid->printableUID.picc_type != "FeliCa") {
         padprintln("UID: " + _rfid->printableUID.uid);
         padprintln("ATQA: " + _rfid->printableUID.atqa);
         padprintln("SAK: " + _rfid->printableUID.sak);
         if (_rfid->dataPages > 0 || _rfid->totalPages > 0) {
-            padprintln("Pages read: " + String(_rfid->dataPages) + "/" + String(_rfid->totalPages));
+            padprintln("Paginas lidas: " + String(_rfid->dataPages) + "/" + String(_rfid->totalPages));
         }
     } else {
         padprintln("IDm: " + _rfid->printableUID.uid);
@@ -237,11 +237,11 @@ void TagOMatic::dump_card_details() {
 }
 
 void TagOMatic::dump_check_details() {
-    padprintln("Source UID: " + _sourceUID);
+    padprintln("UID de origem: " + _sourceUID);
     padprintln("");
 
     padprintln("UID: " + String(_sourceUID == _rfid->printableUID.uid ? "OK" : "NOT OK"));
-    padprintln("Data: " + String(_sourcePages == _rfid->strAllPages ? "OK" : "NOT OK"));
+    padprintln("Dados: " + String(_sourcePages == _rfid->strAllPages ? "OK" : "NAO OK"));
     padprintln("");
 
     if (_rfid->pageReadStatus != RFIDInterface::SUCCESS)
@@ -253,7 +253,7 @@ void TagOMatic::dump_ndef_details() {
 
     if (!_rfid->rawNdefRecord.empty()) {
         padprintln("Payload type: Wi-Fi (WSC)");
-        padprintln("Payload size: " + String(_rfid->rawNdefRecord.size()) + " bytes");
+        padprintln("Tam. payload: " + String(_rfid->rawNdefRecord.size()) + " bytes");
         return;
     }
 
@@ -264,7 +264,7 @@ void TagOMatic::dump_ndef_details() {
     }
 
     padprintln("Payload type: " + payload_type);
-    padprintln("Payload size: " + String(_rfid->ndefMessage.payloadSize) + " bytes");
+    padprintln("Tam. payload: " + String(_rfid->ndefMessage.payloadSize) + " bytes");
 }
 
 void TagOMatic::dump_scan_results() {
@@ -328,10 +328,10 @@ void TagOMatic::clone_card() {
 
     switch (result) {
         case RFIDInterface::TAG_NOT_PRESENT: return; break;
-        case RFIDInterface::NOT_IMPLEMENTED: displayError("Not implemented for this module."); break;
-        case RFIDInterface::TAG_NOT_MATCH: displayError("Tag types do not match."); break;
-        case RFIDInterface::SUCCESS: displaySuccess("UID written successfully."); break;
-        default: displayError("Error writing UID to tag."); break;
+        case RFIDInterface::NOT_IMPLEMENTED: displayError("Nao implementado neste modulo."); break;
+        case RFIDInterface::TAG_NOT_MATCH: displayError("Tipos de tag nao coincidem."); break;
+        case RFIDInterface::SUCCESS: displaySuccess("UID gravado com sucesso."); break;
+        default: displayError("Erro ao gravar UID na tag."); break;
     }
 
     delayWithReturn(1000);
@@ -344,23 +344,23 @@ void TagOMatic::emulate_card() {
 
     switch (result) {
         case RFIDInterface::SUCCESS:
-            displaySuccess("Reader interaction complete.");
+            displaySuccess("Interacao com leitor concluida.");
             delay(400);
             break;
         case RFIDInterface::TAG_NOT_PRESENT:
-            displayError("No NFC reader detected.", true);
+            displayError("Nenhum leitor NFC detectado.", true);
             set_state(EMULATE_MODE);
             break;
         case RFIDInterface::NOT_IMPLEMENTED:
-            displayError("Card emulation not supported.", true);
+            displayError("Emulacao de cartao sem suporte.", true);
             set_state(READ_MODE);
             break;
         case RFIDInterface::FAILURE:
-            displayError("Target mode start failed.", true);
+            displayError("Falha ao iniciar modo alvo.", true);
             set_state(EMULATE_MODE);
             break;
         default:
-            displayError("Emulation failed. Re-try.", true);
+            displayError("Falha na emulacao. Tente de novo.", true);
             set_state(EMULATE_MODE);
             break;
     }
@@ -419,7 +419,7 @@ void TagOMatic::write_custom_uid() {
     display_banner();
 
     if (custom_uid.length() != _rfid->uid.size * 2) {
-        displayError("Invalid UID.", true);
+        displayError("UID invalido.", true);
         set_state(READ_MODE);
         return;
     }
@@ -440,8 +440,8 @@ void TagOMatic::erase_card() {
 
     switch (result) {
         case RFIDInterface::TAG_NOT_PRESENT: return; break;
-        case RFIDInterface::SUCCESS: displaySuccess("Tag erased successfully.", true); break;
-        default: displayError("Error erasing data from tag."); break;
+        case RFIDInterface::SUCCESS: displaySuccess("Tag apagada com sucesso.", true); break;
+        default: displayError("Erro ao apagar dados da tag."); break;
     }
 
     delayWithReturn(1000);
@@ -458,9 +458,9 @@ void TagOMatic::write_data() {
 
     switch (result) {
         case RFIDInterface::TAG_NOT_PRESENT: return; break;
-        case RFIDInterface::TAG_NOT_MATCH: displayError("Tag types do not match."); break;
-        case RFIDInterface::SUCCESS: displaySuccess("Tag written successfully."); break;
-        default: displayError("Error writing data to tag."); break;
+        case RFIDInterface::TAG_NOT_MATCH: displayError("Tipos de tag nao coincidem."); break;
+        case RFIDInterface::SUCCESS: displaySuccess("Tag gravada com sucesso."); break;
+        default: displayError("Erro ao gravar dados na tag."); break;
     }
 
     delayWithReturn(1000);
@@ -608,7 +608,7 @@ void TagOMatic::create_ndef_wifi() {
 
 void TagOMatic::create_ndef_link() {
     if (bruceConfig.qrCodes.empty()) {
-        displayError("No saved links.", true);
+        displayError("Nenhum link salvo.", true);
         return;
     }
 
@@ -627,7 +627,7 @@ void TagOMatic::load_file() {
     int result = _rfid->load();
 
     if (result == RFIDInterface::SUCCESS) {
-        displaySuccess("File loaded.");
+        displaySuccess("Arquivo carregado.");
         delay(500);
         _read_uid = true;
 
@@ -640,7 +640,7 @@ void TagOMatic::load_file() {
 
         loopOptions(options);
     } else {
-        displayError("Error loading file.", true);
+        displayError("Erro ao carregar arquivo.", true);
         set_state(READ_MODE);
     }
 }
@@ -656,9 +656,9 @@ void TagOMatic::save_file() {
     int result = _rfid->save(filename);
 
     if (result == RFIDInterface::SUCCESS) {
-        displaySuccess("File saved.");
+        displaySuccess("Arquivo salvo.");
     } else {
-        displayError("Error writing file.");
+        displayError("Erro ao gravar arquivo.");
     }
     delayWithReturn(1000);
     set_state(READ_MODE);

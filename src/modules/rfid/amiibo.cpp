@@ -24,24 +24,24 @@ void Amiibo::setup() {
 }
 
 bool Amiibo::connect() {
-    displayInfo("Turn on Amiibolink device", true);
+    displayInfo("Ligue o dispositivo Amiibolink", true);
 
     displayBanner();
     padprintln("");
-    padprintln("Searching Amiibolink Device...");
+    padprintln("Buscando dispositivo Amiibolink...");
 
     if (!amiibolink.searchDevice()) {
-        displayError("Amiibolink not found");
+        displayError("Amiibolink nao encontrado");
         delayWithReturn(1000);
         return false;
     }
 
     if (!amiibolink.connectToDevice()) {
-        displayError("Amiibolink connect error", true);
+        displayError("Erro ao conectar Amiibolink", true);
         return false;
     }
 
-    displaySuccess("Amiibolink Connected");
+    displaySuccess("Amiibolink conectado");
     delayWithReturn(1000);
 
     return true;
@@ -51,8 +51,8 @@ void Amiibo::displayBanner(AppMode mode) {
     drawMainBorderWithTitle("AMIIBOLINK");
 
     switch (mode) {
-        case AMIIBO_UPLOAD: printSubtitle("AMIIBO UPLOAD"); break;
-        case CHANGE_UID_MODE: printSubtitle("SET UID MODE"); break;
+        case AMIIBO_UPLOAD: printSubtitle("ENVIAR AMIIBO"); break;
+        case CHANGE_UID_MODE: printSubtitle("MODO UID"); break;
         default: padprintln(""); break;
     }
 
@@ -62,8 +62,8 @@ void Amiibo::displayBanner(AppMode mode) {
 
 void Amiibo::selectMode() {
     options = {
-        {"Upload Amiibo", [this]() { uploadAmiibo(); } },
-        {"Set UID Mode",  [this]() { changeUIDMode(); }},
+        {"Enviar Amiibo", [this]() { uploadAmiibo(); } },
+        {"Definir modo UID",  [this]() { changeUIDMode(); }},
     };
 
     loopOptions(options);
@@ -73,22 +73,22 @@ void Amiibo::uploadAmiibo() {
     if (!openDumpFile()) return;
 
     if (!checkEmulationTagType()) {
-        displayError("Invalid tag type", true);
+        displayError("Tipo de tag invalido", true);
         return;
     }
 
     displayBanner(AMIIBO_UPLOAD);
-    displayInfo("Sending commands...");
+    displayInfo("Enviando comandos...");
 
     bool success =
         (amiibolink.cmdPreUploadDump() && amiibolink.cmdUploadDumpData(strDump) &&
          amiibolink.cmdPostUploadDump());
 
     if (success) {
-        displaySuccess("Success");
+        displaySuccess("Sucesso");
         delayWithReturn(500);
     } else {
-        displayError("Amiibolink communication error", true);
+        displayError("Erro de comunicacao Amiibolink", true);
     }
 
     delayWithReturn(500);
@@ -98,18 +98,18 @@ void Amiibo::changeUIDMode() {
     Amiibolink::UIDMode uidMode;
 
     options = {
-        {"Random Auto",   [&]() { uidMode = Amiibolink::UIDMode_Auto; }  },
-        {"Random Manual", [&]() { uidMode = Amiibolink::UIDMode_Manual; }},
+        {"Aleatorio auto",   [&]() { uidMode = Amiibolink::UIDMode_Auto; }  },
+        {"Aleatorio manual", [&]() { uidMode = Amiibolink::UIDMode_Manual; }},
     };
     loopOptions(options);
 
     displayBanner(CHANGE_UID_MODE);
 
     if (amiibolink.cmdSetUIDMode(uidMode)) {
-        displaySuccess("Success");
+        displaySuccess("Sucesso");
         delayWithReturn(500);
     } else {
-        displayError("Amiibolink communication error", true);
+        displayError("Erro de comunicacao Amiibolink", true);
     }
 
     delayWithReturn(500);
@@ -121,7 +121,7 @@ bool Amiibo::openDumpFile() {
     FS *fs;
 
     if (!getFsStorage(fs)) {
-        displayError("Storage error", true);
+        displayError("Erro no armazenamento", true);
         return false;
     }
 
@@ -130,7 +130,7 @@ bool Amiibo::openDumpFile() {
     file = fs->open(filepath, FILE_READ);
 
     if (!file) {
-        displayError("Dump file error", true);
+        displayError("Erro no arquivo dump", true);
         return false;
     }
 
@@ -155,7 +155,7 @@ bool Amiibo::openDumpFile() {
     vTaskDelay(pdMS_TO_TICKS(100));
 
     if (!pageReadSuccess) {
-        displayError("Incomplete dump file", true);
+        displayError("Arquivo dump incompleto", true);
         return false;
     }
 
