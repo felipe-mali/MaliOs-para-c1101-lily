@@ -175,7 +175,7 @@ void drawMenuItem(
         case ITEM_BUTTON: {
             // Label on left
             tft.setCursor(layout.margin + 2, contentY);
-            tft.print("Button:");
+            tft.print("Botao:");
 
             // Button name on right
             const char *btnName = BUTTON_NAMES[config.button_type];
@@ -195,7 +195,7 @@ void drawMenuItem(
             // Display value based on mode
             if (custom_mode) {
                 // Show "Custom" when user is entering manual value
-                const char *customText = "Custom";
+                const char *customText = "Manual";
                 int textWidth = strlen(customText) * 6 * layout.text_size_large;
                 tft.setCursor(unitX - textWidth, contentY);
                 if (isEdit && isSelected) tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
@@ -228,7 +228,7 @@ void drawMenuItem(
 
             // Centered text
             tft.setTextColor(TFT_WHITE, btnColor);
-            const char *btnText = (tftWidth > 200) ? "START CLICK" : "START";
+            const char *btnText = (tftWidth > 200) ? "INICIAR CLIQUE" : "INICIAR";
             int textWidth = strlen(btnText) * 6 * layout.text_size_large;
             tft.setCursor(
                 (tftWidth - textWidth) / 2, yPos + (layout.button_height - layout.text_size_large * 8) / 2
@@ -261,7 +261,7 @@ void drawConfigScreen(const LayoutConfig &layout) {
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
         tft.setTextSize(layout.text_size_small);
         tft.setCursor(layout.margin, tftHeight - 15);
-        tft.print("NAV: ^v | EDIT: Sel | START: Sel");
+        tft.print("NAV: ^v | EDITAR: Sel | INICIAR: Sel");
     }
 }
 
@@ -307,7 +307,7 @@ void drawClickingScreen(const LayoutConfig &layout, const char *buttonName) {
 
     // Line 3: Stop instructions
     tft.setCursor(layout.margin, infoY + ((config.max_clicks > 0) ? 24 : 12));
-    tft.print("Press SEL to stop");
+    tft.print("SEL para parar");
 }
 
 /**
@@ -381,7 +381,7 @@ void drawSummaryScreen(
     tft.setTextColor(TFT_WHITE, headerColor);
     tft.setTextSize(layout.text_size_large);
 
-    const char *statusText = completed ? "COMPLETED" : "STOPPED";
+    const char *statusText = completed ? "CONCLUIDO" : "PARADO";
     int statusWidth = strlen(statusText) * 6 * layout.text_size_large;
     tft.setCursor((tftWidth - statusWidth) / 2, (layout.header_height - 16) / 2);
     tft.print(statusText);
@@ -402,7 +402,7 @@ void drawSummaryScreen(
 
     // Button used
     tft.setCursor(layout.margin, infoY + 15);
-    tft.print("Button: ");
+    tft.print("Botao: ");
     tft.print(buttonName);
 
     // Delay configuration
@@ -590,7 +590,7 @@ bool handleValueEditing(
 
             // Open keyboard for custom input
             if (custom_mode && check(SelPress)) {
-                String customValue = num_keyboard(String(config.max_clicks).c_str(), 6, "Custom Click Count");
+                String customValue = num_keyboard(String(config.max_clicks).c_str(), 6, "Quantidade de cliques");
                 if (customValue == "\x1B") return false;
                 int val = atoi(customValue.c_str());
                 config.max_clicks = (val < 0) ? 0 : val;
@@ -835,7 +835,7 @@ void clicker_setup() {
     int promptY = tftHeight - 20;
     tft.fillRect(0, promptY - 5, tftWidth, 25, bruceConfig.bgColor);
     tft.setCursor(layout.margin, promptY);
-    tft.print("OK: Restart | ESC: Exit");
+    tft.print("OK: Reiniciar | ESC: Sair");
 
     // Wait for user decision
     bool userChoice = false;
@@ -892,11 +892,11 @@ void bleClickerSetup() {
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     tft.setTextSize(2);
     tft.setCursor(10, tftHeight / 2 - 8);
-    tft.print("BLE Mode");
+    tft.print("Modo BLE");
 
     tft.setTextSize(1);
     tft.setCursor(10, tftHeight / 2 + 20);
-    tft.print("Not yet implemented");
+    tft.print("Ainda nao implementado");
 
     delay(2000);
     // Serial.println("[CLICKER] BLE mode requested but not implemented");

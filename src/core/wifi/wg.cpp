@@ -96,7 +96,7 @@ void read_and_parse_file() {
     File file = SD.open("/wg.conf");
     if (!file) {
         Serial.println("Failed to open wg.conf file");
-        displayError("No wg.conf file on SD", true);
+        displayError("Arquivo wg.conf nao encontrado no SD", true);
         return;
     }
 
@@ -116,31 +116,31 @@ void wg_setup() {
     read_and_parse_file();
 
     drawMainBorderWithTitle("WIREGUARD");
-    printSubtitle("Connecting...");
+    printSubtitle("Conectando...");
     tft.setTextSize(FP);
     padprintln("");
-    padprintln("Syncing time...");
+    padprintln("Sincronizando horario...");
 
     configTime(9 * 60 * 60, 0, "ntp.jst.mfeed.ad.jp", "ntp.nict.jp");
 
-    padprintln("Initializing tunnel...");
+    padprintln("Iniciando tunel...");
     wg.begin(local_ip, private_key, endpoint_address, public_key, endpoint_port);
 
     drawMainBorderWithTitle("WIREGUARD");
-    printSubtitle("Connected");
+    printSubtitle("Conectado");
     tft.setTextSize(FP);
     padprintln("");
     tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
-    padprintln("Status: Connected");
+    padprintln("Status: Conectado");
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     padprintln("");
-    padprintln("Tunnel IP:");
+    padprintln("IP do tunel:");
     tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
     padprintln(local_ip.toString());
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     padprintln("");
-    padprintln("Endpoint: " + String(endpoint_address));
-    padprintln("Port: " + String(endpoint_port));
+    padprintln("Destino: " + String(endpoint_address));
+    padprintln("Porta: " + String(endpoint_port));
     padprintln("");
     printFootnote("Press any key to return");
 

@@ -7,7 +7,7 @@ EspSerialCmd::EspSerialCmd() {}
 
 void EspSerialCmd::sendCommands() {
     displayBanner();
-    padprintln("Waiting...");
+    padprintln("Aguardando...");
 
     if (!beginSend()) return;
 
@@ -18,7 +18,7 @@ void EspSerialCmd::sendCommands() {
 
     while (1) {
         if (check(EscPress)) {
-            displayInfo("Aborting...");
+            displayInfo("Cancelando...");
             sendStatus = ABORTED;
             break;
         }
@@ -59,7 +59,7 @@ void EspSerialCmd::sendCommands() {
 
 void EspSerialCmd::receiveCommands() {
     displayBanner();
-    padprintln("Waiting...");
+    padprintln("Aguardando...");
 
     recvCommand = "";
     recvQueue.clear();
@@ -72,7 +72,7 @@ void EspSerialCmd::receiveCommands() {
 
     while (1) {
         if (check(EscPress)) {
-            displayInfo("Aborting...");
+            displayInfo("Cancelando...");
             recvStatus = ABORTED;
             break;
         }
@@ -119,7 +119,7 @@ EspSerialCmd::Message EspSerialCmd::createCmdMessage() {
 }
 
 void EspSerialCmd::displayBanner() {
-    drawMainBorderWithTitle("RECEIVE COMMANDS");
+    drawMainBorderWithTitle("RECEBER COMANDOS");
     padprintln("");
 }
 
@@ -128,7 +128,7 @@ void EspSerialCmd::displayRecvCommand(bool success) {
     Serial.println(execution);
 
     displayBanner();
-    padprintln("Command received: ");
+    padprintln("Comando recebido: ");
     padprintln(recvCommand);
     padprintln("");
     padprintln(execution);
@@ -138,32 +138,32 @@ void EspSerialCmd::displayRecvCommand(bool success) {
 
 void EspSerialCmd::displayRecvError() {
     displayBanner();
-    padprintln("Error receiving command");
+    padprintln("Erro ao receber comando");
     displayRecvFooter();
 }
 
 void EspSerialCmd::displayRecvFooter() {
     padprintln("\n");
-    padprintln("Press [ESC] to leave");
+    padprintln("Pressione [ESC] para sair");
 }
 
 void EspSerialCmd::displaySentCommand(const char *command) {
     displayBanner();
-    padprintln("Command sent: ");
+    padprintln("Comando enviado: ");
     padprintln(command);
     displaySentFooter();
 }
 
 void EspSerialCmd::displaySentError() {
     displayBanner();
-    padprintln("Error sending command");
+    padprintln("Erro ao enviar comando");
     displaySentFooter();
 }
 
 void EspSerialCmd::displaySentFooter() {
     padprintln("\n");
-    padprintln("Press [OK] to send another command");
+    padprintln("Pressione [OK] para enviar outro comando");
     padprintln("");
-    padprintln("Press [ESC] to leave");
+    padprintln("Pressione [ESC] para sair");
 }
 #endif

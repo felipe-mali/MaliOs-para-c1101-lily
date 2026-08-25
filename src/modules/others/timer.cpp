@@ -52,7 +52,7 @@ void Timer::setup() {
         // Format and display time string
         snprintf(timeString, sizeof(timeString), "%02d:%02d:%02d", hours % 100, minutes % 100, seconds % 100);
 
-        drawMainBorderWithTitle("Set a timer", false);
+        drawMainBorderWithTitle("Definir temporizador", false);
         tft.setTextSize(fontSize);
         tft.drawCentreString(timeString, timerX, timerY, 1);
 
@@ -204,7 +204,7 @@ void Timer::loop() {
 void Timer::playAlarmPattern() {
     // Display "TIME'S UP!" message
     tft.fillScreen(bruceConfig.bgColor);
-    drawMainBorderWithTitle("Timer finished!", false);
+    drawMainBorderWithTitle("Temporizador concluido!", false);
 
     tft.setTextSize(2);
     tft.setTextColor(TFT_RED, bruceConfig.bgColor);
@@ -212,7 +212,7 @@ void Timer::playAlarmPattern() {
 
     tft.setTextSize(1);
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-    tft.drawCentreString("Press SEL or BACK to stop", timerX, timerY + (2 * LH), 1);
+    tft.drawCentreString("SEL ou BACK para parar", timerX, timerY + (2 * LH), 1);
 
     // Alarm pattern loop - continues until user stops it
     while (true) {

@@ -27,7 +27,7 @@ void backToMenu() { returnToMenu = true; }
 
 void addOptionToMainMenu() {
     returnToMenu = false;
-    options.push_back({"Main Menu", backToMenu});
+    options.push_back({"Menu principal", backToMenu});
 }
 
 /***************************************************************************************
@@ -157,45 +157,45 @@ void updateTimeStr(struct tm timeInfo) {
 }
 
 void showDeviceInfo() {
-    ScrollableTextArea area = ScrollableTextArea("DEVICE INFO");
+    ScrollableTextArea area = ScrollableTextArea("INFO DO DISPOSITIVO");
 
-    area.addLine("Bruce Version: " + String(BRUCE_VERSION));
-    area.addLine("EEPROM size: " + String(EEPROMSIZE));
+    area.addLine("Versao Bruce: " + String(BRUCE_VERSION));
+    area.addLine("Tamanho EEPROM: " + String(EEPROMSIZE));
     area.addLine("");
-    area.addLine("[MEMORY]");
-    area.addLine("Total heap: " + formatBytes(ESP.getHeapSize()));
-    area.addLine("Free heap: " + formatBytes(ESP.getFreeHeap()));
+    area.addLine("[MEMORIA]");
+    area.addLine("Heap total: " + formatBytes(ESP.getHeapSize()));
+    area.addLine("Heap livre: " + formatBytes(ESP.getFreeHeap()));
     if (psramFound()) {
-        area.addLine("Total PSRAM: " + formatBytes(ESP.getPsramSize()));
-        area.addLine("Free PSRAM: " + formatBytes(ESP.getFreePsram()));
+        area.addLine("PSRAM total: " + formatBytes(ESP.getPsramSize()));
+        area.addLine("PSRAM livre: " + formatBytes(ESP.getFreePsram()));
     }
     area.addLine("");
-    area.addLine("[NETWORK]");
-    area.addLine("MAC addr: " + String(WiFi.macAddress()));
+    area.addLine("[REDE]");
+    area.addLine("Endereco MAC: " + String(WiFi.macAddress()));
     String localIP = WiFi.localIP().toString();
     String softAPIP = WiFi.softAPIP().toString();
     String ipStatus = (WiFi.isConnected()) ? (localIP != "0.0.0.0"    ? localIP
                                               : softAPIP != "0.0.0.0" ? softAPIP
-                                                                      : "No valid IP")
-                                           : "Not connected";
-    area.addLine("IP address: " + ipStatus);
+                                                                      : "Sem IP valido")
+                                           : "Nao conectado";
+    area.addLine("Endereco IP: " + ipStatus);
     area.addLine("");
-    area.addLine("[STORAGE]");
+    area.addLine("[ARMAZENAMENTO]");
     area.addLine("LittleFS total: " + formatBytes(LittleFS.totalBytes()));
-    area.addLine("LittleFS used: " + formatBytes(LittleFS.usedBytes()));
-    area.addLine("LittleFS free: " + formatBytes(LittleFS.totalBytes() - LittleFS.usedBytes()));
+    area.addLine("LittleFS usado: " + formatBytes(LittleFS.usedBytes()));
+    area.addLine("LittleFS livre: " + formatBytes(LittleFS.totalBytes() - LittleFS.usedBytes()));
     area.addLine("");
-    area.addLine("SD Card total: " + formatBytes(SD.totalBytes()));
-    area.addLine("SD Card used: " + formatBytes(SD.usedBytes()));
-    area.addLine("SD Card free: " + formatBytes(SD.totalBytes() - SD.usedBytes()));
+    area.addLine("Cartao SD total: " + formatBytes(SD.totalBytes()));
+    area.addLine("Cartao SD usado: " + formatBytes(SD.usedBytes()));
+    area.addLine("Cartao SD livre: " + formatBytes(SD.totalBytes() - SD.usedBytes()));
     area.addLine("");
 
 #ifdef HAS_SCREEN
-    area.addLine("[SCREEN]");
-    area.addLine("Rotation: " + String(ROTATION));
-    area.addLine("Width: " + String(tftWidth) + "px");
-    area.addLine("Height: " + String(tftHeight) + "px");
-    area.addLine("Brightness: " + String(bruceConfig.bright) + "%");
+    area.addLine("[TELA]");
+    area.addLine("Rotacao: " + String(ROTATION));
+    area.addLine("Largura: " + String(tftWidth) + "px");
+    area.addLine("Altura: " + String(tftHeight) + "px");
+    area.addLine("Brilho: " + String(bruceConfig.bright) + "%");
     area.addLine("");
 #endif
 
@@ -215,28 +215,28 @@ void showDeviceInfo() {
     area.addLine("");
 
     area.addLine("[BAT]");
-    area.addLine("Charge: " + String(getBattery()) + "%");
+    area.addLine("Carga: " + String(getBattery()) + "%");
 #ifdef USE_BQ27220_VIA_I2C
-    area.addLine("BQ27220 ADDR: " + String(BQ27220_I2C_ADDRESS));
-    area.addLine("Curr Capacity: " + String(bq.getRemainCap()) + "mAh");
-    area.addLine("Full Capacity: " + String(bq.getFullChargeCap()) + "mAh");
-    area.addLine("Design Capacity: " + String(bq.getDesignCap()) + "mAh");
-    area.addLine("Charging: " + String(bq.getIsCharging()));
+    area.addLine("Endereco BQ27220: " + String(BQ27220_I2C_ADDRESS));
+    area.addLine("Capacidade atual: " + String(bq.getRemainCap()) + "mAh");
+    area.addLine("Capacidade total: " + String(bq.getFullChargeCap()) + "mAh");
+    area.addLine("Capacidade nominal: " + String(bq.getDesignCap()) + "mAh");
+    area.addLine("Carregando: " + String(bq.getIsCharging()));
     area.addLine(
-        "Charging Voltage: " + String(((double)bq.getVolt(VOLT_MODE::VOLT_CHARGING) / 1000.0)) + "V"
+        "Tensao de carga: " + String(((double)bq.getVolt(VOLT_MODE::VOLT_CHARGING) / 1000.0)) + "V"
     );
-    area.addLine("Charging Current: " + String(bq.getCurr(CURR_MODE::CURR_CHARGING)) + "mA");
+    area.addLine("Corrente de carga: " + String(bq.getCurr(CURR_MODE::CURR_CHARGING)) + "mA");
     area.addLine(
-        "Time to Empty: " + String((bq.getTimeToEmpty() / 1440)) + " days " +
-        String(((bq.getTimeToEmpty() % 1440) / 60)) + " hrs " + String(((bq.getTimeToEmpty() % 1440) % 60)) +
-        " mins"
+        "Tempo restante: " + String((bq.getTimeToEmpty() / 1440)) + " dias " +
+        String(((bq.getTimeToEmpty() % 1440) / 60)) + " h " + String(((bq.getTimeToEmpty() % 1440) % 60)) +
+        " min"
     );
-    area.addLine("Avg Power Use: " + String(bq.getAvgPower()) + "mW");
-    area.addLine("Voltage: " + String(((double)bq.getVolt(VOLT_MODE::VOLT) / 1000.0)) + "V");
-    area.addLine("Raw Voltage: " + String(bq.getVolt(VOLT_MODE::VOLT_RWA)) + "mV");
-    area.addLine("Curr Current: " + String(bq.getCurr(CURR_INSTANT)) + "mA");
-    area.addLine("Avg Current: " + String(bq.getCurr(CURR_MODE::CURR_AVERAGE)) + "mA");
-    area.addLine("Raw Current: " + String(bq.getCurr(CURR_MODE::CURR_RAW)) + "mA");
+    area.addLine("Consumo medio: " + String(bq.getAvgPower()) + "mW");
+    area.addLine("Tensao: " + String(((double)bq.getVolt(VOLT_MODE::VOLT) / 1000.0)) + "V");
+    area.addLine("Tensao bruta: " + String(bq.getVolt(VOLT_MODE::VOLT_RWA)) + "mV");
+    area.addLine("Corrente atual: " + String(bq.getCurr(CURR_INSTANT)) + "mA");
+    area.addLine("Corrente media: " + String(bq.getCurr(CURR_MODE::CURR_AVERAGE)) + "mA");
+    area.addLine("Corrente bruta: " + String(bq.getCurr(CURR_MODE::CURR_RAW)) + "mA");
 #endif
 
     area.show();

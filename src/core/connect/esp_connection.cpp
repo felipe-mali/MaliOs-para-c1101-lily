@@ -28,7 +28,7 @@ bool EspConnection::beginSend() {
     peerOptions.clear();
 
     if (!setupPeer(dstAddress)) {
-        displayError("Failed to add peer");
+        displayError("Falha ao adicionar par");
         delay(1000);
         return false;
     }
@@ -40,13 +40,13 @@ bool EspConnection::beginEspnow() {
     WiFi.mode(WIFI_STA);
 
     if (esp_now_init() != ESP_OK) {
-        displayError("Error initializing share");
+        displayError("Erro ao iniciar compartilhamento");
         delay(1000);
         return false;
     }
 
     if (!setupPeer(broadcastAddress)) {
-        displayError("Failed to add peer");
+        displayError("Falha ao adicionar par");
         delay(1000);
         return false;
     }

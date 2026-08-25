@@ -41,7 +41,7 @@ bool validateMACFormat(const String &mac) {
 
 bool setCustomMAC(const String &mac) {
     if (!validateMACFormat(mac)) {
-        displayError("Invalid MAC Format!");
+        displayError("Formato MAC invalido!");
         return false;
     }
     bruceConfig.wifiMAC = mac;
@@ -65,31 +65,31 @@ void wifiMACMenu() {
     String currentMAC;
 
     if (bruceConfig.wifiMAC != "" && validateMACFormat(bruceConfig.wifiMAC)) {
-        currentMAC = bruceConfig.wifiMAC + " (Custom)";
+        currentMAC = bruceConfig.wifiMAC + " (Personalizado)";
     } else {
-        currentMAC = WiFi.macAddress() + " (Default)";
+        currentMAC = WiFi.macAddress() + " (Padrao)";
     }
 
-    displayTextLine("Current MAC: " + currentMAC);
+    displayTextLine("MAC atual: " + currentMAC);
     delay(1000);
 
     options.clear();
-    options.push_back({"Default MAC", []() {
+    options.push_back({"MAC padrao", []() {
                            bruceConfig.wifiMAC = "";
                            bruceConfig.saveFile();
-                           displayTextLine("Default MAC set");
+                           displayTextLine("MAC padrao definido");
                        }});
 
-    options.push_back({"Set MAC", []() {
-                           String newMAC = keyboard("", 17, "Enter MAC XX:YY:ZZ:AA:BB:CC");
+    options.push_back({"Definir MAC", []() {
+                           String newMAC = keyboard("", 17, "Digite MAC XX:YY:ZZ:AA:BB:CC");
                            if (newMAC == "\x1B") return;
-                           if (setCustomMAC(newMAC)) { displayTextLine("MAC Saved: " + newMAC); }
+                           if (setCustomMAC(newMAC)) { displayTextLine("MAC salvo: " + newMAC); }
                        }});
 
-    options.push_back({"Random MAC", []() {
+    options.push_back({"MAC aleatorio", []() {
                            String randMAC = generateRandomMAC();
                            setCustomMAC(randMAC);
-                           displayTextLine("Random MAC: " + randMAC);
+                           displayTextLine("MAC aleatorio: " + randMAC);
                        }});
 
     loopOptions(options);

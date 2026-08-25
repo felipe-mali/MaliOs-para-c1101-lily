@@ -69,7 +69,7 @@ void ble_info(const String &name, const String &address, const String &signal) {
     tft.drawCentreString("-=Informacoes=-", tftWidth / 2, 28, SMOOTH_FONT);
     tft.drawString("Nome: " + name, 10, 48);
     tft.drawString("Endereco: " + address, 10, 66);
-    tft.drawString("Signal: " + String(signal) + " dBm", 10, 84);
+    tft.drawString("Sinal: " + String(signal) + " dBm", 10, 84);
     tft.drawCentreString("   Pressione " + String(BTN_ALIAS) + " para agir", tftWidth / 2, tftHeight - 20, 1);
 
     delay(300);

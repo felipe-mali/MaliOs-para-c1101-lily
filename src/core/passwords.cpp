@@ -47,7 +47,7 @@ String readDecryptedFileOLD(FS &fs, String filepath) {
   if(cyphertext.length() == 0) return "";
 
   if(cachedPassword.length()==0) {
-    cachedPassword = keyboard("", 32, "Password:", true);
+    cachedPassword = keyboard("", 32, "Senha:", true);
     if(cachedPassword.length()==0) return "";  // cancelled
   }
 
@@ -74,7 +74,7 @@ String readDecryptedFileOLD(FS &fs, String filepath) {
 String readDecryptedFile(FS &fs, String filepath) {
 
     if (cachedPassword.length() == 0) {
-        cachedPassword = keyboard("", 32, "Password:", true);
+        cachedPassword = keyboard("", 32, "Senha:", true);
         if (cachedPassword.length() == 0 || cachedPassword == "\x1B") return ""; // cancelled
     }
 
@@ -145,7 +145,7 @@ String readDecryptedFile(FS &fs, String filepath) {
     if (!isValidAscii(plaintext)) {
         // invalidate cached password -> will ask again on the next try
         cachedPassword = "";
-        displayError("decryption failed (invalid password?)");
+        displayError("Falha ao descriptografar (senha invalida?)");
         // Serial.println(plaintext);
         return "";
     }

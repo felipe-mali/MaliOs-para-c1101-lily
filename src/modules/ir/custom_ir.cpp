@@ -54,7 +54,7 @@ void selectRecentIrMenu() {
                                selected_code = recent_ircode;
                            }});
     }
-    options.push_back({"Main Menu", [&]() { exit = true; }});
+    options.push_back({"Menu principal", [&]() { exit = true; }});
 
     int idx = 0;
     while (1) {
@@ -84,7 +84,7 @@ bool txIrFile(FS *fs, const String &filepath, bool hideDefaultUI) {
 
     if (!databaseFile) {
         Serial.println("Failed to open database file.");
-        displayError("Fail to open file");
+        displayError("Falha ao abrir arquivo");
         delay(2000);
         return false;
     }
@@ -206,7 +206,7 @@ bool txIrFile(FS *fs, const String &filepath, bool hideDefaultUI) {
             }
             while (check(SelPress)) { vTaskDelay(pdMS_TO_TICKS(1)); }
             if (endingEarly) break; // Cancels  custom IR Spam
-            if (!hideDefaultUI) { displayTextLine("Running, Wait"); }
+            if (!hideDefaultUI) { displayTextLine("Executando, aguarde"); }
         }
     } // end while file has lines to process
     databaseFile.close();
@@ -318,7 +318,7 @@ void sendIRCommand(IRCode *code, bool hideDefaultUI) {
 void sendNECCommand(String address, String command, bool hideDefaultUI) {
     IRsend irsend(bruceConfigPins.irTx); // Set the GPIO to be used to sending the message.
     irsend.begin();
-    if (!hideDefaultUI) { displayTextLine("Sending.."); }
+    if (!hideDefaultUI) { displayTextLine("Enviando..."); }
     uint16_t addressValue = strtoul(address.substring(0, 2).c_str(), nullptr, 16);
     uint16_t commandValue = strtoul(command.substring(0, 2).c_str(), nullptr, 16);
     uint64_t data = irsend.encodeNEC(addressValue, commandValue);
@@ -340,7 +340,7 @@ void sendNECCommand(String address, String command, bool hideDefaultUI) {
 void sendNECextCommand(String address, String command, bool hideDefaultUI) {
     IRsend irsend(bruceConfigPins.irTx); // Set the GPIO to be used to sending the message.
     irsend.begin();
-    if (!hideDefaultUI) { displayTextLine("Sending.."); }
+    if (!hideDefaultUI) { displayTextLine("Enviando..."); }
 
     int first_zero_byte_pos = address.indexOf("00", 2);
     if (first_zero_byte_pos != -1) address = address.substring(0, first_zero_byte_pos);
@@ -379,7 +379,7 @@ void sendNECextCommand(String address, String command, bool hideDefaultUI) {
 void sendRC5Command(String address, String command, bool hideDefaultUI) {
     IRsend irsend(bruceConfigPins.irTx, true); // Set the GPIO to be used to sending the message.
     irsend.begin();
-    if (!hideDefaultUI) { displayTextLine("Sending.."); }
+    if (!hideDefaultUI) { displayTextLine("Enviando..."); }
     uint8_t addressValue = strtoul(address.substring(0, 2).c_str(), nullptr, 16);
     uint8_t commandValue = strtoul(command.substring(0, 2).c_str(), nullptr, 16);
     uint16_t data = irsend.encodeRC5(addressValue, commandValue);
@@ -399,7 +399,7 @@ void sendRC5Command(String address, String command, bool hideDefaultUI) {
 void sendRC6Command(String address, String command, bool hideDefaultUI) {
     IRsend irsend(bruceConfigPins.irTx, true); // Set the GPIO to be used to sending the message.
     irsend.begin();
-    if (!hideDefaultUI) { displayTextLine("Sending.."); }
+    if (!hideDefaultUI) { displayTextLine("Enviando..."); }
     address.replace(" ", "");
     command.replace(" ", "");
     uint32_t addressValue = strtoul(address.substring(0, 2).c_str(), nullptr, 16);
@@ -423,7 +423,7 @@ void sendRC6Command(String address, String command, bool hideDefaultUI) {
 void sendSamsungCommand(String address, String command, bool hideDefaultUI) {
     IRsend irsend(bruceConfigPins.irTx); // Set the GPIO to be used to sending the message.
     irsend.begin();
-    if (!hideDefaultUI) { displayTextLine("Sending.."); }
+    if (!hideDefaultUI) { displayTextLine("Enviando..."); }
     uint8_t addressValue = strtoul(address.substring(0, 2).c_str(), nullptr, 16);
     uint8_t commandValue = strtoul(command.substring(0, 2).c_str(), nullptr, 16);
     uint64_t data = irsend.encodeSAMSUNG(addressValue, commandValue);
@@ -445,7 +445,7 @@ void sendSamsungCommand(String address, String command, bool hideDefaultUI) {
 void sendSonyCommand(String address, String command, uint8_t nbits, bool hideDefaultUI) {
     IRsend irsend(bruceConfigPins.irTx); // Set the GPIO to be used to sending the message.
     irsend.begin();
-    if (!hideDefaultUI) { displayTextLine("Sending.."); }
+    if (!hideDefaultUI) { displayTextLine("Enviando..."); }
 
     address.replace(" ", "");
     command.replace(" ", "");
@@ -493,7 +493,7 @@ void sendSonyCommand(String address, String command, uint8_t nbits, bool hideDef
 void sendKaseikyoCommand(String address, String command, bool hideDefaultUI) {
     IRsend irsend(bruceConfigPins.irTx); // Set the GPIO to be used to sending the message.
     irsend.begin();
-    if (!hideDefaultUI) { displayTextLine("Sending.."); }
+    if (!hideDefaultUI) { displayTextLine("Enviando..."); }
 
     address.replace(" ", "");
     command.replace(" ", "");
@@ -553,7 +553,7 @@ bool sendDecodedCommand(String protocol, String value, uint8_t bits, bool hideDe
     IRsend irsend(bruceConfigPins.irTx); // Set the GPIO to be used to sending the message.
     irsend.begin();
     bool success = false;
-    if (!hideDefaultUI) { displayTextLine("Sending.."); }
+    if (!hideDefaultUI) { displayTextLine("Enviando..."); }
 
     if (hasACState(type)) {
         // need to send the state (still passed from value)
@@ -597,7 +597,7 @@ bool sendDecodedCommand(String protocol, String value, uint8_t bits, bool hideDe
     digitalWrite(bruceConfigPins.irTx, LED_OFF);
     return success;
 #else
-    if (!hideDefaultUI) { displayTextLine("Unavailable on this Version"); }
+    if (!hideDefaultUI) { displayTextLine("Indisponivel nesta versao"); }
     delay(1000);
     return false;
 #endif
@@ -610,7 +610,7 @@ void sendRawCommand(uint16_t frequency, String rawData, bool hideDefaultUI) {
 
     IRsend irsend(bruceConfigPins.irTx); // Set the GPIO to be used to sending the message.
     irsend.begin();
-    if (!hideDefaultUI) { displayTextLine("Sending.."); }
+    if (!hideDefaultUI) { displayTextLine("Enviando..."); }
 
     uint16_t dataBufferSize = 1;
     for (int i = 0; i < rawData.length(); i++) {
@@ -721,7 +721,7 @@ bool chooseCmdIrFile(FS *fs, const String &filepath) {
                                }});
         }
     }
-    options.push_back({"Main Menu", [&]() {
+    options.push_back({"Menu principal", [&]() {
                            actionTaken = true;
                            exit = true;
                            goToMainMenu = true;

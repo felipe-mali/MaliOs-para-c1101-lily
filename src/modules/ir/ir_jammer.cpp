@@ -449,7 +449,7 @@ void renderJammerUI(JammerState &state) {
     curY += ySpacing;
     tft.setCursor(10, curY);
     tft.setTextColor((state.settingIndex == 2) ? TFT_YELLOW : bruceConfig.priColor, bruceConfig.bgColor);
-    padprint("MODE: ");
+    padprint("MODO: ");
     tft.println(getModeName(state.currentMode));
 
     // Display mode-specific settings
@@ -463,12 +463,12 @@ void renderJammerUI(JammerState &state) {
     tft.setCursor(10, instructionsY);
     tft.setTextSize(FP);
     tft.setTextColor(TFT_BLUE, bruceConfig.bgColor);
-    padprintln("[SEL] Change Set. | [NEXT/PREV] Adjust Val. ");
+    padprintln("[SEL] troca conjunto | [NEXT/PREV] ajusta valor");
 
     // Display exit instruction in top-right corner
     tft.setTextColor(TFT_RED, bruceConfig.bgColor);
     tft.setCursor(tftWidth - 70, 30);
-    tft.print("[ESC] Exit");
+    tft.print("[ESC] Sair");
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
 
     // Reset redraw flag now that UI is updated

@@ -95,6 +95,7 @@ MainMenu::MainMenu() {
         &othersMenu,
         &configMenu,
         &maliToolsMenu,
+        &maliCounterMenu,
     };
 
     _totalItems = _menuItems.size();

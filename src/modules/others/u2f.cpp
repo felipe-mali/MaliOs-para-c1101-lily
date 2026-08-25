@@ -1676,18 +1676,18 @@ void drawU2fStatusScreen() {
 
     tft.setTextSize(1);
     tft.setCursor(6, 36);
-    tft.print("Ready for registration/login");
+    tft.print("Pronto para cadastro/login");
     tft.setCursor(6, 50);
-    tft.print("Press center when prompted");
+    tft.print("Pressione o centro quando solicitado");
     tft.setCursor(6, 64);
-    tft.print("ESC: Back");
+    tft.print("ESC: Voltar");
 }
 
 void updateU2fRuntimeInfo(const U2fHidDevice &device) {
     tft.fillRect(0, 84, tftWidth, tftHeight - 84, bruceConfig.bgColor);
     tft.setTextSize(2);
     tft.setCursor(6, 94);
-    tft.print(device.waitingForPresence() ? "Confirm now" : "Waiting...");
+    tft.print(device.waitingForPresence() ? "Confirme agora" : "Aguardando...");
     tft.setTextSize(1);
 }
 
@@ -1716,6 +1716,6 @@ void u2f_setup() {
 
 #else
 
-void u2f_setup() { displayError("USB HID disabled"); }
+void u2f_setup() { displayError("USB HID desativado"); }
 
 #endif

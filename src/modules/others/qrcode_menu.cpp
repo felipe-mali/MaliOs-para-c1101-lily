@@ -73,7 +73,7 @@ void qrcode_menu() {
     }
 
     options.push_back({"PIX", pix_qrcode});
-    options.push_back({"Custom", custom_qrcode_menu});
+    options.push_back({"Personalizado", custom_qrcode_menu});
     addOptionToMainMenu();
 
     loopOptions(options);
@@ -85,7 +85,7 @@ void custom_qrcode_menu() {
         {"Display",      display_custom_qrcode  },
         {"Save&Display", save_and_display_qrcode},
         {"Remove",       remove_custom_qrcode   },
-        {"Back",         qrcode_menu            }
+        {"Voltar",       qrcode_menu            }
     };
     loopOptions(options);
 }
@@ -119,7 +119,7 @@ void save_and_display_qrcode() {
 
 void remove_custom_qrcode() {
     if (bruceConfig.qrCodes.empty()) {
-        displayInfo("There is nothing to remove!");
+        displayInfo("Nao ha nada para remover!");
         delay(1000);
         custom_qrcode_menu();
     }
@@ -134,7 +134,7 @@ void remove_custom_qrcode() {
         });
     }
 
-    options.emplace_back("Back", [=]() { custom_qrcode_menu(); });
+    options.emplace_back("Voltar", [=]() { custom_qrcode_menu(); });
 
     loopOptions(options);
 }

@@ -16,12 +16,12 @@ MassStorage::~MassStorage() {
 }
 
 void MassStorage::setup() {
-    displayMessage("Mounting...");
+    displayMessage("Montando...");
 
     setShouldStop(false);
 
     if (!setupSdCard()) {
-        displayError("SD card not found.");
+        displayError("Cartao SD nao encontrado.");
         delay(1000);
         return;
     }
@@ -40,8 +40,8 @@ void MassStorage::loop() {
             switch (status) {
                 case ARDUINO_USB_STARTED_EVENT: drawUSBStickIcon(true); break;
                 case ARDUINO_USB_STOPPED_EVENT: drawUSBStickIcon(false); break;
-                case ARDUINO_USB_SUSPEND_EVENT: MassStorage::displayMessage("USB suspend"); break;
-                case ARDUINO_USB_RESUME_EVENT: MassStorage::displayMessage("USB resume"); break;
+                case ARDUINO_USB_SUSPEND_EVENT: MassStorage::displayMessage("USB suspenso"); break;
+                case ARDUINO_USB_RESUME_EVENT: MassStorage::displayMessage("USB retomado"); break;
                 default: break;
             }
             prev_status = status;
@@ -79,7 +79,7 @@ void MassStorage::setupUsbEvent() {
 }
 
 void MassStorage::displayMessage(String message) {
-    drawMainBorderWithTitle("Mass Storage");
+    drawMainBorderWithTitle("Armazenamento USB");
     padprintln("");
     padprintln(message);
 }

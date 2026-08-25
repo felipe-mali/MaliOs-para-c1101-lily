@@ -19,11 +19,11 @@ void Pn532ble::setup() {
 }
 
 bool Pn532ble::connect() {
-    displayInfo("Turn on PN532 BLE");
+    displayInfo("Ligue o PN532 BLE");
     delay(500);
     displayBanner();
     padprintln("");
-    displayInfo("Searching...");
+    displayInfo("Buscando...");
 
     if (!pn532_ble.searchForDevice()) {
         displayError("Nao encontrado");
@@ -77,47 +77,47 @@ void Pn532ble::loop() {
 void Pn532ble::selectMode() {
     options = {};
     if (pn532_ble.isConnected()) {
-        options.push_back({"Scan Tag", [this]() { scanTagMenu(); }});
-        options.push_back({"Read Tag", [this]() { readTagMenu(); }});
-        options.push_back({"Emulate Tag", [this]() { loadNdefEmulateMenu(); }});
+        options.push_back({"Buscar tag", [this]() { scanTagMenu(); }});
+        options.push_back({"Ler tag", [this]() { readTagMenu(); }});
+        options.push_back({"Emular tag", [this]() { loadNdefEmulateMenu(); }});
         if (mfd.size() > 0 || mfud.size() > 0 || iso15dump.size() > 0) {
-            options.push_back({"Write Dump", [this]() { writeDumpMenu(); }});
-            options.push_back({"Save Dump", [this]() { saveDumpMenu(); }});
+            options.push_back({"Gravar dump", [this]() { writeDumpMenu(); }});
+            options.push_back({"Salvar dump", [this]() { saveDumpMenu(); }});
         };
     }
-    options.push_back({"Load Dump", [this]() { loadDumpMenu(); }});
-    options.push_back({"Back", [this]() { setMode(STANDBY_MODE); }});
+    options.push_back({"Carregar dump", [this]() { loadDumpMenu(); }});
+    options.push_back({"Voltar", [this]() { setMode(STANDBY_MODE); }});
 
     loopOptions(options);
 }
 
 void Pn532ble::scanTagMenu() {
     options = {
-        {"Scan ISO14443A", [this]() { setMode(HF_14A_SCAN_MODE); }},
+        {"Buscar ISO14443A", [this]() { setMode(HF_14A_SCAN_MODE); }},
     };
 
     if (pn532_ble.isPN532Killer()) {
-        options.push_back({"Scan ISO15693", [this]() { setMode(HF_15_SCAN_MODE); }});
-        options.push_back({"Scan EM4100", [this]() { setMode(LF_EM4100_SCAN_MODE); }});
+        options.push_back({"Buscar ISO15693", [this]() { setMode(HF_15_SCAN_MODE); }});
+        options.push_back({"Buscar EM4100", [this]() { setMode(LF_EM4100_SCAN_MODE); }});
     }
 
-    options.push_back({"Back", [this]() { selectMode(); }});
+    options.push_back({"Voltar", [this]() { selectMode(); }});
 
     loopOptions(options);
 }
 
 void Pn532ble::readTagMenu() {
     options = {
-        {"Read MFC", [this]() { setMode(HF_MF_READ_MODE); } },
-        {"Read MFU", [this]() { setMode(HF_MFU_READ_MODE); }},
+        {"Ler MFC", [this]() { setMode(HF_MF_READ_MODE); } },
+        {"Ler MFU", [this]() { setMode(HF_MFU_READ_MODE); }},
     };
 
     if (pn532_ble.isPN532Killer()) {
-        options.push_back({"Read ISO15693", [this]() { setMode(HF_ISO15693_READ_MODE); }});
-        options.push_back({"Read EM4100", [this]() { setMode(LF_EM4100_SCAN_MODE); }});
+        options.push_back({"Ler ISO15693", [this]() { setMode(HF_ISO15693_READ_MODE); }});
+        options.push_back({"Ler EM4100", [this]() { setMode(LF_EM4100_SCAN_MODE); }});
     }
 
-    options.push_back({"Back", [this]() { selectMode(); }});
+    options.push_back({"Voltar", [this]() { selectMode(); }});
 
     loopOptions(options);
 }
@@ -126,18 +126,18 @@ void Pn532ble::writeDumpMenu() {
     options = {};
 
     if (mfd.size() > 0) {
-        options.push_back({"Write MFC", [this]() { setMode(HF_MF_WRITE_MODE); }});
+        options.push_back({"Gravar MFC", [this]() { setMode(HF_MF_WRITE_MODE); }});
     }
 
     if (mfud.size() > 0) {
-        options.push_back({"Write MFU", [this]() { setMode(HF_MFU_WRITE_MODE); }});
+        options.push_back({"Gravar MFU", [this]() { setMode(HF_MFU_WRITE_MODE); }});
     }
 
     if (pn532_ble.isPN532Killer() && iso15dump.size() > 0) {
-        options.push_back({"Write ISO15693", [this]() { setMode(HF_ISO15693_WRITE_MODE); }});
+        options.push_back({"Gravar ISO15693", [this]() { setMode(HF_ISO15693_WRITE_MODE); }});
     }
 
-    options.push_back({"Back", [this]() { selectMode(); }});
+    options.push_back({"Voltar", [this]() { selectMode(); }});
 
     loopOptions(options);
 }
@@ -145,42 +145,42 @@ void Pn532ble::writeDumpMenu() {
 void Pn532ble::saveDumpMenu() {
     options = {};
     if (mfd.size() == 320 || mfd.size() == 1024 || mfd.size() == 4096) {
-        options.push_back({"Save MFC dump", [this]() {
+        options.push_back({"Salvar dump MFC", [this]() {
                                String fileName =
                                    saveHfDumpBinFile(mfd, pn532_ble.hf14aTagInfo.uid_hex, "mf-");
                                if (fileName != "") {
-                                   displaySuccess("Saved to " + fileName);
+                                   displaySuccess("Salvo em " + fileName);
                                } else {
-                                   displayError("Dump save failed");
+                                   displayError("Falha ao salvar dump");
                                }
                            }});
     }
 
     if (mfud.size() > 0) {
-        options.push_back({"Save MFU dump", [this]() {
+        options.push_back({"Salvar dump MFU", [this]() {
                                String fileName =
                                    saveHfDumpBinFile(mfud, pn532_ble.hf14aTagInfo.uid_hex, "mfu-");
                                if (fileName != "") {
-                                   displaySuccess("Saved to " + fileName);
+                                   displaySuccess("Salvo em " + fileName);
                                } else {
-                                   displayError("Dump save failed");
+                                   displayError("Falha ao salvar dump");
                                }
                            }});
     }
 
     if (iso15dump.size() > 0) {
-        options.push_back({"Save ISO15693 dump", [this]() {
+        options.push_back({"Salvar dump ISO15693", [this]() {
                                String fileName =
                                    saveHfDumpBinFile(iso15dump, pn532_ble.hf15TagInfo.uid_hex, "iso15-");
                                if (fileName != "") {
-                                   displaySuccess("Saved to " + fileName);
+                                   displaySuccess("Salvo em " + fileName);
                                } else {
-                                   displayError("Dump save failed");
+                                   displayError("Falha ao salvar dump");
                                }
                            }});
     }
 
-    options.push_back({"Back", [this]() { selectMode(); }});
+    options.push_back({"Voltar", [this]() { selectMode(); }});
     loopOptions(options);
 }
 
@@ -189,7 +189,7 @@ void Pn532ble::loadDumpMenu() {
         {"Load MFC",      [this]() { setMode(HF_MF_LOAD_DUMP_MODE); }      },
         {"Load MFU",      [this]() { setMode(HF_MFU_LOAD_DUMP_MODE); }     },
         {"Load ISO15693", [this]() { setMode(HF_ISO15693_LOAD_DUMP_MODE); }},
-        {"Back",          [this]() { selectMode(); }                       },
+        {"Voltar",        [this]() { selectMode(); }                       },
     };
 
     loopOptions(options);
@@ -200,11 +200,11 @@ void Pn532ble::loadNdefEmulateMenu() {
 
     options = {
         {"Visit Bruce", [&]() { prefix = "https://bruce.computer"; }},
-        {"Open Url",    [&]() { prefix = "https://"; }              },
+        {"Abrir URL",   [&]() { prefix = "https://"; }              },
         {"Phone Call",  [&]() { prefix = "tel:"; }                  },
-        {"Send Email",  [&]() { prefix = "mailto:"; }               },
-        {"Custom",      [&]() { prefix = ""; }                      },
-        {"Back",        [&]() { selectMode(); }                     },
+        {"Enviar e-mail", [&]() { prefix = "mailto:"; }             },
+        {"Personalizado", [&]() { prefix = ""; }                    },
+        {"Voltar",      [&]() { selectMode(); }                     },
     };
     delay(200);
     loopOptions(options);
@@ -221,19 +221,19 @@ void Pn532ble::setMode(AppMode mode) {
 
     displayBanner();
     switch (mode) {
-        case STANDBY_MODE: padprintln(""); padprintln("[ok] - Select mode");
+        case STANDBY_MODE: padprintln(""); padprintln("[ok] - Selecionar modo");
 #ifdef HAS_KEYBOARD
-            if (pn532_ble.isConnected()) { padprintln("[h] - Scan ISO14443A"); }
+            if (pn532_ble.isConnected()) { padprintln("[h] - Buscar ISO14443A"); }
             if (pn532_ble.isPN532Killer()) {
-                padprintln("[H] - Scan ISO15693");
-                padprintln("[l] - Scan EM4100");
+                padprintln("[H] - Buscar ISO15693");
+                padprintln("[l] - Buscar EM4100");
             }
             padprintln("");
             if (pn532_ble.isConnected()) {
-                padprintln("[c] - Read Mifare Classic");
-                padprintln("[u] - Read Mifare Ultralight");
+                padprintln("[c] - Ler Mifare Classic");
+                padprintln("[u] - Ler Mifare Ultralight");
             }
-            if (pn532_ble.isPN532Killer()) { padprintln("[i] - Read ISO15693"); }
+            if (pn532_ble.isPN532Killer()) { padprintln("[i] - Ler ISO15693"); }
 #endif
             break;
         case GET_FW_MODE:
@@ -262,13 +262,13 @@ void Pn532ble::setMode(AppMode mode) {
 
 void Pn532ble::displayBanner() {
     drawMainBorderWithTitle("PN532 BLE");
-    padprintln("PN532 HSU Mode on BLE");
+    padprintln("Modo HSU PN532 via BLE");
     delay(100);
 }
 
 void Pn532ble::showDeviceInfo() {
     displayBanner();
-    padprintln("Devices: " + String(pn532_ble.getName().c_str()));
+    padprintln("Dispositivo: " + String(pn532_ble.getName().c_str()));
     pn532_ble.setNormalMode();
     bool res = pn532_ble.getVersion();
     if (!res) {
@@ -278,7 +278,7 @@ void Pn532ble::showDeviceInfo() {
     }
     uint8_t *version = pn532_ble.cmdResponse.data;
     uint8_t dataSize = pn532_ble.cmdResponse.dataSize;
-    String versionStr = "Version: ";
+    String versionStr = "Versao: ";
     for (size_t i = 0; i < dataSize; i++) {
         versionStr += version[i] < 0x10 ? " 0" : " ";
         versionStr += String(version[i], HEX);
@@ -286,12 +286,12 @@ void Pn532ble::showDeviceInfo() {
     padprintln(versionStr);
     padprintln("------------");
     padprintln("");
-    padprintln("[ok] - Select mode");
+    padprintln("[ok] - Selecionar modo");
 }
 
 void Pn532ble::hf14aScan() {
     displayBanner();
-    padprintln("HF 14a Scan");
+    padprintln("Busca HF 14a");
     delay(200);
     pn532_ble.setNormalMode();
     PN532_BLE::Iso14aTagInfo tagInfo = pn532_ble.hf14aScan();
@@ -301,7 +301,7 @@ void Pn532ble::hf14aScan() {
         displayError("Tag nao e ISO14443A");
     } else {
         padprintln("------------");
-        padprintln("Type: " + tagInfo.type);
+        padprintln("Tipo: " + tagInfo.type);
         padprintln("UID:  " + tagInfo.uid_hex);
         padprintln("ATQA: " + tagInfo.atqa_hex);
         padprintln("SAK:  " + tagInfo.sak_hex);
@@ -320,18 +320,18 @@ void Pn532ble::hf14aScan() {
 
 void Pn532ble::hf15Scan() {
     displayBanner();
-    padprintln("HF 15 Scan");
+    padprintln("Busca HF 15");
     delay(200);
     if (!pn532_ble.isPN532Killer()) {
-        displayError("Not supported");
+        displayError("Sem suporte");
         return;
     }
     pn532_ble.setNormalMode();
     PN532_BLE::Iso15TagInfo tagInfo = pn532_ble.hf15Scan();
     if (tagInfo.uid.empty()) {
-        displayError("No tag found");
+        displayError("Tag nao encontrada");
     } else if (tagInfo.uid.size() != 8) {
-        displayError("Not ISO15693 Tag");
+        displayError("A tag nao e ISO15693");
     } else {
         padprintln("------------");
         padprintln("UID:  " + tagInfo.uid_hex);
@@ -339,23 +339,23 @@ void Pn532ble::hf15Scan() {
         padprintln("DSFID: " + String(tagInfo.dsfid, HEX));
         padprintln("AFI:   " + String(tagInfo.afi, HEX));
         padprintln("ICRef: " + String(tagInfo.icRef, HEX));
-        padprintln("BlockSize: " + String(tagInfo.blockSize));
+        padprintln("Tam. bloco: " + String(tagInfo.blockSize));
     }
 }
 
 void Pn532ble::lfScan() {
     displayBanner();
-    padprintln("LF Scan");
+    padprintln("Busca LF");
     delay(200);
     if (!pn532_ble.isPN532Killer()) {
-        displayError("Not supported");
+        displayError("Sem suporte");
         return;
     }
 
     pn532_ble.setNormalMode();
     PN532_BLE::LfTagInfo tagInfo = pn532_ble.lfScan();
     if (tagInfo.uid.empty()) {
-        displayError("No tag found");
+        displayError("Tag nao encontrada");
     } else {
         padprintln("------------");
         padprintln("UID: " + tagInfo.uid_hex);
@@ -379,7 +379,7 @@ void Pn532ble::hf14aMfReadDumpMode() {
     pn532_ble.setNormalMode();
     PN532_BLE::Iso14aTagInfo tagInfo = pn532_ble.hf14aScan();
     if (tagInfo.uid.empty()) {
-        displayError("No tag found");
+        displayError("Tag nao encontrada");
         return;
     }
     mfd.clear();
@@ -390,7 +390,7 @@ void Pn532ble::hf14aMfReadDumpMode() {
 
     if (tagInfo.sak == 0x08 || tagInfo.sak == 0x09 || tagInfo.sak == 0x18) {
         if (pn532_ble.isGen1A()) {
-            area.addLine("TYPE: " + tagInfo.type);
+            area.addLine("TIPO: " + tagInfo.type);
             area.scrollDown();
             area.draw();
             area.addLine("UID:  " + tagInfo.uid_hex);
@@ -406,7 +406,7 @@ void Pn532ble::hf14aMfReadDumpMode() {
                 uint8_t blockData[16];
                 std::vector<uint8_t> res = pn532_ble.sendData({0x30, i}, true);
                 if (res.size() < 18) {
-                    displayError("Read failed");
+                    displayError("Falha na leitura");
                     return;
                 }
                 String blockStr = String(i) + " ";
@@ -428,7 +428,7 @@ void Pn532ble::hf14aMfReadDumpMode() {
             area.draw();
         } else if (pn532_ble.isGen4(gen4pwd)) {
             delay(200);
-            area.addLine("TYPE: " + tagInfo.type);
+            area.addLine("TIPO: " + tagInfo.type);
             area.scrollDown();
             area.draw();
             area.addLine("UID:  " + tagInfo.uid_hex);
@@ -450,7 +450,7 @@ void Pn532ble::hf14aMfReadDumpMode() {
                     std::vector<uint8_t> res =
                         pn532_ble.sendData({0xCF, 0x00, 0x00, 0x00, 0x00, 0xCE, blockIndex}, true);
                     if (res.size() < 18) {
-                        displayError("Read failed");
+                        displayError("Falha na leitura");
                         return;
                     }
                     String blockStr = String(blockIndex) + " ";
@@ -470,7 +470,7 @@ void Pn532ble::hf14aMfReadDumpMode() {
             area.draw();
         } else {
             tagInfo = pn532_ble.hf14aScan();
-            area.addLine("TYPE: " + tagInfo.type);
+            area.addLine("TIPO: " + tagInfo.type);
             area.scrollDown();
             area.draw();
             area.addLine("UID:  " + tagInfo.uid_hex);
@@ -494,7 +494,7 @@ void Pn532ble::hf14aMfReadDumpMode() {
                         pn532_ble.mfAuth(tagInfo.uid, sectorBlockIdex, pn532_ble.mifareDefaultKey, useKeyA);
                 }
                 if (!authResult) {
-                    displayError("Sector " + String(s) + " auth failed");
+                    displayError("Falha de autenticacao no setor " + String(s));
                     continue;
                 }
                 uint8_t sectorBlockSize = (s < 32) ? 4 : 16;
@@ -503,7 +503,7 @@ void Pn532ble::hf14aMfReadDumpMode() {
                     uint8_t blockData[16];
                     std::vector<uint8_t> res = pn532_ble.mfRdbl(blockIndex);
                     if (res.size() < 16) {
-                        area.addLine("Sector " + String(s) + " Block " + String(blockIndex) + " read failed");
+                        area.addLine("Falha ao ler setor " + String(s) + ", bloco " + String(blockIndex));
                         area.scrollDown();
                         area.draw();
                         continue;
@@ -546,7 +546,7 @@ void Pn532ble::hf14aMfReadDumpMode() {
             vTaskDelay(pdMS_TO_TICKS(1));
         }
     } else {
-        area.addLine("Not Mifare Ultralight");
+        area.addLine("Nao e Mifare Ultralight");
         area.scrollDown();
         area.draw();
     }
@@ -559,7 +559,7 @@ void Pn532ble::hf14aMfuReadDumpMode() {
     pn532_ble.setNormalMode();
     PN532_BLE::Iso14aTagInfo tagInfo = pn532_ble.hf14aScan();
     if (tagInfo.uid.empty()) {
-        displayError("No tag found");
+        displayError("Tag nao encontrada");
         return;
     }
     mfd.clear();
@@ -571,7 +571,7 @@ void Pn532ble::hf14aMfuReadDumpMode() {
 
     if (tagInfo.sak == 0x00) {
         mfud.clear();
-        area.addLine("TYPE: " + tagInfo.type);
+        area.addLine("TIPO: " + tagInfo.type);
         area.scrollDown();
         area.draw();
         area.addLine("UID:  " + tagInfo.uid_hex);
@@ -585,7 +585,7 @@ void Pn532ble::hf14aMfuReadDumpMode() {
             if (res.size() == 17) { res.erase(res.begin()); }
             if (block == 0 && res.size() == 16) {
                 max_block = res[14] * 2 + 9;
-                area.addLine("PAGE: " + String(max_block));
+                area.addLine("PAGINA: " + String(max_block));
                 area.addLine("------------");
                 area.scrollDown();
                 area.draw();
@@ -623,7 +623,7 @@ void Pn532ble::hf14aMfuReadDumpMode() {
                     area.draw();
                 }
             } else {
-                padprintln("Block " + String(block) + " Failed to read");
+                padprintln("Falha ao ler bloco " + String(block));
             }
             block += 4;
         }
@@ -641,7 +641,7 @@ void Pn532ble::hf14aMfuReadDumpMode() {
             vTaskDelay(pdMS_TO_TICKS(1));
         }
     } else {
-        area.addLine("Not Mifare Ultralight");
+        area.addLine("Nao e Mifare Ultralight");
         area.scrollDown();
         area.draw();
     }
@@ -649,22 +649,22 @@ void Pn532ble::hf14aMfuReadDumpMode() {
 
 void Pn532ble::hf14aMfuWriteDumpMode() {
     displayBanner();
-    padprintln("HF MFU Write Dump");
+    padprintln("Gravar dump HF MFU");
     pn532_ble.setNormalMode();
     PN532_BLE::Iso14aTagInfo tagInfo = pn532_ble.hf14aScan();
     padprintln("------------");
     if (tagInfo.uid.empty()) {
-        displayError("No tag found");
+        displayError("Tag nao encontrada");
         return;
     }
     padprintln("UID:  " + tagInfo.uid_hex);
-    padprintln("Type: " + tagInfo.type);
+    padprintln("Tipo: " + tagInfo.type);
     delay(200);
     drawMainBorder(true);
 
     ScrollableTextArea area(FP, 10, 28, tftWidth - 20, tftHeight - 38);
     if (tagInfo.sak == 0x00) {
-        area.addLine("Write Mifare Ultralight");
+        area.addLine("Gravar Mifare Ultralight");
         area.addLine("------------");
         area.scrollDown();
         area.draw();
@@ -676,7 +676,7 @@ void Pn532ble::hf14aMfuWriteDumpMode() {
         if (first4Page.size() == 16) { max_block = first4Page[14] * 2 + 9; }
 
         if (max_block > mfud.size() / 4) {
-            displayError("Dump size not enough");
+        displayError("Dump pequeno demais");
             return;
         }
 
@@ -684,9 +684,9 @@ void Pn532ble::hf14aMfuWriteDumpMode() {
             std::vector<uint8_t> data(mfud.begin() + i, mfud.begin() + i + 4);
             bool res = pn532_ble.mfuWrbl(block, data);
             if (res) {
-                area.addLine("Block " + String(block) + " write success");
+                area.addLine("Bloco " + String(block) + " gravado");
             } else {
-                area.addLine("Block " + String(block) + " write failed");
+                area.addLine("Falha ao gravar bloco " + String(block));
             }
             area.scrollDown();
             area.draw();
@@ -706,28 +706,28 @@ void Pn532ble::hf14aMfuWriteDumpMode() {
             vTaskDelay(pdMS_TO_TICKS(1));
         }
     } else {
-        area.addLine("Not Mifare Ultralight");
+        area.addLine("Nao e Mifare Ultralight");
         area.scrollDown();
         area.draw();
     }
 }
 void Pn532ble::hf14aMfWriteDumpMode() {
     displayBanner();
-    padprintln("HF 14A Write Dump");
+    padprintln("Gravar dump HF 14A");
     pn532_ble.setNormalMode();
     PN532_BLE::Iso14aTagInfo tagInfo = pn532_ble.hf14aScan();
     padprintln("------------");
     if (tagInfo.uid.empty()) {
-        displayError("No tag found");
+        displayError("Tag nao encontrada");
         return;
     }
     padprintln("UID:  " + tagInfo.uid_hex);
-    padprintln("Type: " + tagInfo.type);
+    padprintln("Tipo: " + tagInfo.type);
     delay(200);
     drawMainBorder(true);
     ScrollableTextArea area(FP, 10, 28, tftWidth - 20, tftHeight - 38);
     if (mfd.size() == 1024 && pn532_ble.isGen1A()) {
-        area.addLine("Write Mifare Classic");
+        area.addLine("Gravar Mifare Classic");
         area.addLine("------------");
         area.scrollDown();
         area.draw();
@@ -739,9 +739,9 @@ void Pn532ble::hf14aMfWriteDumpMode() {
             std::vector<uint8_t> res2 =
                 pn532_ble.sendData(std::vector<uint8_t>(blockData, blockData + 16), true);
             if (res2.size() > 0 && res2[0] == 0x00) {
-                area.addLine("Block " + String(i) + " write success");
+                area.addLine("Bloco " + String(i) + " gravado");
             } else {
-                area.addLine("Block " + String(i) + " write failed");
+                area.addLine("Falha ao gravar bloco " + String(i));
             }
             area.scrollDown();
             area.draw();
@@ -750,7 +750,7 @@ void Pn532ble::hf14aMfWriteDumpMode() {
         area.scrollDown();
         area.draw();
     } else if (pn532_ble.isGen4(gen4pwd)) {
-        area.addLine("Write Dump to Gen4");
+        area.addLine("Gravar dump em Gen4");
         area.addLine("------------");
         area.scrollDown();
         area.draw();
@@ -759,7 +759,7 @@ void Pn532ble::hf14aMfWriteDumpMode() {
             pwd.push_back(strtol(gen4pwd.substr(i, 2).c_str(), NULL, 16));
         }
         std::vector<uint8_t> configCmd = {0xCF, pwd[0], pwd[1], pwd[2], pwd[3], 0xF0};
-        String gen4Type = "Unknown";
+        String gen4Type = "Desconhecido";
         if (pn532_ble.hf14aTagInfo.uidSize == 4 && mfd.size() == 320) {
             configCmd.insert(configCmd.end(), default4bS20Config.begin(), default4bS20Config.end());
             gen4Type = "4B S20";
@@ -779,7 +779,7 @@ void Pn532ble::hf14aMfWriteDumpMode() {
             configCmd.insert(configCmd.end(), default7bS50Config.begin(), default7bS50Config.end());
             gen4Type = "7B S50";
         } else {
-            area.addLine("Config Gen4 failed");
+            area.addLine("Falha ao configurar Gen4");
             area.scrollDown();
             area.draw();
             return;
@@ -787,7 +787,7 @@ void Pn532ble::hf14aMfWriteDumpMode() {
 
         std::vector<uint8_t> res = pn532_ble.sendData(configCmd, true);
         if (res.size() > 0 && res[0] == 0x00) {
-            area.addLine("Config Gen4 to " + gen4Type + " success");
+            area.addLine("Gen4 configurado como " + gen4Type);
             area.scrollDown();
             area.draw();
             delay(500);
@@ -798,9 +798,9 @@ void Pn532ble::hf14aMfWriteDumpMode() {
                 blockWriteCommand.insert(blockWriteCommand.end(), data.begin(), data.end());
                 std::vector<uint8_t> res = pn532_ble.sendData(blockWriteCommand, true);
                 if (res.size() > 0 && res[0] == 0x00) {
-                    area.addLine("Block " + String(i) + " write success");
+                    area.addLine("Bloco " + String(i) + " gravado");
                 } else {
-                    area.addLine("Block " + String(i) + " write failed");
+                    area.addLine("Falha ao gravar bloco " + String(i));
                 }
                 area.scrollDown();
                 area.draw();
@@ -809,35 +809,35 @@ void Pn532ble::hf14aMfWriteDumpMode() {
             area.scrollDown();
             area.draw();
         } else {
-            area.addLine("Config Gen4 to S50 failed");
+            area.addLine("Falha ao configurar Gen4 como S50");
             area.scrollDown();
             area.draw();
         }
     } else if (pn532_ble.isGen3()) {
-        area.addLine("Write to Gen3");
+        area.addLine("Gravar em Gen3");
         area.addLine("------------");
         area.scrollDown();
         area.draw();
         uint8_t uidSize = pn532_ble.hf14aTagInfo.uidSize;
-        area.addLine("Set UID");
+        area.addLine("Definir UID");
         area.scrollDown();
         area.draw();
         std::vector<uint8_t> setUidCmd = {0x90, 0xFB, 0xCC, 0xCC, 0x07};
         for (byte i = 0; i < uidSize; i++) { setUidCmd.push_back(mfd[i]); }
         pn532_ble.sendData(setUidCmd, true);
-        area.addLine("Set UID Block");
+        area.addLine("Definir bloco UID");
         area.scrollDown();
         area.draw();
         std::vector<uint8_t> setBlock0Config = {0x90, 0xF0, 0xCC, 0xCC, 0x10};
         for (byte i = 0; i < 16; i++) { setBlock0Config.push_back(mfd[i]); }
         std::vector<uint8_t> res = pn532_ble.sendData(setBlock0Config, true);
         if (res.size() > 0 && res[0] == 0x00) {
-            area.addLine("UID and Block0 write success");
+            area.addLine("UID e bloco 0 gravados");
             area.scrollDown();
             area.draw();
             hf14aMfWriteDump(area);
         } else {
-            area.addLine("UID and Block0 write failed");
+            area.addLine("Falha ao gravar UID e bloco 0");
             area.scrollDown();
             area.draw();
         }
@@ -872,7 +872,7 @@ void Pn532ble::hf14aMfWriteDump(ScrollableTextArea &area) {
             );
         }
         if (!authResult) {
-            area.addLine("Sector " + String(s) + " auth failed");
+            area.addLine("Falha de autenticacao no setor " + String(s));
             area.scrollDown();
             area.draw();
             continue;
@@ -882,9 +882,9 @@ void Pn532ble::hf14aMfWriteDump(ScrollableTextArea &area) {
             std::vector<uint8_t> data(mfd.begin() + blockIndex * 16, mfd.begin() + blockIndex * 16 + 16);
             bool writeResult = pn532_ble.mfWrbl(blockIndex, data);
             if (writeResult) {
-                area.addLine("Block " + String(blockIndex) + " write success");
+                area.addLine("Bloco " + String(blockIndex) + " gravado");
             } else {
-                area.addLine("Block " + String(blockIndex) + " write failed");
+                area.addLine("Falha ao gravar bloco " + String(blockIndex));
             }
             area.scrollDown();
             area.draw();
@@ -910,11 +910,11 @@ void Pn532ble::hf15ReadDumpMode() {
     PN532_BLE::Iso15TagInfo tagInfo = pn532_ble.hf15Scan();
     padprintln("------------");
     if (tagInfo.uid.empty()) {
-        displayError("No tag found");
+        displayError("Tag nao encontrada");
         return;
     }
     padprintln("UID:  " + tagInfo.uid_hex);
-    padprintln("Checking Tag...");
+    padprintln("Verificando tag...");
     tagInfo = pn532_ble.hf15Info();
     ScrollableTextArea area(FP, 10, 28, tftWidth - 20, tftHeight - 38);
 
@@ -924,14 +924,14 @@ void Pn532ble::hf15ReadDumpMode() {
         area.addLine("DSFID: " + String(tagInfo.dsfid, HEX));
         area.addLine("AFI:   " + String(tagInfo.afi, HEX));
         area.addLine("ICRef: " + String(tagInfo.icRef, HEX));
-        area.addLine("BlockSize: " + String(tagInfo.blockSize));
+        area.addLine("Tam. bloco: " + String(tagInfo.blockSize));
         area.addLine("------------");
         area.scrollDown();
         area.draw();
         for (uint8_t i = 0; i < tagInfo.blockSize; i++) {
             std::vector<uint8_t> res = pn532_ble.hf15Rdbl(i);
             if (res.size() < 4) {
-                displayError("Read failed");
+                displayError("Falha na leitura");
                 return;
             }
             String blockStr = String(i) + " ";
@@ -961,16 +961,16 @@ void Pn532ble::hf15ReadDumpMode() {
 
 void Pn532ble::hf15WriteDumpMode() {
     displayBanner();
-    padprintln("HF 15 Write Dump");
+    padprintln("Gravar dump HF 15");
     pn532_ble.setNormalMode();
     PN532_BLE::Iso15TagInfo tagInfo = pn532_ble.hf15Scan();
     padprintln("------------");
     if (tagInfo.uid.empty()) {
-        displayError("No tag found");
+        displayError("Tag nao encontrada");
         return;
     }
     padprintln("UID:  " + tagInfo.uid_hex);
-    padprintln("Checking Tag...");
+    padprintln("Verificando tag...");
     tagInfo = pn532_ble.hf15Info();
     ScrollableTextArea area(FP, 10, 28, tftWidth - 20, tftHeight - 38);
 
@@ -980,14 +980,14 @@ void Pn532ble::hf15WriteDumpMode() {
         area.addLine("DSFID: " + String(tagInfo.dsfid, HEX));
         area.addLine("AFI:   " + String(tagInfo.afi, HEX));
         area.addLine("ICRef: " + String(tagInfo.icRef, HEX));
-        area.addLine("BlockSize: " + String(tagInfo.blockSize));
+        area.addLine("Tam. bloco: " + String(tagInfo.blockSize));
         area.addLine("------------");
         area.scrollDown();
         area.draw();
 
         // check iso15dump size with tag block size
         if (iso15dump.size() > tagInfo.blockSize * 4) {
-            displayError("Dump size is too large");
+            displayError("Dump grande demais");
             return;
         }
 
@@ -995,9 +995,9 @@ void Pn532ble::hf15WriteDumpMode() {
             std::vector<uint8_t> data(iso15dump.begin() + i * 4, iso15dump.begin() + i * 4 + 4);
             bool writeResult = pn532_ble.hf15Wrbl(i, data);
             if (writeResult) {
-                area.addLine("Block " + String(i) + " write success");
+                area.addLine("Bloco " + String(i) + " gravado");
             } else {
-                area.addLine("Block " + String(i) + " write failed");
+                area.addLine("Falha ao gravar bloco " + String(i));
             }
             area.scrollDown();
             area.draw();
@@ -1021,19 +1021,19 @@ void Pn532ble::hf15WriteDumpMode() {
 void Pn532ble::loadMifareClassicDumpFile() {
     FS *fs;
     if (!getFsStorage(fs)) {
-        padprintln("No storage found");
+        padprintln("Armazenamento nao encontrado");
         return;
     }
     if (!(*fs).exists("/BruceRFID")) (*fs).mkdir("/BruceRFID");
     String filePath = loopSD(*fs, true, "bin", "/BruceRFID");
     if (filePath == "") {
-        padprintln("No file selected");
+        padprintln("Nenhum arquivo selecionado");
         return;
     }
 
     File file = (*fs).open(filePath, FILE_READ);
     if (!file) {
-        padprintln("File open failed");
+        padprintln("Falha ao abrir arquivo");
         return;
     }
     mfd.clear();
@@ -1041,7 +1041,7 @@ void Pn532ble::loadMifareClassicDumpFile() {
     file.close();
     // check dump size if is 320, 1024 or 4096
     if (mfd.size() != 320 && mfd.size() != 1024 && mfd.size() != 4096) {
-        padprintln("Invalid dump size: " + String(mfd.size()));
+        padprintln("Tamanho de dump invalido: " + String(mfd.size()));
         return;
     }
 
@@ -1049,7 +1049,7 @@ void Pn532ble::loadMifareClassicDumpFile() {
 
     ScrollableTextArea area(FP, 10, 28, tftWidth - 20, tftHeight - 38);
     area.addLine("Dump: " + filePath);
-    area.addLine("Size: " + String(mfd.size()));
+    area.addLine("Tamanho: " + String(mfd.size()));
     area.addLine("------------");
     area.scrollDown();
     area.draw();
@@ -1083,19 +1083,19 @@ void Pn532ble::loadMifareClassicDumpFile() {
 void Pn532ble::loadMifareUltralightDumpFile() {
     FS *fs;
     if (!getFsStorage(fs)) {
-        padprintln("No storage found");
+        padprintln("Armazenamento nao encontrado");
         return;
     }
     if (!(*fs).exists("/BruceRFID")) (*fs).mkdir("/BruceRFID");
     String filePath = loopSD(*fs, true, "bin", "/BruceRFID");
     if (filePath == "") {
-        padprintln("No file selected");
+        padprintln("Nenhum arquivo selecionado");
         return;
     }
 
     File file = (*fs).open(filePath, FILE_READ);
     if (!file) {
-        padprintln("File open failed");
+        padprintln("Falha ao abrir arquivo");
         return;
     }
     mfd.clear();
@@ -1106,7 +1106,7 @@ void Pn532ble::loadMifareUltralightDumpFile() {
 
     ScrollableTextArea area(FP, 10, 28, tftWidth - 20, tftHeight - 38);
     area.addLine("Dump: " + filePath);
-    area.addLine("Size: " + String(mfd.size()));
+    area.addLine("Tamanho: " + String(mfd.size()));
     area.addLine("------------");
     area.scrollDown();
     area.draw();
@@ -1140,19 +1140,19 @@ void Pn532ble::loadMifareUltralightDumpFile() {
 void Pn532ble::loadIso15693DumpFile() {
     FS *fs;
     if (!getFsStorage(fs)) {
-        padprintln("No storage found");
+        padprintln("Armazenamento nao encontrado");
         return;
     }
     if (!(*fs).exists("/BruceRFID")) (*fs).mkdir("/BruceRFID");
     String filePath = loopSD(*fs, true, "bin", "/BruceRFID");
     if (filePath == "") {
-        padprintln("No file selected");
+        padprintln("Nenhum arquivo selecionado");
         return;
     }
 
     File file = (*fs).open(filePath, FILE_READ);
     if (!file) {
-        padprintln("File open failed");
+        padprintln("Falha ao abrir arquivo");
         return;
     }
     iso15dump.clear();
@@ -1163,7 +1163,7 @@ void Pn532ble::loadIso15693DumpFile() {
 
     ScrollableTextArea area(FP, 10, 28, tftWidth - 20, tftHeight - 38);
     area.addLine("Dump: " + filePath);
-    area.addLine("Size: " + String(iso15dump.size()));
+    area.addLine("Tamanho: " + String(iso15dump.size()));
     area.addLine("------------");
     area.scrollDown();
     area.draw();
@@ -1196,7 +1196,7 @@ void Pn532ble::loadIso15693DumpFile() {
 
 void Pn532ble::ntagEmulationMode() {
     ScrollableTextArea area(FP, 10, 28, tftWidth - 20, tftHeight - 38);
-    area.addLine("Emulate Tag");
+    area.addLine("Emular tag");
     area.addLine(emulationNdefData);
     area.addLine("------------");
     area.scrollDown();
@@ -1210,7 +1210,7 @@ void Pn532ble::ntagEmulationMode() {
                                               0x55, 0x44, 0x33, 0x22, 0x11, 0x00, 0x00};
     std::vector<uint8_t> initAsTargetResult = pn532_ble.tgInitAsTarget(tgInitAsTargetCmd);
     if (initAsTargetResult.size() == 0) {
-        displayError("Init as target failed");
+        displayError("Falha ao iniciar como alvo");
         return;
     }
     String respStr = "Resp: ";
@@ -1260,7 +1260,7 @@ void Pn532ble::ntagEmulationMode() {
         area.draw();
 
         if (resp[0] == 0x29 || resp[0] == 0x25) {
-            area.addLine("Reinit as target");
+            area.addLine("Reiniciando como alvo");
             area.scrollDown();
             area.draw();
             initAsTargetResult = pn532_ble.tgInitAsTarget(tgInitAsTargetCmd);
@@ -1269,7 +1269,7 @@ void Pn532ble::ntagEmulationMode() {
 
         if (resp.size() < 5) {
             delay(10);
-            area.addLine("Invalid response");
+            area.addLine("Resposta invalida");
             area.scrollDown();
             area.draw();
             continue;
@@ -1285,7 +1285,7 @@ void Pn532ble::ntagEmulationMode() {
 
         if (ins == ApduCommand::ISO7816_SELECT_FILE) {
             if (p1 == ApduCommand::C_APDU_P1_SELECT_BY_ID) {
-                area.addLine("Reader: Select by ID");
+                area.addLine("Leitor: selecionar por ID");
                 area.scrollDown();
                 area.draw();
                 if (p2 != 0x0C) {
@@ -1303,7 +1303,7 @@ void Pn532ble::ntagEmulationMode() {
                     };
                 }
             } else if (p1 == ApduCommand::C_APDU_P1_SELECT_BY_NAME) {
-                area.addLine("Reader: Select by Name");
+                area.addLine("Leitor: selecionar por nome");
                 area.scrollDown();
                 area.draw();
                 std::vector<uint8_t> application(resp.begin() + 3, resp.begin() + 12);
@@ -1313,7 +1313,7 @@ void Pn532ble::ntagEmulationMode() {
                     wbuf = {
                         ApduCommand::R_APDU_SW1_COMMAND_COMPLETE, ApduCommand::R_APDU_SW2_COMMAND_COMPLETE
                     };
-                    area.addLine("Application: V1");
+                    area.addLine("Aplicativo: V1");
                     area.scrollDown();
                     area.draw();
                 } else {
@@ -1321,12 +1321,12 @@ void Pn532ble::ntagEmulationMode() {
                         ApduCommand::R_APDU_SW1_FUNCTION_NOT_SUPPORTED,
                         ApduCommand::R_APDU_SW2_FUNCTION_NOT_SUPPORTED
                     };
-                    area.addLine("Application not found");
+                    area.addLine("Aplicativo nao encontrado");
                     area.scrollDown();
                     area.draw();
                 }
             } else {
-                area.addLine("Reader: Unknown function");
+                area.addLine("Leitor: funcao desconhecida");
                 area.scrollDown();
                 area.draw();
                 wbuf = {
@@ -1335,7 +1335,7 @@ void Pn532ble::ntagEmulationMode() {
                 };
             }
         } else if (ins == ApduCommand::ISO7816_READ_BINARY) {
-            area.addLine("Reader: Read Binary");
+            area.addLine("Leitor: ler binario");
             area.scrollDown();
             area.draw();
             if (currentFile == TagFile::NONE) {
@@ -1344,7 +1344,7 @@ void Pn532ble::ntagEmulationMode() {
                 };
             } else if (currentFile == TagFile::CC) {
                 if (p1p2Length > NdefCommand::NDEF_MAX_LENGTH) {
-                    area.addLine("Reached max length");
+                    area.addLine("Tamanho maximo atingido");
                     area.scrollDown();
                     area.draw();
                     wbuf = {
@@ -1352,7 +1352,7 @@ void Pn532ble::ntagEmulationMode() {
                         ApduCommand::R_APDU_SW2_END_OF_FILE_BEFORE_REACHED_LE_BYTES
                     };
                 } else {
-                    area.addLine("Set CC Data");
+                    area.addLine("Definir dados CC");
                     area.scrollDown();
                     area.draw();
                     compatibilityContainer[11] = (NdefCommand::NDEF_MAX_LENGTH & 0xFF00) >> 8;
@@ -1368,7 +1368,7 @@ void Pn532ble::ntagEmulationMode() {
                 }
             } else if (currentFile == TagFile::NDEF) {
                 if (p1p2Length > NdefCommand::NDEF_MAX_LENGTH) {
-                    area.addLine("NDEF Read failed");
+                    area.addLine("Falha na leitura NDEF");
                     area.scrollDown();
                     area.draw();
                     wbuf = {
@@ -1402,28 +1402,28 @@ void Pn532ble::ntagEmulationMode() {
                         wbuf.push_back(uriMessage.size() & 0xFF);
                         wbuf.push_back(ApduCommand::R_APDU_SW1_COMMAND_COMPLETE);
                         wbuf.push_back(ApduCommand::R_APDU_SW2_COMMAND_COMPLETE);
-                        area.addLine("Set NDEF data length");
+                        area.addLine("Definir tamanho dos dados NDEF");
                         area.scrollDown();
                         area.draw();
                     } else {
                         wbuf.insert(wbuf.end(), uriMessage.begin(), uriMessage.end());
                         wbuf.push_back(ApduCommand::R_APDU_SW1_COMMAND_COMPLETE);
                         wbuf.push_back(ApduCommand::R_APDU_SW2_COMMAND_COMPLETE);
-                        area.addLine("Set NDEF Data");
+                        area.addLine("Definir dados NDEF");
                         area.scrollDown();
                         area.draw();
                     }
                 }
             }
         } else if (ins == ApduCommand::ISO7816_UPDATE_BINARY) {
-            area.addLine("Reader: Update Binary");
+            area.addLine("Leitor: atualizar binario");
             area.scrollDown();
             area.draw();
             wbuf = {
                 ApduCommand::R_APDU_SW1_FUNCTION_NOT_SUPPORTED, ApduCommand::R_APDU_SW2_FUNCTION_NOT_SUPPORTED
             };
         } else {
-            area.addLine("Unknown Command");
+            area.addLine("Comando desconhecido");
             area.scrollDown();
             area.draw();
             wbuf = {};

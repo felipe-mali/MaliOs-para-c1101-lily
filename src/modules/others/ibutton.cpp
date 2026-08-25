@@ -257,7 +257,7 @@ static void doWrite() {
     }
 
     tft.fillScreen(bruceConfig.bgColor);
-    drawMainBorderWithTitle("Write iButton");
+    drawMainBorderWithTitle("Gravar iButton");
     padprintln("UID: " + bufferToHexStr(keyBuffer, 8));
     padprintln("");
     padprintln("Encoste a chave virgem...");
@@ -310,19 +310,19 @@ static void selectMenuOption() {
     options = {};
 
     if (keyLoaded) {
-        options.emplace_back("Write to key", []() { setAction(ACTION_WRITE); });
-        options.emplace_back("Save to file", []() { setAction(ACTION_SAVE); });
+        options.emplace_back("Gravar na chave", []() { setAction(ACTION_WRITE); });
+        options.emplace_back("Salvar em arquivo", []() { setAction(ACTION_SAVE); });
     }
 
-    options.emplace_back("Load from file", []() { setAction(ACTION_LOAD); });
+    options.emplace_back("Carregar arquivo", []() { setAction(ACTION_LOAD); });
 
     if (keyLoaded) {
-        options.emplace_back("Reset buffer", []() { setAction(ACTION_RESET); });
+        options.emplace_back("Limpar buffer", []() { setAction(ACTION_RESET); });
     }
 
-    options.emplace_back("Setup pin", []() { setAction(ACTION_SETUP_PIN); });
-    options.emplace_back("Close menu", []() { setAction(ACTION_CLOSE); });
-    options.emplace_back("Main menu", []() { setAction(ACTION_MAIN_MENU); });
+    options.emplace_back("Configurar pino", []() { setAction(ACTION_SETUP_PIN); });
+    options.emplace_back("Fechar menu", []() { setAction(ACTION_CLOSE); });
+    options.emplace_back("Menu principal", []() { setAction(ACTION_MAIN_MENU); });
 
     selectedAction = ACTION_CLOSE;
     loopOptions(options);

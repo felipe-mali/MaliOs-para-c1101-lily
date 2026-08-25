@@ -92,16 +92,16 @@ void loopOptionsWebUi() {
     if (isWebUIActive) {
         bool opt = WiFi.getMode() - 1;
         options = {
-            {"Stop WebUI", stopWebUi},
-            {"WebUi screen", lambdaHelper(startWebUi, opt)}
+            {"Parar WebUI", stopWebUi},
+            {"Tela WebUI", lambdaHelper(startWebUi, opt)}
         };
         addOptionToMainMenu();
         loopOptions(options);
         return;
     }
     options = {
-        {"my Network", lambdaHelper(startWebUi, false)},
-        {"AP mode",    lambdaHelper(startWebUi, true) },
+        {"Minha rede", lambdaHelper(startWebUi, false)},
+        {"Modo AP",    lambdaHelper(startWebUi, true) },
     };
 
     loopOptions(options);
@@ -308,7 +308,7 @@ void drawWebUiScreen(bool mode_ap) {
 
     tft.setTextColor(TFT_RED, bruceConfig.bgColor);
     tft.setTextSize(FP);
-    tft.drawCentreString("press Esc to stop", tftWidth / 2, tftHeight - 2 * LH * FP - 5, 1);
+    tft.drawCentreString("pressione Esc para parar", tftWidth / 2, tftHeight - 2 * LH * FP - 5, 1);
 
 #if defined(HAS_TOUCH)
     TouchFooter();
@@ -781,8 +781,8 @@ void startWebUi(bool mode_ap) {
     bool closeServer = false;
 
     options.clear();
-    options.emplace_back("Run in background", []() {});
-    options.emplace_back("Exit", [&closeServer]() { closeServer = true; });
+    options.emplace_back("Executar em segundo plano", []() {});
+    options.emplace_back("Sair", [&closeServer]() { closeServer = true; });
 
     loopOptions(options);
 

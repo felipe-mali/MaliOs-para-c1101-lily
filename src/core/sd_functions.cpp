@@ -192,7 +192,7 @@ bool deleteFromSd(FS fs, String path) {
 ** Description:   rename file or folder
 ***************************************************************************************/
 bool renameFile(FS fs, String path, String filename) {
-    String newName = keyboard(filename, 76, "Type the new Name:");
+    String newName = keyboard(filename, 76, "Digite o novo nome:");
     if (newName == "\x1B") return false;
     // Rename the file of folder
     if (fs.rename(path, path.substring(0, path.lastIndexOf('/')) + "/" + newName)) {
@@ -243,7 +243,7 @@ bool copyToFs(FS from, FS to, String path, bool draw) {
     int prog = 0;
 
     if (&to == &LittleFS && (LittleFS.totalBytes() - LittleFS.usedBytes()) < tot) {
-        displayError("Not enought space", true);
+        displayError("Espaco insuficiente", true);
         return false;
     }
     const int bufSize = 1024;
@@ -278,7 +278,7 @@ bool copyToFs(FS from, FS to, String path, bool draw) {
     }
     if (prog == tot) result = true;
     else {
-        displayError("Fail Copying File", true);
+        displayError("Falha ao copiar arquivo", true);
         free(buff);
         return false;
     }
@@ -298,7 +298,7 @@ bool copyFile(FS fs, String path) {
         file.close();
         return true;
     } else {
-        displayRedStripe("Cannot copy Folder");
+        displayRedStripe("Nao e possivel copiar pasta");
         file.close();
         return false;
     }
@@ -368,7 +368,7 @@ bool pasteFile(FS fs, String path) {
 ** Description:   create new folder
 ***************************************************************************************/
 bool createFolder(FS fs, String path) {
-    String foldername = keyboard("", 76, "Folder Name: ");
+    String foldername = keyboard("", 76, "Nome da pasta: ");
     if (foldername == "\x1B") return false;
     if (!fs.mkdir(path + "/" + foldername)) {
         displayRedStripe("Couldn't create folder");
@@ -422,7 +422,7 @@ String readSmallFile(FS &fs, const String &filepath) {
 
     size_t fileSize = file.size();
     if (fileSize > SAFE_STACK_BUFFER_SIZE || fileSize > ESP.getFreeHeap()) {
-        displayError("File is too big", true);
+        displayError("Arquivo muito grande", true);
         return "";
     }
     // TODO: if(psramFound()) -> use PSRAM instead
@@ -624,7 +624,7 @@ String loopSD(FS &fs, bool filePicker, const String &allowed_ext, String rootPat
     tft.drawRoundRect(5, 5, tftWidth - 10, tftHeight - 10, 5, bruceConfig.priColor);
     if (&fs == &SD) {
         if (!setupSdCard()) {
-            displayError("Fail Mounting SD", true);
+            displayError("Falha ao montar SD", true);
             return "";
         }
     }
@@ -764,14 +764,14 @@ String loopSD(FS &fs, bool filePicker, const String &allowed_ext, String rootPat
             if (check(SelPress)) {
                 if (fileList[index].folder == true && fileList[index].operation == false) {
                     options = {
-                        {"New Folder", [=]() { createFolder(fs, Folder); }                                 },
-                        {"Rename",
+                        {"Nova pasta", [=]() { createFolder(fs, Folder); }                                 },
+                        {"Renomear",
                          [=]() {
                              renameFile(fs, Folder + fileList[index].filename, fileList[index].filename);
                          }                                                                                 },
-                        {"Delete",     [=]() { deleteFromSd(fs, Folder + "/" + fileList[index].filename); }},
-                        {"Close Menu", [&]() { yield(); }                                                  },
-                        {"Main Menu",  [&]() { exit = true; }                                              },
+                        {"Excluir",     [=]() { deleteFromSd(fs, Folder + "/" + fileList[index].filename); }},
+                        {"Fechar menu", [&]() { yield(); }                                                  },
+                        {"Menu principal",  [&]() { exit = true; }                                              },
                     };
                     while (check(SelPress)) {
                         vTaskDelay(pdMS_TO_TICKS(1));
@@ -784,11 +784,11 @@ String loopSD(FS &fs, bool filePicker, const String &allowed_ext, String rootPat
                     goto Files;
                 } else {
                     options = {
-                        {"New Folder", [=]() { createFolder(fs, Folder); }},
+                        {"Nova pasta", [=]() { createFolder(fs, Folder); }},
                     };
-                    if (fileToCopy != "") options.push_back({"Paste", [=]() { pasteFile(fs, Folder); }});
-                    options.push_back({"Close Menu", [&]() { yield(); }});
-                    options.push_back({"Main Menu", [&]() { exit = true; }});
+                    if (fileToCopy != "") options.push_back({"Colar", [=]() { pasteFile(fs, Folder); }});
+                    options.push_back({"Fechar menu", [&]() { yield(); }});
+                    options.push_back({"Menu principal", [&]() { exit = true; }});
                     while (check(SelPress)) {
                         vTaskDelay(pdMS_TO_TICKS(1));
                     } // wait for SEL release to avoid repeated activations
@@ -817,40 +817,40 @@ String loopSD(FS &fs, bool filePicker, const String &allowed_ext, String rootPat
                     fileList.clear(); // Clear memory to allow other functions to work better
 
                     options = {
-                        {"View File",  [=, &fs]() { viewFile(fs, filepath); }            },
-                        {"File Info",  [=, &fs]() { fileInfo(fs, filepath); }            },
-                        {"Rename",     [=, &fs]() { renameFile(fs, filepath, filename); }},
-                        {"Copy",       [=, &fs]() { copyFile(fs, filepath); }            },
-                        {"Delete",     [=, &fs]() { deleteFromSd(fs, filepath); }        },
-                        {"New Folder", [=, &fs]() { createFolder(fs, Folder); }          },
+                        {"Ver arquivo", [=, &fs]() { viewFile(fs, filepath); }            },
+                        {"Info do arquivo", [=, &fs]() { fileInfo(fs, filepath); }            },
+                        {"Renomear",    [=, &fs]() { renameFile(fs, filepath, filename); }},
+                        {"Copiar",      [=, &fs]() { copyFile(fs, filepath); }            },
+                        {"Excluir",     [=, &fs]() { deleteFromSd(fs, filepath); }        },
+                        {"Nova pasta",  [=, &fs]() { createFolder(fs, Folder); }          },
                     };
-                    if (fileToCopy != "") options.push_back({"Paste", [=, &fs]() { pasteFile(fs, Folder); }});
+                    if (fileToCopy != "") options.push_back({"Colar", [=, &fs]() { pasteFile(fs, Folder); }});
                     if (&fs == &SD)
-                        options.push_back({"Copy->LittleFS", [=]() { copyToFs(SD, LittleFS, filepath); }});
+                        options.push_back({"Copiar->LittleFS", [=]() { copyToFs(SD, LittleFS, filepath); }});
                     if (&fs == &LittleFS && sdcardMounted)
-                        options.push_back({"Copy->SD", [=]() { copyToFs(LittleFS, SD, filepath); }});
+                        options.push_back({"Copiar->SD", [=]() { copyToFs(LittleFS, SD, filepath); }});
 
                     // custom file formats commands added in front
                     if (filepath.endsWith(".jpg") || filepath.endsWith(".gif") || filepath.endsWith(".bmp") ||
                         filepath.endsWith(".png"))
-                        options.insert(options.begin(), {"View Image", [&]() {
+                        options.insert(options.begin(), {"Ver imagem", [&]() {
                                                              drawImg(fs, filepath, 0, 0, true, -1);
                                                              delay(750);
                                                              while (!check(AnyKeyPress))
                                                                  vTaskDelay(10 / portTICK_PERIOD_MS);
                                                          }});
                     if (filepath.endsWith(".ir")) {
-                        options.insert(options.begin(), {"IR Choose cmd", [&]() {
+                        options.insert(options.begin(), {"IR escolher comando", [&]() {
                                                              delay(200);
                                                              chooseCmdIrFile(&fs, filepath);
                                                          }});
-                        options.insert(options.begin(), {"IR Tx SpamAll", [&]() {
+                        options.insert(options.begin(), {"IR transmitir todos", [&]() {
                                                              delay(200);
                                                              txIrFile(&fs, filepath);
                                                          }});
                     }
                     if (filepath.endsWith(".sub"))
-                        options.insert(options.begin(), {"Subghz Tx", [&]() {
+                        options.insert(options.begin(), {"Transmitir Sub-GHz", [&]() {
                                                              delay(200);
                                                              RfCodes data{};
 
@@ -858,22 +858,22 @@ String loopSD(FS &fs, bool filePicker, const String &allowed_ext, String rootPat
                                                                  txSubFile(data);
                                                          }});
                     if (filepath.endsWith(".csv")) {
-                        options.insert(options.begin(), {"Wigle Upload", [&]() {
+                        options.insert(options.begin(), {"Enviar ao Wigle", [&]() {
                                                              delay(200);
                                                              Wigle wigle;
                                                              wigle.upload(&fs, filepath);
                                                          }});
-                        options.insert(options.begin(), {"Wigle Up All", [&]() {
+                        options.insert(options.begin(), {"Enviar todos ao Wigle", [&]() {
                                                              delay(200);
                                                              Wigle wigle;
                                                              wigle.upload_all(&fs, Folder);
                                                          }});
-                        options.insert(options.begin(), {"WDG Upload", [&]() {
+                        options.insert(options.begin(), {"Enviar WDG", [&]() {
                                                              delay(200);
                                                              WDGoWars wdg;
                                                              wdg.upload(&fs, filepath);
                                                          }});
-                        options.insert(options.begin(), {"WDG Up All", [&]() {
+                        options.insert(options.begin(), {"Enviar todos WDG", [&]() {
                                                              delay(200);
                                                              WDGoWars wdg;
                                                              wdg.upload_all(&fs, Folder);
@@ -881,7 +881,7 @@ String loopSD(FS &fs, bool filePicker, const String &allowed_ext, String rootPat
                     }
 #if !defined(LITE_VERSION) && !defined(DISABLE_INTERPRETER)
                     if (filepath.endsWith(".bjs") || filepath.endsWith(".js")) {
-                        options.insert(options.begin(), {"JS Script Run", [&]() {
+                        options.insert(options.begin(), {"Executar script JS", [&]() {
                                                              delay(200);
                                                              run_bjs_script_headless(fs, filepath);
                                                              exit = true;
@@ -890,26 +890,26 @@ String loopSD(FS &fs, bool filePicker, const String &allowed_ext, String rootPat
 #endif
 #if defined(USB_as_HID)
                     if (filepath.endsWith(".txt")) {
-                        options.push_back({"BadUSB Run", [&]() {
+                        options.push_back({"Executar BadUSB", [&]() {
                                                ducky_startKb(hid_usb, false);
                                                key_input(fs, filepath, hid_usb);
                                                delete hid_usb;
                                                hid_usb = nullptr;
                                                // TODO: reinit serial port
                                            }});
-                        options.push_back({"USB HID Type", [&]() {
+                        options.push_back({"Digitar via USB HID", [&]() {
                                                String t = readSmallFile(fs, filepath);
-                                               displayRedStripe("Typing");
+                                               displayRedStripe("Digitando");
                                                key_input_from_string(t);
                                            }});
                     }
                     if (filepath.endsWith(".enc")) { // encrypted files
                         options.insert(
-                            options.begin(), {"Decrypt+Type", [&]() {
+                            options.begin(), {"Descriptografar+digitar", [&]() {
                                                   String plaintext = readDecryptedFile(fs, filepath);
                                                   if (plaintext.length() == 0)
                                                       return displayError(
-                                                          "Decryption failed", true
+                                                          "Falha ao descriptografar", true
                                                       ); // file is too big or cannot read, or cancelled
                                                   // else
                                                   plaintext.trim(); // remove newlines
@@ -920,11 +920,11 @@ String loopSD(FS &fs, bool filePicker, const String &allowed_ext, String rootPat
 #endif
                     if (filepath.endsWith(".enc")) { // encrypted files
                         options.insert(
-                            options.begin(), {"Decrypt+Show", [&]() {
+                            options.begin(), {"Descriptografar+mostrar", [&]() {
                                                   String plaintext = readDecryptedFile(fs, filepath);
                                                   delay(200);
                                                   if (plaintext.length() == 0)
-                                                      return displayError("Decryption failed", true);
+                                                      return displayError("Falha ao descriptografar", true);
                                                   plaintext.trim(); // remove newlines
                                                                     // if(plaintext.length()<..)
                                                   displaySuccess(plaintext, true);
@@ -935,7 +935,7 @@ String loopSD(FS &fs, bool filePicker, const String &allowed_ext, String rootPat
                     }
 #if defined(HAS_NS4168_SPKR)
                     if (isAudioFile(filepath))
-                        options.insert(options.begin(), {"Play Audio", [&]() {
+                        options.insert(options.begin(), {"Reproduzir audio", [&]() {
                                                              delay(200);
                                                              check(AnyKeyPress);
                                                              // playAudioFile(&fs, filepath);
@@ -959,8 +959,8 @@ String loopSD(FS &fs, bool filePicker, const String &allowed_ext, String rootPat
                                                displaySuccess(md5File(fs, filepath), true);
                                            }});
                     }
-                    options.push_back({"Close Menu", [&]() { yield(); }});
-                    options.push_back({"Main Menu", [&]() { exit = true; }});
+                    options.push_back({"Fechar menu", [&]() { yield(); }});
+                    options.push_back({"Menu principal", [&]() { exit = true; }});
                     if (!filePicker) {
                         while (check(SelPress)) {
                             vTaskDelay(pdMS_TO_TICKS(1));
@@ -1014,7 +1014,7 @@ void viewFile(FS &fs, const String &filepath) {
 **********************************************************************/
 bool checkLittleFsSize() {
     if ((LittleFS.totalBytes() - LittleFS.usedBytes()) < 4096) {
-        displayError("LittleFS is Full", true);
+        displayError("LittleFS esta cheio", true);
         return false;
     } else return true;
 }
@@ -1061,13 +1061,13 @@ void fileInfo(FS &fs, const String &filepath) {
         unit = "kB";
     }
 
-    drawMainBorderWithTitle("FILE INFO");
+    drawMainBorderWithTitle("INFO DO ARQUIVO");
     padprintln("");
-    padprintln("Path: " + filepath);
+    padprintln("Caminho: " + filepath);
     padprintln("");
     padprintf("Bytes: %d\n", bytesize);
     padprintln("");
-    padprintf("Size: %.02f %s\n", filesize, unit.c_str());
+    padprintf("Tamanho: %.02f %s\n", filesize, unit.c_str());
     padprintln("");
     padprintf("Modified: %s\n", ctime(&modifiedTime));
 

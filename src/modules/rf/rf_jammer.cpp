@@ -116,7 +116,7 @@ void RFJammer::setup() {
 }
 
 void RFJammer::display_banner() {
-    drawMainBorderWithTitle("RF JAMMER");
+    drawMainBorderWithTitle("JAMMER RF");
 
     int y = BORDER_PAD_Y + FM * LH + 4;
     int lineH = max(14, tftHeight / 10);

@@ -105,21 +105,21 @@ void TagOMatic::loop() {
 void TagOMatic::select_state() {
     options = {};
     if (_read_uid) {
-        options.emplace_back("Clone UID", [this]() { set_state(CLONE_MODE); });
-        options.emplace_back("Custom UID", [this]() { set_state(CUSTOM_UID_MODE); });
-        options.emplace_back("Check tag", [this]() { set_state(CHECK_MODE); });
-        options.emplace_back("Write data", [this]() { set_state(WRITE_MODE); });
-        options.emplace_back("Emulate tag", [this]() { set_state(EMULATE_MODE); });
-        options.emplace_back("Save file", [this]() { set_state(SAVE_MODE); });
+        options.emplace_back("Clonar UID", [this]() { set_state(CLONE_MODE); });
+        options.emplace_back("UID personalizado", [this]() { set_state(CUSTOM_UID_MODE); });
+        options.emplace_back("Verificar tag", [this]() { set_state(CHECK_MODE); });
+        options.emplace_back("Gravar dados", [this]() { set_state(WRITE_MODE); });
+        options.emplace_back("Emular tag", [this]() { set_state(EMULATE_MODE); });
+        options.emplace_back("Salvar arquivo", [this]() { set_state(SAVE_MODE); });
     }
-    options.emplace_back("Read tag", [this]() { set_state(READ_MODE); });
-    options.emplace_back("Scan tags", [this]() { set_state(SCAN_MODE); });
-    options.emplace_back("Load file", [this]() { set_state(LOAD_MODE); });
+    options.emplace_back("Ler tag", [this]() { set_state(READ_MODE); });
+    options.emplace_back("Buscar tags", [this]() { set_state(SCAN_MODE); });
+    options.emplace_back("Carregar arquivo", [this]() { set_state(LOAD_MODE); });
     if (ndefEmulationSupported()) {
-        options.emplace_back("Emulate NDEF", [this]() { set_state(EMULATE_NDEF_MODE); });
+        options.emplace_back("Emular NDEF", [this]() { set_state(EMULATE_NDEF_MODE); });
     }
-    options.emplace_back("Write NDEF", [this]() { set_state(WRITE_NDEF_MODE); });
-    options.emplace_back("Erase tag", [this]() { set_state(ERASE_MODE); });
+    options.emplace_back("Gravar NDEF", [this]() { set_state(WRITE_NDEF_MODE); });
+    options.emplace_back("Apagar tag", [this]() { set_state(ERASE_MODE); });
 
     loopOptions(options);
 }
@@ -149,7 +149,7 @@ void TagOMatic::set_state(RFID_State state) {
             padprintln("");
             break;
         case CLONE_MODE:
-            padprintln("New UID: " + _rfid->printableUID.uid);
+            padprintln("Novo UID: " + _rfid->printableUID.uid);
             padprintln("SAK: " + _rfid->printableUID.sak);
             padprintln("");
             break;
@@ -172,7 +172,7 @@ void TagOMatic::set_state(RFID_State state) {
         case EMULATE_MODE:
             if (_rfid->printableUID.uid.length() > 0) {
                 padprintln("UID: " + _rfid->printableUID.uid);
-                padprintln("Type: " + _rfid->printableUID.picc_type);
+                padprintln("Tipo: " + _rfid->printableUID.picc_type);
             } else {
                 padprintln("Usando NDEF lido/carregado");
                 padprintln("(reserva: URL de teste)");
@@ -196,18 +196,18 @@ void TagOMatic::display_banner() {
     drawMainBorderWithTitle("TAG-O-MATIC");
 
     switch (current_state) {
-        case READ_MODE: printSubtitle("READ MODE"); break;
-        case SCAN_MODE: printSubtitle("SCAN MODE"); break;
-        case CHECK_MODE: printSubtitle("CHECK MODE"); break;
-        case LOAD_MODE: printSubtitle("LOAD MODE"); break;
-        case CLONE_MODE: printSubtitle("CLONE MODE"); break;
-        case CUSTOM_UID_MODE: printSubtitle("CUSTOM UID MODE"); break;
-        case ERASE_MODE: printSubtitle("ERASE MODE"); break;
-        case WRITE_MODE: printSubtitle("WRITE DATA MODE"); break;
-        case WRITE_NDEF_MODE: printSubtitle("WRITE NDEF MODE"); break;
-        case EMULATE_MODE: printSubtitle("EMULATE MODE"); break;
-        case EMULATE_NDEF_MODE: printSubtitle("EMULATE NDEF MODE"); break;
-        case SAVE_MODE: printSubtitle("SAVE MODE"); break;
+        case READ_MODE: printSubtitle("MODO LEITURA"); break;
+        case SCAN_MODE: printSubtitle("MODO BUSCA"); break;
+        case CHECK_MODE: printSubtitle("MODO VERIFICACAO"); break;
+        case LOAD_MODE: printSubtitle("MODO CARREGAR"); break;
+        case CLONE_MODE: printSubtitle("MODO CLONE"); break;
+        case CUSTOM_UID_MODE: printSubtitle("MODO UID MANUAL"); break;
+        case ERASE_MODE: printSubtitle("MODO APAGAR"); break;
+        case WRITE_MODE: printSubtitle("MODO GRAVAR DADOS"); break;
+        case WRITE_NDEF_MODE: printSubtitle("MODO GRAVAR NDEF"); break;
+        case EMULATE_MODE: printSubtitle("MODO EMULACAO"); break;
+        case EMULATE_NDEF_MODE: printSubtitle("EMULAR NDEF"); break;
+        case SAVE_MODE: printSubtitle("MODO SALVAR"); break;
     }
 
     tft.setTextSize(FP);
@@ -230,7 +230,7 @@ void TagOMatic::dump_card_details() {
     } else {
         padprintln("IDm: " + _rfid->printableUID.uid);
         padprintln("PMm: " + _rfid->printableUID.sak);
-        padprintln("Sys code: " + _rfid->printableUID.atqa);
+        padprintln("Codigo do sistema: " + _rfid->printableUID.atqa);
     }
     if (_rfid->pageReadStatus != RFIDInterface::SUCCESS)
         padprintln("[!] " + _rfid->statusMessage(_rfid->pageReadStatus));
@@ -240,7 +240,7 @@ void TagOMatic::dump_check_details() {
     padprintln("UID de origem: " + _sourceUID);
     padprintln("");
 
-    padprintln("UID: " + String(_sourceUID == _rfid->printableUID.uid ? "OK" : "NOT OK"));
+    padprintln("UID: " + String(_sourceUID == _rfid->printableUID.uid ? "OK" : "NAO OK"));
     padprintln("Dados: " + String(_sourcePages == _rfid->strAllPages ? "OK" : "NAO OK"));
     padprintln("");
 
@@ -252,7 +252,7 @@ void TagOMatic::dump_ndef_details() {
     if (!_ndef_created) return;
 
     if (!_rfid->rawNdefRecord.empty()) {
-        padprintln("Payload type: Wi-Fi (WSC)");
+        padprintln("Tipo do payload: Wi-Fi (WSC)");
         padprintln("Tam. payload: " + String(_rfid->rawNdefRecord.size()) + " bytes");
         return;
     }
@@ -263,7 +263,7 @@ void TagOMatic::dump_ndef_details() {
         case RFIDInterface::NDEF_TEXT: payload_type = "Text"; break;
     }
 
-    padprintln("Payload type: " + payload_type);
+    padprintln("Tipo do payload: " + payload_type);
     padprintln("Tam. payload: " + String(_rfid->ndefMessage.payloadSize) + " bytes");
 }
 
@@ -377,8 +377,8 @@ void TagOMatic::emulate_ndef_data() {
         dump_ndef_details();
         String caveat = _rfid->emulationCaveat();
         if (caveat.length() > 0) padprintln("[!] " + caveat);
-        padprintln("Waiting for an NFC reader...");
-        padprintln("Press [BACK] to stop.");
+        padprintln("Aguardando um leitor NFC...");
+        padprintln("[BACK] para parar.");
         padprintln("");
     }
 
@@ -387,23 +387,23 @@ void TagOMatic::emulate_ndef_data() {
 
     switch (result) {
         case RFIDInterface::SUCCESS:
-            displaySuccess("Reader interaction complete.");
+            displaySuccess("Interacao com leitor concluida.");
             delay(400);
             _ndef_created = false;
             set_state(READ_MODE);
             break;
         case RFIDInterface::TAG_NOT_PRESENT: return; // keep waiting, same content
         case RFIDInterface::NOT_IMPLEMENTED:
-            displayError("Card emulation not supported.", true);
+            displayError("Emulacao de cartao sem suporte.", true);
             _ndef_created = false;
             set_state(READ_MODE);
             break;
         case RFIDInterface::FAILURE:
-            displayError("Target mode start failed.", true);
+            displayError("Falha ao iniciar modo alvo.", true);
             delayWithReturn(800);
             break; // retry with the same content
         default:
-            displayError("Emulation failed. Re-try.", true);
+            displayError("Falha na emulacao. Tente de novo.", true);
             delayWithReturn(800);
             break; // retry with the same content
     }
@@ -478,9 +478,9 @@ void TagOMatic::write_ndef_data() {
 
     switch (result) {
         case RFIDInterface::TAG_NOT_PRESENT: return; break;
-        case RFIDInterface::TAG_NOT_MATCH: displayError("Tag is not MIFARE Ultralight."); break;
-        case RFIDInterface::SUCCESS: displaySuccess("Tag written successfully."); break;
-        default: displayError("Error writing data to tag."); break;
+        case RFIDInterface::TAG_NOT_MATCH: displayError("A tag nao e MIFARE Ultralight."); break;
+        case RFIDInterface::SUCCESS: displaySuccess("Tag gravada com sucesso."); break;
+        default: displayError("Erro ao gravar dados na tag."); break;
     }
 
     delayWithReturn(1000);
@@ -491,8 +491,8 @@ void TagOMatic::create_ndef_message() {
     options = {
         {"Text",         [this]() { create_ndef_text(); }},
         {"URL",          [this]() { create_ndef_url(); } },
-        {"Wifi Network", [this]() { create_ndef_wifi(); }},
-        {"Saved links",  [this]() { create_ndef_link(); }},
+        {"Rede Wi-Fi",     [this]() { create_ndef_wifi(); }},
+        {"Links salvos",   [this]() { create_ndef_link(); }},
     };
 
     loopOptions(options);
@@ -595,7 +595,7 @@ void TagOMatic::create_ndef_wifi() {
             buildWifiNdef(ssid, bruceConfig.getWifiPassword(ssid));
         });
     }
-    options.emplace_back("Manual entry", [this]() {
+    options.emplace_back("Entrada manual", [this]() {
         String ssid = keyboard("", 32, "SSID:");
         if (ssid == "\x1B") return;
         String pwd = keyboard("", 63, "Password:", true);
@@ -632,10 +632,10 @@ void TagOMatic::load_file() {
         _read_uid = true;
 
         options = {
-            {"Clone UID",   [this]() { set_state(CLONE_MODE); }  },
-            {"Write data",  [this]() { set_state(WRITE_MODE); }  },
-            {"Check tag",   [this]() { set_state(CHECK_MODE); }  },
-            {"Emulate tag", [this]() { set_state(EMULATE_MODE); }},
+            {"Clonar UID",   [this]() { set_state(CLONE_MODE); }  },
+            {"Gravar dados", [this]() { set_state(WRITE_MODE); }  },
+            {"Verificar tag",[this]() { set_state(CHECK_MODE); }  },
+            {"Emular tag",   [this]() { set_state(EMULATE_MODE); }},
         };
 
         loopOptions(options);
@@ -648,7 +648,7 @@ void TagOMatic::load_file() {
 void TagOMatic::save_file() {
     String uid_str = _rfid->printableUID.uid;
     uid_str.replace(" ", "");
-    String filename = keyboard(uid_str, 30, "File name:");
+    String filename = keyboard(uid_str, 30, "Nome do arquivo:");
     if (filename == "\x1B") return;
 
     display_banner();

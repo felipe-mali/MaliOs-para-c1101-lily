@@ -496,7 +496,7 @@ static void openKeySection(
             );
         }
 
-        sectionOptions.push_back({"Back", []() {}});
+        sectionOptions.push_back({"Voltar", []() {}});
 
         int selected = loopOptions(sectionOptions, MENU_TYPE_REGULAR, title, index);
         if (selected < 0 || selected == static_cast<int>(keyCount)) break;
@@ -757,7 +757,7 @@ void ducky_setup(HIDInterface *&hid, bool ble) {
                         mySerial.write(0x00);
                     } else break;
                     if (check(EscPress)) {
-                        displayError("CH9329 not found");
+                        displayError("CH9329 nao encontrado");
                         delay(500);
                         goto EXIT;
                     }
@@ -841,7 +841,7 @@ void key_input(FS fs, const String &bad_script, HIDInterface *_hid) {
         tft.setTextSize(FP);
         tft.setTextColor(TFT_RED);
         tft.setCursor(BORDER_OFFSET_FROM_SCREEN_EDGE * 2, tftHeight / 2);
-        tft.print("Script output disabled");
+        tft.print("Saida do script desativada");
     }
 
     uint32_t startMillisBADUSBBLE = millis();
@@ -987,7 +987,7 @@ void key_input_from_string(const String &text) {
 }
 
 #ifndef KB_HID_EXIT_MSG
-#define KB_HID_EXIT_MSG "Exit"
+#define KB_HID_EXIT_MSG "Sair"
 #endif
 
 // ============================================================================
@@ -1005,12 +1005,12 @@ void ducky_keyboard(HIDInterface *&hid, bool ble) {
     if (returnToMenu) return;
 
     if (ble) {
-        displayTextLine("Waiting Victim");
+        displayTextLine("Aguardando alvo");
         while (!hid->isConnected() && !check(EscPress)) { vTaskDelay(pdMS_TO_TICKS(1)); }
         if (hid->isConnected()) {
             BLEConnected = true;
         } else {
-            displayWarning("Canceled", true);
+            displayWarning("Cancelado", true);
             goto EXIT;
         }
     } else {
@@ -1064,7 +1064,7 @@ void ducky_keyboard(HIDInterface *&hid, bool ble) {
                     tft.drawCentreString(
                         "                                  ", tftWidth / 2, tftHeight / 2, 1
                     );
-                tft.drawCentreString("Pressed: " + keyStr, tftWidth / 2, tftHeight / 2, 1);
+                tft.drawCentreString("Pressionada: " + keyStr, tftWidth / 2, tftHeight / 2, 1);
                 _mymsg = keyStr;
             }
             debounce = millis();
@@ -1201,8 +1201,8 @@ void MediaCommands(HIDInterface *hid, bool ble) {
         options = {
             {"ScreenShot", [=]() { hid->press(KEY_PRINT_SCREEN); }        },
             {"Play/Pause", [=]() { hid->press(KEY_MEDIA_PLAY_PAUSE); }    },
-            {"Stop",       [=]() { hid->press(KEY_MEDIA_STOP); }          },
-            {"Next Track", [=]() { hid->press(KEY_MEDIA_NEXT_TRACK); }    },
+            {"Parar",         [=]() { hid->press(KEY_MEDIA_STOP); }          },
+            {"Proxima faixa", [=]() { hid->press(KEY_MEDIA_NEXT_TRACK); }    },
             {"Prev Track", [=]() { hid->press(KEY_MEDIA_PREVIOUS_TRACK); }},
             {"Volume +",   [=]() { hid->press(KEY_MEDIA_VOLUME_UP); }     },
             {"Volume -",   [=]() { hid->press(KEY_MEDIA_VOLUME_DOWN); }   },
@@ -1396,7 +1396,7 @@ void PresenterMode(HIDInterface *&hid, bool ble) {
     while (!hid->isConnected() && !check(EscPress)) { vTaskDelay(pdMS_TO_TICKS(1)); }
 
     if (!hid->isConnected()) {
-        displayWarning("Canceled", true);
+        displayWarning("Cancelado", true);
         returnToMenu = true;
         return;
     }

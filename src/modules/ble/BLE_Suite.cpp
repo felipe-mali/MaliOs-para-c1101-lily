@@ -5796,7 +5796,7 @@ void runAudioControlTest(NimBLEAddress target) {
 
             tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
             tft.setCursor(20, 60);
-            tft.println("Select Audio Test:");
+            tft.println("Selecione o teste de audio:");
 
             int maxTests = std::min(AUDIO_TESTS, 5);
             int testHeight = 35, startY = 90;

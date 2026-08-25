@@ -31,7 +31,7 @@ uint16_t fm_scan() {
     min_noise = radio.currNoiseLevel;
 
     tft.fillScreen(bruceConfig.bgColor);
-    displayTextLine("Scanning...");
+    displayTextLine("Buscando...");
     for (f = 8750; f < 10800; f += 10) {
         Serial.print("Measuring ");
         Serial.print(f);

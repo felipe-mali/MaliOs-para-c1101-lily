@@ -32,43 +32,43 @@ SRIXTool::~SRIXTool() {
 void SRIXTool::setup() {
     drawMainBorderWithTitle("SRIX TOOL");
     padprintln("");
-    padprintln("Initializing I2C...");
+    padprintln("Iniciando I2C...");
 
     // Init I2C
     TwoWire *Wire = acquireI2CBus();
     Wire->setClock(100000);
 
-    padprintln("Initializing PN532...");
+    padprintln("Iniciando PN532...");
 
 // Create PN532 object based on board
 #if defined(PN532_IRQ) && defined(PN532_RF_REST)
     // Board with integrated PN532 (e.g. T-Embed
     nfc = new Arduino_PN532_SRIX(PN532_IRQ, PN532_RF_REST);
-    padprintln("Hardware mode (IRQ + RST)");
+    padprintln("Modo hardware (IRQ + RST)");
 #else
     // Board with external PN532 I2C (e.g. CYD)
     nfc = new Arduino_PN532_SRIX(-1, -1);
-    padprintln("I2C-only mode");
+    padprintln("Modo somente I2C");
 #endif
     nfc->setWire(Wire);
 
     if (!nfc->init()) {
-        displayError("PN532 not found!", true);
+        displayError("PN532 nao encontrado!", true);
         return;
     }
 
-    padprintln("Init OK, testing retries...");
+    padprintln("Inicio OK; testando tentativas...");
 
     // Configure for SRIX
     if (!nfc->setPassiveActivationRetries(0xFF)) {
-        displayError("Retry config failed!", true);
+        displayError("Falha ao configurar tentativas!", true);
         delay(500);
         return;
     }
 
-    padprintln("Testing SRIX init...");
+    padprintln("Testando inicio do SRIX...");
     if (!nfc->SRIX_init()) {
-        displayError("SRIX init failed!", true);
+        displayError("Falha ao iniciar SRIX!", true);
         return;
     }
     uint32_t ver = nfc->getFirmwareVersion();
@@ -82,11 +82,11 @@ void SRIXTool::setup() {
     }
     delay(1000);
 #ifdef T_EMBED_1101
-    displayError("T-Embed detected!", false);
+    displayError("T-Embed detectado!", false);
     delay(1000);
-    displayError("Read Menu INFO!", true);
+    displayError("Leia as INFO do menu!", true);
 #endif
-    displaySuccess("PN532-SRIX ready!");
+    displaySuccess("PN532-SRIX pronto!");
     delay(1000);
 
     set_state(IDLE_MODE);
@@ -124,15 +124,15 @@ void SRIXTool::loop() {
 void SRIXTool::select_state() {
     options = {};
 
-    options.emplace_back("Main Menu", [this]() { set_state(IDLE_MODE); });
-    options.emplace_back("Read tag", [this]() { set_state(READ_TAG_MODE); });
+    options.emplace_back("Menu principal", [this]() { set_state(IDLE_MODE); });
+    options.emplace_back("Ler tag", [this]() { set_state(READ_TAG_MODE); });
 
     if (_dump_valid_from_read) {
         options.emplace_back(" -Save dump", [this]() { set_state(SAVE_MODE); });
         options.emplace_back(" -Clone tag", [this]() { set_state(WRITE_TAG_MODE); });
     }
-    options.emplace_back("Read UID", [this]() { set_state(READ_UID_MODE); });
-    options.emplace_back("Load dump", [this]() { set_state(LOAD_MODE); });
+    options.emplace_back("Ler UID", [this]() { set_state(READ_UID_MODE); });
+    options.emplace_back("Carregar dump", [this]() { set_state(LOAD_MODE); });
     if (_dump_valid_from_load) {
         options.emplace_back(" -Write to tag", [this]() { set_state(WRITE_TAG_MODE); });
     }
@@ -154,13 +154,13 @@ void SRIXTool::display_banner() {
     drawMainBorderWithTitle("SRIX TOOL");
 
     switch (current_state) {
-        case READ_TAG_MODE: printSubtitle("READ TAG MODE"); break;
-        case WRITE_TAG_MODE: printSubtitle("WRITE TAG MODE"); break;
-        case READ_UID_MODE: printSubtitle("READ UID MODE"); break;
-        case PN_INFO_MODE: printSubtitle("PN532 INFO"); break;
-        case IDLE_MODE: printSubtitle("MAIN MENU"); break;
-        case SAVE_MODE: printSubtitle("SAVE MODE"); break;
-        case LOAD_MODE: printSubtitle("LOAD MODE"); break;
+        case READ_TAG_MODE: printSubtitle("MODO LEITURA DE TAG"); break;
+        case WRITE_TAG_MODE: printSubtitle("MODO GRAVACAO DE TAG"); break;
+        case READ_UID_MODE: printSubtitle("MODO LEITURA DE UID"); break;
+        case PN_INFO_MODE: printSubtitle("INFO DO PN532"); break;
+        case IDLE_MODE: printSubtitle("MENU PRINCIPAL"); break;
+        case SAVE_MODE: printSubtitle("MODO SALVAR"); break;
+        case LOAD_MODE: printSubtitle("MODO CARREGAR"); break;
     }
 
     tft.setTextSize(FP);
@@ -176,22 +176,22 @@ void SRIXTool::show_main_menu() {
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     tft.setTextSize(FP);
 
-    padprintln("SRIX Tool for SRIX4K/512 v1.3");
+    padprintln("Ferramenta SRIX4K/512 v1.3");
     padprintln("");
 #ifdef T_EMBED_1101
-    padprintln("- !!! - T-Embed CC1101 detected - !!!");
-    padprintln("- !!! - Antenna too Weak for SRIX - !!!");
+    padprintln("- !!! - T-Embed CC1101 detectado - !!!");
+    padprintln("- !!! - Antena fraca para SRIX - !!!");
     padprintln("");
 #endif
-    padprintln("Features:");
-    padprintln("- Read/Clone complete tag (512B)");
-    padprintln("- Save/Load .srix dumps");
-    padprintln("- Read 8-byte UID");
-    padprintln("- PN532 module info");
+    padprintln("Recursos:");
+    padprintln("- Ler/clonar tag completa (512B)");
+    padprintln("- Salvar/carregar dumps .srix");
+    padprintln("- Ler UID de 8 bytes");
+    padprintln("- Informacoes do modulo PN532");
     padprintln("");
 
     tft.setTextColor(getColorVariation(bruceConfig.priColor), bruceConfig.bgColor);
-    padprintln("Press [OK] to open menu");
+    padprintln("[OK] abre o menu");
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
 
     _screen_drawn = true;
@@ -207,7 +207,7 @@ bool SRIXTool::waitForTag() {
 
     if (attempts == 0 && !message_shown) {
         attemptStart = millis();
-        padprint("Waiting for tag");
+        padprint("Aguardando tag");
         message_shown = true;
         lastDotTime = millis();
     }
@@ -226,7 +226,7 @@ bool SRIXTool::waitForTag() {
         if (attempts >= TAG_MAX_ATTEMPTS) {
             padprintln("");
             padprintln("");
-            padprintln("Timeout! No tag found.");
+            padprintln("Tempo esgotado! Tag nao encontrada.");
             attempts = 0;
             message_shown = false;
             delay(1000);
@@ -257,12 +257,12 @@ void SRIXTool::read_tag() {
     display_banner();
 
     _dump_valid_from_read = false;
-    padprintln("Tag detected!");
+    padprintln("Tag detectada!");
     padprintln("");
 
     // Read UID
     if (!nfc->SRIX_get_uid(_uid)) {
-        displayError("Failed to read UID!");
+        displayError("Falha ao ler UID!");
         delay(2000);
         set_state(READ_TAG_MODE);
         return;
@@ -280,13 +280,13 @@ void SRIXTool::read_tag() {
     padprintln("");
 
     // Read 128 blocks
-    padprintln("Reading 128 blocks...");
+    padprintln("Lendo 128 blocos...");
     padprint("Please Wait");
     uint8_t block[4];
 
     for (uint8_t b = 0; b < 128; b++) {
         if (!nfc->SRIX_read_block(b, block)) {
-            displayError("Read failed at block " + String(b));
+            displayError("Falha de leitura no bloco " + String(b));
             delay(2000);
             set_state(READ_TAG_MODE);
             return;
@@ -299,19 +299,19 @@ void SRIXTool::read_tag() {
         _dump[off + 3] = block[3];
 
         // Progress indicator
-        progressHandler(b + 1, 128, "Reading data blocks");
+        progressHandler(b + 1, 128, "Lendo blocos de dados");
     }
 
     _dump_valid_from_read = true;
     _dump_valid_from_load = false;
     padprintln("");
     padprintln("");
-    displaySuccess("Tag read successfully!");
+    displaySuccess("Tag lida com sucesso!");
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     padprintln("");
 
     tft.setTextColor(getColorVariation(bruceConfig.priColor), bruceConfig.bgColor);
-    padprintln("Press [OK] for Main Menu");
+    padprintln("[OK] abre o menu principal");
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
 
     _tag_read = true;
@@ -321,8 +321,8 @@ void SRIXTool::read_tag() {
 
 void SRIXTool::write_tag() {
     if (!_dump_valid_from_read && !_dump_valid_from_load) {
-        displayError("No data in memory!");
-        displayError("Read or load a dump first.");
+        displayError("Sem dados na memoria!");
+        displayError("Leia ou carregue um dump primeiro.");
         delay(2000);
         set_state(IDLE_MODE);
         return;
@@ -331,8 +331,8 @@ void SRIXTool::write_tag() {
     // ✅ DEBUG MODE
     display_banner();
     tft.setTextSize(FM);
-    padprintln("DEBUG MODE ACTIVE");
-    padprintln("Simulation via Serial...");
+    padprintln("MODO DE DEPURACAO ATIVO");
+    padprintln("Simulacao via Serial...");
     padprintln("");
 
     Serial.println("\n========== SRIX WRITE SIMULATION ==========");
@@ -358,8 +358,8 @@ void SRIXTool::write_tag() {
     Serial.printf("Total: %d blocks (%d bytes)\n", 128, 512);
     Serial.println("===========================================\n");
 
-    displaySuccess("Simulation complete!");
-    displayInfo("Check Serial Monitor");
+    displaySuccess("Simulacao concluida!");
+    displayInfo("Verifique o monitor Serial");
     delay(4000);
     set_state(IDLE_MODE);
     return;
@@ -369,9 +369,9 @@ void SRIXTool::write_tag() {
     if (!waitForTag()) return;
 
     display_banner();
-    padprintln("Tag detected!");
+    padprintln("Tag detectada!");
     padprintln("");
-    padprintln("Writing 128 blocks...");
+    padprintln("Gravando 128 blocos...");
     padprintln("");
     padprint("Please Wait");
 
@@ -409,26 +409,26 @@ void SRIXTool::write_tag() {
 
     // Final report
     if (blocks_failed == 0) {
-        displaySuccess("Write complete!", true);
+        displaySuccess("Gravacao concluida!", true);
 
     } else if (blocks_written > 0) {
-        displayWarning("Partial write!", true);
+        displayWarning("Gravacao parcial!", true);
         padprintln("");
-        padprintln("Written: " + String(blocks_written) + "/128");
-        padprintln("Failed: " + String(blocks_failed));
+        padprintln("Gravados: " + String(blocks_written) + "/128");
+        padprintln("Falhas: " + String(blocks_failed));
         padprintln("");
         tft.setTextSize(FP);
 
         // Over 10 failed block add "..."
         if (blocks_failed > 10) {
-            padprintln("Failed blocks: " + failed_blocks + "...");
+            padprintln("Blocos com falha: " + failed_blocks + "...");
         } else {
-            padprintln("Failed blocks: " + failed_blocks);
+            padprintln("Blocos com falha: " + failed_blocks);
         }
 
     } else {
-        displayError("Write failed!", true);
-        padprintln("No blocks written");
+        displayError("Falha na gravacao!", true);
+        padprintln("Nenhum bloco gravado");
     }
 
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
@@ -449,12 +449,12 @@ void SRIXTool::read_uid() {
 
     display_banner();
 
-    padprintln("Tag detected!");
+    padprintln("Tag detectada!");
     padprintln("");
     padprintln("");
 
     if (!nfc->SRIX_get_uid(_uid)) {
-        displayError("Failed to read UID!");
+        displayError("Falha ao ler UID!");
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
         delay(2000);
         set_state(READ_UID_MODE);
@@ -491,7 +491,7 @@ void SRIXTool::read_uid() {
     padprintln("");
 
     tft.setTextColor(getColorVariation(bruceConfig.priColor), bruceConfig.bgColor);
-    padprintln("Press [OK] for Main Menu");
+    padprintln("[OK] abre o menu principal");
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
 
     _lastReadTime = millis();
@@ -507,7 +507,7 @@ void SRIXTool::show_pn_info() {
 
     uint32_t ver = nfc->getFirmwareVersion();
     if (!ver) {
-        displayError("Failed to read firmware!");
+        displayError("Falha ao ler firmware!");
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
         delay(2000);
         set_state(IDLE_MODE);
@@ -516,7 +516,7 @@ void SRIXTool::show_pn_info() {
 
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     tft.setTextSize(FM);
-    padprintln("PN532 Info:");
+    padprintln("Informacoes do PN532:");
     tft.setTextSize(FP);
     padprintln("");
 
@@ -530,9 +530,9 @@ void SRIXTool::show_pn_info() {
     padprintln("");
 
     if (_has_hardware_pins) {
-        padprintln("Mode: Hardware (IRQ+RST)");
+        padprintln("Modo: Hardware (IRQ+RST)");
     } else {
-        padprintln("Mode: I2C-Only (Polling)");
+        padprintln("Modo: somente I2C (consulta)");
     }
 
     _screen_drawn = true;
@@ -540,8 +540,8 @@ void SRIXTool::show_pn_info() {
 
 void SRIXTool::save_file() {
     if (!_dump_valid_from_read) {
-        displayError("No data in memory!");
-        displayError("Read a tag first.");
+        displayError("Sem dados na memoria!");
+        displayError("Leia uma tag primeiro.");
         delay(2000);
         set_state(IDLE_MODE);
         return;
@@ -556,19 +556,19 @@ void SRIXTool::save_file() {
     uid_str.toUpperCase();
 
     // Ask the user for the file name
-    String filename = keyboard(uid_str, 30, "File name:");
+    String filename = keyboard(uid_str, 30, "Nome do arquivo:");
     filename.trim();
 
     if (filename == "\x1B") {
         // User cancelled the operation
-        padprintln("Operation cancelled.");
+        padprintln("Operacao cancelada.");
         delay(2000);
         set_state(IDLE_MODE); // Back to IDLE
         return;
     }
 
     if (filename.isEmpty()) {
-        displayError("Invalid filename!");
+        displayError("Nome de arquivo invalido!");
         delay(2000);
         set_state(IDLE_MODE);
         return;
@@ -579,7 +579,7 @@ void SRIXTool::save_file() {
     // Get filesystem
     FS *fs;
     if (!getFsStorage(fs)) {
-        displayError("Filesystem error!");
+        displayError("Erro no sistema de arquivos!");
         delay(2000);
         set_state(IDLE_MODE);
         return;
@@ -601,7 +601,7 @@ void SRIXTool::save_file() {
     // Open file for writing
     File file = (*fs).open(filepath, FILE_WRITE);
     if (!file) {
-        displayError("Error creating file!");
+        displayError("Erro ao criar arquivo!");
         delay(1500);
         set_state(IDLE_MODE);
         return;
@@ -636,9 +636,9 @@ void SRIXTool::save_file() {
 
     file.close();
 
-    displaySuccess("File saved!");
+    displaySuccess("Arquivo salvo!");
     padprintln("");
-    padprintln("Path: " + filepath);
+    padprintln("Caminho: " + filepath);
 
     delayWithReturn(2500);
     set_state(IDLE_MODE);
@@ -647,7 +647,7 @@ void SRIXTool::save_file() {
 void SRIXTool::load_file() {
     FS *fs;
     if (!getFsStorage(fs)) {
-        displayError("Filesystem error!");
+        displayError("Erro no sistema de arquivos!");
         delay(2000);
         set_state(IDLE_MODE);
         return;
@@ -655,9 +655,9 @@ void SRIXTool::load_file() {
 
     // Verify that the directory exists
     if (!(*fs).exists("/BruceRFID/SRIX")) {
-        displayError("No dumps found!");
+        displayError("Nenhum dump encontrado!");
         delay(1500);
-        displayError("Folder /BruceRFID/SRIX missing");
+        displayError("Pasta /BruceRFID/SRIX ausente");
         delay(2000);
         set_state(IDLE_MODE);
         return;
@@ -666,7 +666,7 @@ void SRIXTool::load_file() {
     // List all .srix files in the directory
     File dir = (*fs).open("/BruceRFID/SRIX");
     if (!dir || !dir.isDirectory()) {
-        displayError("Cannot open SRIX folder!");
+        displayError("Nao foi possivel abrir a pasta SRIX!");
         delay(1500);
         set_state(IDLE_MODE);
         return;
@@ -688,7 +688,7 @@ void SRIXTool::load_file() {
     dir.close();
 
     if (fileList.empty()) {
-        displayError("No .srix files found!");
+        displayError("Nenhum arquivo .srix encontrado!");
         delay(2500);
         set_state(IDLE_MODE);
         return;
@@ -696,14 +696,14 @@ void SRIXTool::load_file() {
 
     // Show Menu
     display_banner();
-    padprintln("Select file to load:");
+    padprintln("Selecione o arquivo:");
     padprintln("");
 
     options = {};
     for (const String &fname : fileList) {
         options.emplace_back(fname, [this, fname, fs]() { load_file_data(fs, "/BruceRFID/SRIX/" + fname); });
     }
-    options.emplace_back("Cancel", [this]() { set_state(IDLE_MODE); });
+    options.emplace_back("Cancelar", [this]() { set_state(IDLE_MODE); });
 
     loopOptions(options);
 }
@@ -716,12 +716,12 @@ void SRIXTool::load_file_data(FS *fs, const String &filepath) {
     }
 
     display_banner();
-    padprintln("Loading: " + filepath);
+    padprintln("Carregando: " + filepath);
     padprintln("");
 
     File file = (*fs).open(filepath, FILE_READ);
     if (!file) {
-        displayError("Cannot open file!");
+        displayError("Nao foi possivel abrir o arquivo!");
         delay(1500);
         set_state(IDLE_MODE);
         return;
@@ -792,8 +792,8 @@ void SRIXTool::load_file_data(FS *fs, const String &filepath) {
 
     // Verify that all 128 blocks have been loaded
     if (blocks_loaded < 128) {
-        displayError("Incomplete dump!");
-        displayError("Loaded " + String(blocks_loaded) + "/128 blocks");
+        displayError("Dump incompleto!");
+        displayError("Carregados " + String(blocks_loaded) + "/128 blocos");
         delay(2000);
         set_state(IDLE_MODE);
         return;
@@ -803,7 +803,7 @@ void SRIXTool::load_file_data(FS *fs, const String &filepath) {
     _dump_valid_from_load = true;
     _dump_valid_from_read = false;
 
-    displaySuccess("Dump loaded successfully!");
+    displaySuccess("Dump carregado com sucesso!");
     delay(1000);
 
     // Extract only the file name from the full path
@@ -819,18 +819,18 @@ void SRIXTool::load_file_data(FS *fs, const String &filepath) {
     display_banner();
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     tft.setTextSize(FM);
-    padprintln("File:");
+    padprintln("Arquivo:");
     padprintln(filename); // Rewrite for long filename
     padprintln("");
     padprintln("UID: " + uid_from_file);
     padprintln("");
-    padprintln("Blocks: " + String(blocks_loaded));
+    padprintln("Blocos: " + String(blocks_loaded));
     padprintln("");
     tft.setTextSize(FP);
 
     tft.setTextColor(getColorVariation(bruceConfig.priColor), bruceConfig.bgColor);
-    padprintln("Press [OK] to open menu");
-    padprintln("Select 'Write tag' to write");
+    padprintln("[OK] abre o menu");
+    padprintln("Selecione 'Gravar tag'");
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
 
     _lastReadTime = millis();

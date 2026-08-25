@@ -249,9 +249,9 @@ void sendmsg() {
         tft.setTextColor(TFT_RED);
         tft.setTextSize(2);
         tft.setCursor(10, tftHeight / 2 - 10);
-        tft.print("LoRa not init!");
+        tft.print("LoRa nao iniciado!");
 
-        tft.drawCentreString("LoRa not initialized!", tftWidth / 2, tftHeight / 2, 2);
+        tft.drawCentreString("LoRa nao iniciado!", tftWidth / 2, tftHeight / 2, 2);
         delay(1500);
         update = true;
         return;

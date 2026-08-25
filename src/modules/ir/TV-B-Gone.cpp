@@ -267,22 +267,22 @@ void StartTvBGone() {
 
         // Send region-specific codes
         if (region == NA) {
-            displayTextLine("Sending NA codes...");
+            displayTextLine("Enviando codigos NA...");
             sendParsedCodeBatch(NApowerCodes, num_NAcodes, irsend);
         } else {
-            displayTextLine("Sending EU codes...");
+            displayTextLine("Enviando codigos EU...");
             sendParsedCodeBatch(EUpowerCodes, num_EUcodes, irsend);
         }
 
         // Send universal parsed codes if user didn't stop
         if (!returnToMenu) {
-            displayTextLine("Sending universal parsed codes...");
+            displayTextLine("Enviando codigos universais...");
             sendParsedCodeBatch(UniversalParsedCodes, num_UniversalParsedCodes, irsend);
         }
 
         // Send universal raw codes if user didn't stop
         if (!returnToMenu) {
-            displayTextLine("Sending universal raw codes...");
+            displayTextLine("Enviando codigos RAW universais...");
             sendRawCodeBatch(UniversalRawCodes, num_UniversalRawCodes, irsend);
         }
 

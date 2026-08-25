@@ -151,9 +151,9 @@ void HostInfo::setup(const Host &host) {
 
     /*
     if (scanCanceled) {
-        tft.print("Scan Canceled!");
+        tft.print("Busca cancelada!");
     } else {
-        tft.print("Done!");
+        tft.print("Concluido!");
     }
     */
 

@@ -473,7 +473,7 @@ void RFScan::set_option(RFMenuOption option) {
 void RFScan::replay_signal(bool asRaw) {
     String actualProtocol = received.protocol;
     if (asRaw) { received.protocol = "RAW"; }
-    displayTextLine("Sending..");
+    displayTextLine("Enviando...");
     sendRfCommand(received);
     addToRecentCodes(received);
     received.protocol = actualProtocol;
@@ -548,8 +548,8 @@ bruceConfigPins.setRfScanRange(2); }}, {subghz_frequency_ranges[3],             
         bruceConfigPins.setRfScanRange(bruceConfigPins.rfScanRange, 1);
     }
 
-    if (bruceConfigPins.rfFxdFreq) displayTextLine("Scan freq set to " + String(bruceConfigPins.rfFreq));
-    else displayTextLine("Range set to " + String(subghz_frequency_ranges[bruceConfigPins.rfScanRange]));
+    if (bruceConfigPins.rfFxdFreq) displayTextLine("Frequencia definida: " + String(bruceConfigPins.rfFreq));
+    else displayTextLine("Faixa definida: " + String(subghz_frequency_ranges[bruceConfigPins.rfScanRange]));
 }
 */
 // Routes one info line to the right sink: Serial when running headless (CLI),
@@ -579,8 +579,8 @@ void display_info(
     if (autoSave) rf_info_line(headless, "Auto save: Enabled");
 
     if (bruceConfigPins.rfFxdFreq)
-        rf_info_line(headless, "Scanning: " + String(bruceConfigPins.rfFreq) + " MHz");
-    else rf_info_line(headless, "Scanning: " + String(subghz_frequency_ranges[bruceConfigPins.rfScanRange]));
+        rf_info_line(headless, "Buscando: " + String(bruceConfigPins.rfFreq) + " MHz");
+    else rf_info_line(headless, "Buscando: " + String(subghz_frequency_ranges[bruceConfigPins.rfScanRange]));
 
     rf_info_line(headless, "Total signals found: " + String(signals));
 
@@ -619,7 +619,7 @@ void display_signal_data(RfCodes received, bool headless) {
             }
         }
     } else {
-        strlcpy(hexString, "No code identified", sizeof(hexString));
+        strlcpy(hexString, "Nenhum codigo identificado", sizeof(hexString));
         rf_info_line(headless, "Length: No code identified");
         rf_info_line(headless, "Record length: " + String(transitions) + " transitions");
     }

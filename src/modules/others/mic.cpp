@@ -230,7 +230,7 @@ void mic_test_one_task() {
 
     if (!frameBuffer) {
         Serial.println("Error alloc drawing frameBuffer, exiting");
-        displayError("Not Enough RAM", true);
+        displayError("RAM insuficiente", true);
         return;
     }
 
@@ -322,7 +322,7 @@ void mic_test() {
         fftHistory = (uint8_t *)malloc(HISTORY_LEN * SPECTRUM_HEIGHT);
     }
     if (!i2s_buffer || !fftHistory) {
-        displayError("Fail to alloc buffers, exiting", true);
+        displayError("Falha ao alocar buffers; saindo", true);
         return;
     }
 
@@ -621,7 +621,7 @@ void mic_record_app() {
                 uint16_t btnColor = isSelected ? TFT_RED : TFT_DARKGREY;
                 tft.fillRoundRect(MARGIN, yPos, tftWidth - 2 * MARGIN, BUTTON_HEIGHT, 8, btnColor);
                 tft.setTextColor(TFT_WHITE, btnColor);
-                const char *btnText = (tftWidth > 200) ? "START REC" : "START";
+                const char *btnText = (tftWidth > 200) ? "INICIAR GRAV." : "INICIAR";
                 int textWidth = strlen(btnText) * 6 * TEXT_SIZE_LARGE;
                 tft.setCursor((tftWidth - textWidth) / 2, yPos + (BUTTON_HEIGHT - TEXT_SIZE_LARGE * 8) / 2);
                 tft.print(btnText);
@@ -645,7 +645,7 @@ void mic_record_app() {
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
         tft.setTextSize(TEXT_SIZE_SMALL);
         tft.setCursor(MARGIN, tftHeight - 15);
-        tft.print("NAV: ^v | EDIT: Sel | REC: Start");
+        tft.print("NAV: ^v | EDITAR: Sel | GRAVAR: Iniciar");
     }
 
     // Draw all the elements for the first time
@@ -748,13 +748,13 @@ void mic_record_app() {
 
         FS *fs = nullptr;
         if (!getFsStorage(fs) || fs == nullptr) {
-            displayError("No storage", true);
+            displayError("Sem armazenamento", true);
             goto cleanup_and_exit;
         }
 
         if (!fs->exists("/BruceMIC")) {
             if (!fs->mkdir("/BruceMIC")) {
-                displayError("Dir creation failed", true);
+                displayError("Falha ao criar diretorio", true);
                 goto cleanup_and_exit;
             }
         }
@@ -812,7 +812,7 @@ void mic_record_app() {
 
             // Stop instructions
             tft.setCursor(MARGIN, INFO_START_Y + 24);
-            tft.print("Press SEL to stop");
+            tft.print("SEL para parar");
         }
 
         uint32_t max_ms = mic_config.record_time_ms;
@@ -896,7 +896,7 @@ void mic_record_app() {
                 tft.fillRect(0, 0, tftWidth, HEADER_HEIGHT, TFT_DARKGREEN);
                 tft.setTextColor(TFT_WHITE, TFT_DARKGREEN);
                 tft.setTextSize(TEXT_SIZE_LARGE);
-                const char *successText = "SAVED";
+                const char *successText = "SALVO";
                 int successWidth = strlen(successText) * 6 * TEXT_SIZE_LARGE;
                 tft.setCursor((tftWidth - successWidth) / 2, (HEADER_HEIGHT - 16) / 2);
                 tft.print(successText);
@@ -906,7 +906,7 @@ void mic_record_app() {
 
                 int infoY = HEADER_HEIGHT + 20;
                 tft.setCursor(MARGIN, infoY);
-                tft.print("File: ");
+                tft.print("Arquivo: ");
                 String shortName = String(filename);
                 if (shortName.length() > 25) {
                     shortName = "..." + shortName.substring(shortName.length() - 22);
@@ -914,13 +914,13 @@ void mic_record_app() {
                 tft.println(shortName);
 
                 tft.setCursor(MARGIN, infoY + 15);
-                tft.print("Size: ");
+                tft.print("Tamanho: ");
                 if (out_bytes > 0) {
                     float sizeKB = out_bytes / 1024.0f;
                     tft.print(sizeKB, 1);
                     tft.print(" KB");
                 } else {
-                    tft.print("Unknown");
+                    tft.print("Desconhecido");
                 }
 
                 tft.setCursor(MARGIN, infoY + 30);
@@ -936,7 +936,7 @@ void mic_record_app() {
             }
 
         } else {
-            displayError("Recording failed", true);
+            displayError("Falha na gravacao", true);
         }
     }
 

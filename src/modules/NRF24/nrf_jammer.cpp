@@ -134,7 +134,7 @@ void nrf_jammer() {
             }
 
             if (redraw) {
-                drawMainBorderWithTitle("NRF JAMMER", false);
+                drawMainBorderWithTitle("JAMMER NRF", false);
                 printSubtitle("Jammer NRF");
                 padprintln("STATUS : " + String(NRFOnline) + " ATIVO");
                 String _modeName = String(modes[modeIndex].name) + "            ";

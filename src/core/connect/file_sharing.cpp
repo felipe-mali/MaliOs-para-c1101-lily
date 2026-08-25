@@ -5,13 +5,13 @@
 FileSharing::FileSharing() {}
 
 void FileSharing::sendFile() {
-    drawMainBorderWithTitle("SEND FILE");
+    drawMainBorderWithTitle("ENVIAR ARQUIVO");
 
     if (!beginSend()) return;
 
     File file = selectFile();
     if (!file) {
-        displayError("Error selecting file");
+        displayError("Erro ao selecionar arquivo");
         delay(1000);
         return;
     }
@@ -21,9 +21,9 @@ void FileSharing::sendFile() {
     esp_err_t response;
     sendStatus = STARTED;
 
-    drawMainBorderWithTitle("SEND FILE");
+    drawMainBorderWithTitle("ENVIAR ARQUIVO");
     padprintln("");
-    padprintln("Sending...");
+    padprintln("Enviando...");
 
     delay(100);
 
@@ -34,7 +34,7 @@ void FileSharing::sendFile() {
             message.done = true;
             message.dataSize = 0;
             esp_now_send(dstAddress, (uint8_t *)&message, sizeof(message));
-            displayError("Error sending file");
+            displayError("Erro ao enviar arquivo");
             break;
         }
 
@@ -49,20 +49,20 @@ void FileSharing::sendFile() {
             sendStatus = FAILED;
         }
 
-        progressHandler(file.position(), file.size(), "Sending...");
+        progressHandler(file.position(), file.size(), "Enviando...");
         delay(100);
     }
 
-    if (message.bytesSent == message.totalBytes) displaySuccess("File sent");
+    if (message.bytesSent == message.totalBytes) displaySuccess("Arquivo enviado");
 
     file.close();
     delay(1000);
 }
 
 void FileSharing::receiveFile() {
-    drawMainBorderWithTitle("RECEIVE FILE");
+    drawMainBorderWithTitle("RECEBER ARQUIVO");
     padprintln("");
-    padprintln("Waiting...");
+    padprintln("Aguardando...");
 
     recvFileName = "";
     recvQueue = {};
@@ -76,11 +76,11 @@ void FileSharing::receiveFile() {
         if (check(EscPress)) recvStatus = ABORTED;
 
         if (recvStatus == ABORTED || recvStatus == FAILED) {
-            displayError("Error receiving file");
+            displayError("Erro ao receber arquivo");
             break;
         }
         if (recvStatus == SUCCESS) {
-            displaySuccess("File received");
+            displaySuccess("Arquivo recebido");
             break;
         }
 
@@ -106,12 +106,12 @@ void FileSharing::receiveFile() {
     delay(1000);
 
     if (recvStatus == SUCCESS) {
-        drawMainBorderWithTitle("RECEIVE FILE");
+        drawMainBorderWithTitle("RECEBER ARQUIVO");
         padprintln("");
-        padprintln("File received: ");
+        padprintln("Arquivo recebido: ");
         padprintln(recvFileName);
         padprintln("\n");
-        padprintln("Press any key to leave");
+        padprintln("Pressione uma tecla para sair");
         while (!check(AnyKeyPress)) vTaskDelay(50 / portTICK_PERIOD_MS);
         ;
     }

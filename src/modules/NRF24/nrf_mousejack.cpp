@@ -278,7 +278,7 @@ static int mj_addTarget(const uint8_t *addr, uint8_t addrLen, uint8_t channel, M
 
 static bool mj_validateNrfMode() {
     if (!CHECK_NRF_SPI(mj_nrfMode)) {
-        displayError("MouseJack needs SPI mode", true);
+        displayError("MouseJack requer modo SPI", true);
         return false;
     }
     return true;
@@ -601,7 +601,7 @@ static void mj_drawScanScreen(uint8_t currentCh, bool initial) {
     int listY = contentY + 14; // Below status line
     int listH = tftHeight - listY - footerH - 6;
 
-    if (initial) { drawMainBorderWithTitle("MOUSEJACK SCAN"); }
+    if (initial) { drawMainBorderWithTitle("BUSCA MOUSEJACK"); }
 
     // Status line (below title, inside border)
     tft.setTextSize(FP);
@@ -633,7 +633,7 @@ static void mj_drawScanScreen(uint8_t currentCh, bool initial) {
     int footerY = tftHeight - BORDER_PAD_X - FP * LH - 2;
     tft.fillRect(7, footerY, tftWidth - 14, FP * LH, bruceConfig.bgColor);
     tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
-    tft.drawCentreString("[ESC] Stop", tftWidth / 2, footerY, 1);
+    tft.drawCentreString("[ESC] Parar", tftWidth / 2, footerY, 1);
 }
 
 // ── Scanning function ───────────────────────────────────────────
@@ -644,7 +644,7 @@ static bool mj_scan() {
     if (!mj_validateNrfMode()) return false;
 
     if (!nrf_start(mj_nrfMode)) {
-        displayError("NRF24 not found", true);
+        displayError("NRF24 nao encontrado", true);
         return false;
     }
 
@@ -747,7 +747,7 @@ static void mj_attackString(int targetIndex) {
     String text = keyboard("", 200, "Inject text:");
     if (text.length() == 0 || text == "\x1B") return;
 
-    drawMainBorderWithTitle("INJECTING");
+    drawMainBorderWithTitle("INJETANDO");
     tft.setTextSize(FP);
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     int cy = tftHeight * 0.35;
@@ -756,7 +756,7 @@ static void mj_attackString(int targetIndex) {
     );
     cy += 16;
     tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
-    tft.drawCentreString("Sending keystrokes...", tftWidth / 2, cy, 1);
+    tft.drawCentreString("Enviando teclas...", tftWidth / 2, cy, 1);
     cy += 16;
 
     // Show first 30 chars of the text
@@ -768,7 +768,7 @@ static void mj_attackString(int targetIndex) {
     if (!mj_validateNrfMode()) return;
 
     if (!nrf_start(mj_nrfMode)) {
-        displayError("NRF24 not found", true);
+        displayError("NRF24 nao encontrado", true);
         return;
     }
 
@@ -787,7 +787,7 @@ static void mj_attackString(int targetIndex) {
     mj_typeString(target, text.c_str());
 
     NRFradio.powerDown();
-    displaySuccess("Injection complete", true);
+    displaySuccess("Injecao concluida", true);
 }
 
 // ── Attack: DuckyScript from SD Card ────────────────────────────
@@ -797,7 +797,7 @@ static void mj_attackDucky(int targetIndex) {
     // File browser
     FS *fs = nullptr;
     if (!getFsStorage(fs)) {
-        displayError("No storage found");
+        displayError("Armazenamento nao encontrado");
         delay(500);
         return;
     }
@@ -813,7 +813,7 @@ static void mj_attackDucky(int targetIndex) {
     );
     cy += 16;
     tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
-    tft.drawCentreString("Running script...", tftWidth / 2, cy, 1);
+    tft.drawCentreString("Executando script...", tftWidth / 2, cy, 1);
     cy += 16;
 
     // Show filename
@@ -826,13 +826,13 @@ static void mj_attackDucky(int targetIndex) {
 
     File file = fs->open(filepath, FILE_READ);
     if (!file) {
-        displayError("Cannot open file", true);
+        displayError("Nao foi possivel abrir o arquivo", true);
         return;
     }
 
     if (!nrf_start(mj_nrfMode)) {
         file.close();
-        displayError("NRF24 not found", true);
+        displayError("NRF24 nao encontrado", true);
         return;
     }
 
@@ -885,7 +885,7 @@ static void mj_attackDucky(int targetIndex) {
 
     file.close();
     NRFradio.powerDown();
-    displaySuccess("Script complete", true);
+    displaySuccess("Script concluido", true);
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -898,7 +898,7 @@ static void mj_attackMenu(int targetIndex) {
     options = {
         {"Inject String", [&]() { mj_attackString(targetIndex); }},
         {"DuckyScript",   [&]() { mj_attackDucky(targetIndex); } },
-        {"Back",          [=]() { /* return */ }                 },
+        {"Voltar",        [=]() { /* return */ }                 },
     };
 
     String title = String("[") + mj_getTypeLabel(target.type) + "] " + mj_formatAddr(target);

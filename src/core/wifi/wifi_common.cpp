@@ -53,7 +53,7 @@ void ensureWifiPlatform() {
 
 bool _wifiConnect(const String &ssid, int encryption) {
     String password = bruceConfig.getWifiPassword(ssid);
-    if (password == "" && encryption > 0) { password = keyboard(password, 63, "Network Password:", true); }
+    if (password == "" && encryption > 0) { password = keyboard(password, 63, "Senha da rede:", true); }
     if (password == "\x1B") return false;
     bool connected = _connectToWifiNetwork(ssid, password);
     bool retry = false;
@@ -63,7 +63,7 @@ bool _wifiConnect(const String &ssid, int encryption) {
 
         options = {
             {"Retry",  [&]() { retry = true; } },
-            {"Cancel", [&]() { retry = false; }},
+            {"Cancelar", [&]() { retry = false; }},
         };
         loopOptions(options);
 
@@ -72,7 +72,7 @@ bool _wifiConnect(const String &ssid, int encryption) {
             return false;
         }
 
-        password = keyboard(password, 63, "Network Password:", true);
+        password = keyboard(password, 63, "Senha da rede:", true);
         if (password == "\x1B") {
             wifiDisconnect();
             return false;
@@ -98,7 +98,7 @@ bool _wifiConnect(const String &ssid, int encryption) {
 bool _connectToWifiNetwork(const String &ssid, const String &pwd) {
     if (FORCE_RADIO_TEARDOWN_ON_SWITCH) {
         if (BLEConnected) {
-            displayWarning("Board with no PSRAM, closing BLE Stack");
+            displayWarning("Placa sem PSRAM; fechando pilha BLE");
             vTaskDelay(700 / portTICK_PERIOD_MS);
         }
         stopBLEStack();
@@ -106,9 +106,9 @@ bool _connectToWifiNetwork(const String &ssid, const String &pwd) {
     }
 
     RAM_LOG("wifi pre-mode"); // Wi-Fi is already up from the menu scan by this point
-    drawMainBorderWithTitle("WiFi Connect");
+    drawMainBorderWithTitle("Conectar ao WiFi");
     padprintln("");
-    padprint("Connecting to: " + ssid + ".");
+    padprint("Conectando a: " + ssid + ".");
     WiFi.mode(WIFI_MODE_STA);
     RAM_LOG("wifi post-mode");
     vTaskDelay(10 / portTICK_PERIOD_MS);
@@ -127,7 +127,7 @@ bool _connectToWifiNetwork(const String &ssid, const String &pwd) {
 #endif
 
         if (i > 20) {
-            displayError("Wifi Offline");
+            displayError("WiFi desconectado");
             vTaskDelay(500 / portTICK_RATE_MS);
             break;
         }
@@ -180,7 +180,7 @@ bool wifiConnectMenu(wifi_mode_t mode) {
 
     // Check if WiFi is in transition
     if (wifiTransitioning) {
-        displayTextLine("WiFi busy, please wait...");
+        displayTextLine("Wi-Fi ocupado, aguarde...");
         vTaskDelay(500 / portTICK_PERIOD_MS);
         return false;
     }
@@ -194,7 +194,7 @@ bool wifiConnectMenu(wifi_mode_t mode) {
         case WIFI_STA: { // station mode
             int nets;
             if (!radioHasMemForWifi()) {
-                displayError("Low RAM: free BLE/SD first", true);
+                displayError("RAM baixa: libere BLE/SD primeiro", true);
                 return false;
             }
             WiFi.mode(WIFI_MODE_STA);
@@ -204,7 +204,7 @@ bool wifiConnectMenu(wifi_mode_t mode) {
 
             bool refresh_scan = false;
             do {
-                displayTextLine("Scanning..");
+                displayTextLine("Buscando...");
                 nets = WiFi.scanNetworks();
 
                 String selSsid = "";
@@ -222,7 +222,7 @@ bool wifiConnectMenu(wifi_mode_t mode) {
                         String encryptionPrefix = (encryptionType == WIFI_AUTH_OPEN) ? "" : "#";
                         String encryptionTypeStr;
                         switch (encryptionType) {
-                            case WIFI_AUTH_OPEN: encryptionTypeStr = "Open"; break;
+                            case WIFI_AUTH_OPEN: encryptionTypeStr = "Aberta"; break;
                             case WIFI_AUTH_WEP: encryptionTypeStr = "WEP"; break;
                             case WIFI_AUTH_WPA_PSK: encryptionTypeStr = "WPA/PSK"; break;
                             case WIFI_AUTH_WPA2_PSK: encryptionTypeStr = "WPA2/PSK"; break;
@@ -230,7 +230,7 @@ bool wifiConnectMenu(wifi_mode_t mode) {
                             case WIFI_AUTH_WPA2_ENTERPRISE: encryptionTypeStr = "WPA2/Enterprise"; break;
                             case WIFI_AUTH_WPA3_PSK: encryptionTypeStr = "WPA3/PSK"; break;
                             case WIFI_AUTH_WPA2_WPA3_PSK: encryptionTypeStr = "WPA2/WPA3/PSK"; break;
-                            default: encryptionTypeStr = "Unknown"; break;
+                            default: encryptionTypeStr = "Desconhecida"; break;
                         }
 
                         String optionText = encryptionPrefix + ssid + "(" + String(rssi) + "|" +
@@ -243,7 +243,7 @@ bool wifiConnectMenu(wifi_mode_t mode) {
                     }
                 }
                 WiFi.scanDelete();
-                options.push_back({"Hidden SSID", [&selHidden]() { selHidden = true; }});
+                options.push_back({"SSID oculto", [&selHidden]() { selHidden = true; }});
                 addOptionToMainMenu();
 
                 loopOptions(options);
@@ -252,7 +252,7 @@ bool wifiConnectMenu(wifi_mode_t mode) {
                 if (returnToMenu) {
                     refresh_scan = false;
                 } else if (selHidden) {
-                    String __ssid = keyboard("", 32, "Your SSID");
+                    String __ssid = keyboard("", 32, "Seu SSID");
                     if (__ssid != "\x1B") _wifiConnect(__ssid.c_str(), 8);
                     refresh_scan = false;
                 } else if (selSsid != "") {
@@ -348,21 +348,21 @@ bool wifiConnecttoKnownNet(void) {
 
     // Check if WiFi is in transition
     if (wifiTransitioning) {
-        displayTextLine("WiFi busy, please wait...");
+        displayTextLine("Wi-Fi ocupado, aguarde...");
         vTaskDelay(500 / portTICK_PERIOD_MS);
         return false;
     }
 
     // No-PSRAM guard: refuse before the scan brings Wi-Fi up in low memory.
     if (!radioHasMemForWifi()) {
-        displayError("Low RAM: free BLE/SD first", true);
+        displayError("RAM baixa: libere BLE/SD primeiro", true);
         return false;
     }
 
     bool result = false;
     int nets;
     // WiFi.mode(WIFI_MODE_STA);
-    displayTextLine("Scanning Networks..");
+    displayTextLine("Buscando redes...");
     WiFi.disconnect(true, true);
     vTaskDelay(10 / portTICK_PERIOD_MS);
     nets = WiFi.scanNetworks();

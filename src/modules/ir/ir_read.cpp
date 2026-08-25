@@ -189,10 +189,10 @@ void IrRead::begin() {
 
     display_banner();
     if (quickloop) {
-        padprintln("Waiting for signal of button: " + String(quickButtons[button_pos]));
-        padprintln("Button " + String(button_pos + 1) + " of " + String(quickButtons.size()));
+        padprintln("Aguardando sinal do botao: " + String(quickButtons[button_pos]));
+        padprintln("Botao " + String(button_pos + 1) + " de " + String(quickButtons.size()));
     } else {
-        padprintln("Waiting for signal...");
+        padprintln("Aguardando sinal...");
     }
 
     tft.println("");
@@ -210,11 +210,11 @@ void IrRead::cls() {
 void IrRead::display_banner() {
     cls();
     tft.setTextSize(FM);
-    padprintln("IR Read");
+    padprintln("Leitura IR");
 
     tft.setTextSize(FP);
     padprintln("--------------");
-    padprintln("Signals captured: " + String(signals_read));
+    padprintln("Sinais capturados: " + String(signals_read));
     tft.println("");
 }
 
@@ -222,18 +222,18 @@ void IrRead::display_btn_options() {
     tft.println("");
     tft.println("");
     if (_emulate_mode) {
-        padprintln("Press [OK]   to send again");
-        padprintln("Press [NEXT] for new signal");
-        padprintln("Press [PREV] to save signal");
+        padprintln("[OK] envia novamente");
+        padprintln("[NEXT] novo sinal");
+        padprintln("[PREV] salva o sinal");
     } else if (_read_signal) {
-        padprintln("Press [OK]   to emulate signal");
-        padprintln("Press [NEXT] to save signal");
-        padprintln("Press [PREV] to discard");
+        padprintln("[OK] emula o sinal");
+        padprintln("[NEXT] salva o sinal");
+        padprintln("[PREV] descarta");
     } else {
-        if (quickloop) padprintln("Press [NEXT] to skip button");
-        if (signals_read > 0) { padprintln("Press [OK]   to save device"); }
+        if (quickloop) padprintln("[NEXT] ignora o botao");
+        if (signals_read > 0) { padprintln("[OK] salva o dispositivo"); }
     }
-    padprintln("Press [ESC]  to exit");
+    padprintln("[ESC] sair");
 }
 
 void IrRead::read_signal() {
@@ -247,7 +247,7 @@ void IrRead::read_signal() {
 
     if (!raw) {
         String proto = getParsedProtocolName(results);
-        padprintln("Protocol: " + (proto.length() ? proto : "UNKNOWN"));
+        padprintln("Protocolo: " + (proto.length() ? proto : "DESCONHECIDO"));
         padprintln("Bits: " + String(results.bits));
     }
 
@@ -406,7 +406,7 @@ void IrRead::append_to_file_str(const String &btn_name) {
 void IrRead::save_device() {
     if (signals_read == 0) return;
 
-    String filename = keyboard("MyDevice", 30, "File name:");
+    String filename = keyboard("MeuDispositivo", 30, "Nome do arquivo:");
     if (filename == "\x1B") return;
 
     display_banner();
@@ -430,7 +430,7 @@ void IrRead::save_device() {
     };
 
     if (fs && write_file(filename, fs)) {
-        displaySuccess("Arquivo salvo em " + String((fs == &SD) ? "SD Card" : "LittleFS") + ".", true);
+        displaySuccess("Arquivo salvo em " + String((fs == &SD) ? "cartao SD" : "LittleFS") + ".", true);
         signals_read = 0;
         strDeviceContent = "";
         if (quickloop) {
@@ -488,7 +488,7 @@ bool IrRead::write_file(String filename, FS *fs) {
         int ch = 1;
         int i = 1;
 
-        displayWarning("File \"" + String(filename) + "\" already exists", true);
+        displayWarning("O arquivo \"" + String(filename) + "\" ja existe", true);
         display_banner();
 
         options = {
@@ -507,7 +507,7 @@ bool IrRead::write_file(String filename, FS *fs) {
                 break;
             case 2: (*fs).remove("/BruceIR/" + filename + ".ir"); break;
             case 3:
-                filename = keyboard(filename, 30, "File name:");
+                filename = keyboard(filename, 30, "Nome do arquivo:");
                 if (filename == "\x1B") return false;
                 display_banner();
                 break;

@@ -195,10 +195,10 @@ void rf_waterfall_run() {
 
         if (selected_item == 2) {
             tft.setTextColor(TFT_RED);
-            tft.print("EXIT");
+            tft.print("SAIR");
         } else {
             tft.setTextColor(TFT_WHITE);
-            tft.print("EXIT");
+            tft.print("SAIR");
         }
 
         if (check(EscPress)) break;

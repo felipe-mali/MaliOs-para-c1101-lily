@@ -97,7 +97,7 @@ void rf_listen() {
 
     while (check(EscPress)) { delay(10); }
 
-    showStripe("Waiting for a pulse");
+    showStripe("Aguardando pulso");
 
     while (!check(EscPress)) {
         if (newPulse) {
@@ -120,7 +120,7 @@ void rf_listen() {
 
         if (pulseActive && millis() - lastPulseTime > 3000) {
             pulseActive = false;
-            showStripe("Waiting for a pulse");
+            showStripe("Aguardando pulso");
         }
 
         if (check(SelPress)) break;

@@ -205,12 +205,12 @@ void loopEmulate(RfCodes &data) {
 void display_info(RfCodes &data) {
     char hexString[64] = {0};
 
-    drawMainBorderWithTitle("RF Emulate");
+    drawMainBorderWithTitle("Emular RF");
 
     padprintln("Frequencia: " + String(data.frequency / 1000000.0) + "MHz");
 
     if (data.serial != 0) {
-        padprintln("Protocol: KeeLoq");
+        padprintln("Protocolo: KeeLoq");
         padprintln("Fabricante: " + data.mf_name);
 
         decimalToHexString(data.serial, hexString);
@@ -223,7 +223,7 @@ void display_info(RfCodes &data) {
         decimalToHexString(data.key, hexString);
         padprintln("Payload: " + String(hexString));
     } else {
-        padprintln("Protocol: " + String(data.protocol) + "(" + data.preset + ")");
+        padprintln("Protocolo: " + String(data.protocol) + "(" + data.preset + ")");
 
         for (uint64_t key : keyList) {
             decimalToHexString(key, hexString);
@@ -463,7 +463,7 @@ void sendRfCommand(struct RfCodes rfcode, bool hideDefaultUI) {
         transmittimings[transmittimings_idx] = 0; // termination
 
         // send rf command
-        if (!hideDefaultUI) { displayTextLine("Sending.."); }
+        if (!hideDefaultUI) { displayTextLine("Enviando..."); }
         rfTransmitRawTimings(transmittimings);
         free(transmittimings);
     } else if (protocol == "BinRAW") {
@@ -477,7 +477,7 @@ void sendRfCommand(struct RfCodes rfcode, bool hideDefaultUI) {
     else if (protocol == "KeeLoq") {
         // KeeLoq has dedicated framing (see rf_keeloq_durations). `rfcode.key` is
         // the 64-bit rolling code already assembled by keeloq_step.
-        if (!hideDefaultUI) { displayTextLine("Sending.."); }
+        if (!hideDefaultUI) { displayTextLine("Enviando..."); }
         rf_tx_keeloq(rfcode.key, num_signal_repeat);
     }
 

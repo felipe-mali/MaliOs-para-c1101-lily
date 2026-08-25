@@ -325,15 +325,15 @@ void setCustomUIColorSettingMenuB(int colorType) {
 }
 
 constexpr const char *colorTypes[] = {
-    "Background", // 0
-    "Primary",    // 1
-    "Secondary"   // 2
+    "Fundo",      // 0
+    "Primaria",   // 1
+    "Secundaria"  // 2
 };
 
 constexpr const char *rgbNames[] = {
-    "Blue", // 0
-    "Red",  // 1
-    "Green" // 2
+    "Azul",     // 0
+    "Vermelho", // 1
+    "Verde"     // 2
 };
 
 void setCustomUIColorSettingMenu(
@@ -1233,7 +1233,7 @@ void setStartupApp() {
     if (bruceConfig.startupApp == "") idx = 0;
 
     options = {
-        {"None", [=]() { bruceConfig.setStartupApp(""); }, bruceConfig.startupApp == ""}
+        {"Nenhum", [=]() { bruceConfig.setStartupApp(""); }, bruceConfig.startupApp == ""}
     };
 
     int index = 0;
@@ -1241,12 +1241,22 @@ void setStartupApp() {
         index++;
         if (bruceConfig.startupApp == appName) idx = index;
 
-        options.push_back({appName.c_str(), [=]() {
+        String displayAppName = appName;
+        if (appName == "Clock") displayAppName = "Relogio";
+        else if (appName == "Custom SubGHz") displayAppName = "Sub-GHz personalizado";
+        else if (appName == "Mass Storage") displayAppName = "Armazenamento USB";
+        else if (appName == "GPS Tracker") displayAppName = "Rastreador GPS";
+        else if (appName == "WardrivingNoRadio") displayAppName = "Wardriving sem radio";
+        else if (appName == "WardrivingBTEOnly") displayAppName = "Wardriving so BLE";
+        else if (appName == "WardrivingWifiOnly") displayAppName = "Wardriving so Wi-Fi";
+        else if (appName == "JS Interpreter") displayAppName = "Interpretador JS";
+
+        options.push_back({displayAppName.c_str(), [=]() {
                                bruceConfig.setStartupApp(appName);
 #if !defined(LITE_VERSION) && !defined(DISABLE_INTERPRETER)
                                if (appName == "JS Interpreter") {
                                    options = getScriptsOptionsList("", true);
-                                   loopOptions(options, MENU_TYPE_SUBMENU, "Startup Script");
+                                   loopOptions(options, MENU_TYPE_SUBMENU, "Script de inicializacao");
                                }
 #endif
                            }});
@@ -1282,15 +1292,15 @@ void setWifiApSsidMenu() {
     const bool isDefault = bruceConfig.wifiAp.ssid == "BruceNet";
 
     options = {
-        {"Default (BruceNet)",
+        {"Padrao (BruceNet)",
          [=]() { bruceConfig.setWifiApCreds("BruceNet", bruceConfig.wifiAp.pwd); },
          isDefault                                                                            },
-        {"Custom",
+        {"Personalizado",
          [=]() {
              String newSsid = keyboard(bruceConfig.wifiAp.ssid, 32, "WiFi AP SSID:");
              if (newSsid != "\x1B") {
                  if (!newSsid.isEmpty()) bruceConfig.setWifiApCreds(newSsid, bruceConfig.wifiAp.pwd);
-                 else displayError("SSID cannot be empty", true);
+                 else displayError("O SSID nao pode ficar vazio", true);
              }
          },                                                                         !isDefault},
     };
@@ -1307,15 +1317,15 @@ void setWifiApPasswordMenu() {
     const bool isDefault = bruceConfig.wifiAp.pwd == "brucenet";
 
     options = {
-        {"Default (brucenet)",
+        {"Padrao (brucenet)",
          [=]() { bruceConfig.setWifiApCreds(bruceConfig.wifiAp.ssid, "brucenet"); },
          isDefault                                                                             },
-        {"Custom",
+        {"Personalizada",
          [=]() {
-             String newPassword = keyboard(bruceConfig.wifiAp.pwd, 32, "WiFi AP Password:", true);
+             String newPassword = keyboard(bruceConfig.wifiAp.pwd, 32, "Senha do AP Wi-Fi:", true);
              if (newPassword != "\x1B") {
                  if (!newPassword.isEmpty()) bruceConfig.setWifiApCreds(bruceConfig.wifiAp.ssid, newPassword);
-                 else displayError("Password cannot be empty", true);
+                 else displayError("A senha nao pode ficar vazia", true);
              }
          },                                                                          !isDefault},
     };
@@ -1331,7 +1341,7 @@ void setWifiApPasswordMenu() {
 void setWifiApCredsMenu() {
     options = {
         {"SSID",     setWifiApSsidMenu    },
-        {"Password", setWifiApPasswordMenu},
+        {"Senha",    setWifiApPasswordMenu},
     };
     addOptionToMainMenu();
 
@@ -1344,7 +1354,7 @@ void setWifiApCredsMenu() {
 **********************************************************************/
 void setNetworkCredsMenu() {
     options = {
-        {"WiFi AP Creds", setWifiApCredsMenu}
+        {"Credenciais do AP Wi-Fi", setWifiApCredsMenu}
     };
     addOptionToMainMenu();
 
@@ -1357,9 +1367,9 @@ void setNetworkCredsMenu() {
 **********************************************************************/
 void setBadUSBBLEMenu() {
     options = {
-        {"Keyboard Layout", setBadUSBBLEKeyboardLayoutMenu},
-        {"Key Delay",       setBadUSBBLEKeyDelayMenu      },
-        {"Show Output",     setBadUSBBLEShowOutputMenu    },
+        {"Layout do teclado", setBadUSBBLEKeyboardLayoutMenu},
+        {"Atraso das teclas", setBadUSBBLEKeyDelayMenu      },
+        {"Mostrar saida",     setBadUSBBLEShowOutputMenu    },
     };
     addOptionToMainMenu();
 
@@ -1375,20 +1385,20 @@ void setBadUSBBLEKeyboardLayoutMenu() {
 
     options.clear();
     options = {
-        {"US International",      [&]() { opt = 0; } },
-        {"Danish",                [&]() { opt = 1; } },
-        {"English (UK)",          [&]() { opt = 2; } },
-        {"French (AZERTY)",       [&]() { opt = 3; } },
-        {"German",                [&]() { opt = 4; } },
-        {"Hungarian",             [&]() { opt = 5; } },
-        {"Italian",               [&]() { opt = 6; } },
-        {"Polish",                [&]() { opt = 7; } },
-        {"Portuguese (Brazil)",   [&]() { opt = 8; } },
-        {"Portuguese (Portugal)", [&]() { opt = 9; } },
-        {"Slovenian",             [&]() { opt = 10; }},
-        {"Spanish",               [&]() { opt = 11; }},
-        {"Swedish",               [&]() { opt = 12; }},
-        {"Turkish",               [&]() { opt = 13; }},
+        {"EUA Internacional",    [&]() { opt = 0; } },
+        {"Dinamarques",          [&]() { opt = 1; } },
+        {"Ingles (Reino Unido)", [&]() { opt = 2; } },
+        {"Frances (AZERTY)",     [&]() { opt = 3; } },
+        {"Alemao",               [&]() { opt = 4; } },
+        {"Hungaro",              [&]() { opt = 5; } },
+        {"Italiano",             [&]() { opt = 6; } },
+        {"Polones",              [&]() { opt = 7; } },
+        {"Portugues (Brasil)",   [&]() { opt = 8; } },
+        {"Portugues (Portugal)", [&]() { opt = 9; } },
+        {"Esloveno",             [&]() { opt = 10; }},
+        {"Espanhol",             [&]() { opt = 11; }},
+        {"Sueco",                [&]() { opt = 12; }},
+        {"Turco",                [&]() { opt = 13; }},
     };
     addOptionToMainMenu();
 
@@ -1402,13 +1412,13 @@ void setBadUSBBLEKeyboardLayoutMenu() {
 **  Main Menu for setting Bad USB/BLE Keyboard Key Delay
 **********************************************************************/
 void setBadUSBBLEKeyDelayMenu() {
-    String delayStr = num_keyboard(String(bruceConfig.badUSBBLEKeyDelay), 3, "Key Delay (ms):");
+    String delayStr = num_keyboard(String(bruceConfig.badUSBBLEKeyDelay), 3, "Atraso das teclas (ms):");
     if (delayStr != "\x1B") {
         uint16_t delayVal = static_cast<uint16_t>(delayStr.toInt());
         if (delayVal <= 500) {
             bruceConfig.setBadUSBBLEKeyDelay(delayVal);
         } else if (delayVal != 0) {
-            displayError("Invalid key delay value (0 to 500)", true);
+            displayError("Atraso invalido (0 a 500)", true);
         }
     }
 }
@@ -1420,8 +1430,8 @@ void setBadUSBBLEKeyDelayMenu() {
 void setBadUSBBLEShowOutputMenu() {
     options.clear();
     options = {
-        {"Enable",  [&]() { bruceConfig.setBadUSBBLEShowOutput(true); } },
-        {"Disable", [&]() { bruceConfig.setBadUSBBLEShowOutput(false); }},
+        {"Ativar",    [&]() { bruceConfig.setBadUSBBLEShowOutput(true); } },
+        {"Desativar", [&]() { bruceConfig.setBadUSBBLEShowOutput(false); }},
     };
     addOptionToMainMenu();
 
@@ -1438,20 +1448,20 @@ void setMacAddressMenu() {
 
     options.clear();
     options = {
-        {"Default MAC (" + WiFi.macAddress() + ")",
+        {"MAC padrao (" + WiFi.macAddress() + ")",
          [&]() { bruceConfig.setWifiMAC(""); },
          bruceConfig.wifiMAC == ""},
-        {"Set Custom MAC",
+        {"Definir MAC personalizado",
          [&]() {
              String newMAC = keyboard(bruceConfig.wifiMAC, 17, "XX:YY:ZZ:AA:BB:CC");
              if (newMAC == "\x1B") return;
              if (newMAC.length() == 17) {
                  bruceConfig.setWifiMAC(newMAC);
              } else {
-                 displayError("Invalid MAC format");
+                 displayError("Formato MAC invalido");
              }
          }, bruceConfig.wifiMAC != ""},
-        {"Random MAC", [&]() {
+        {"MAC aleatorio", [&]() {
              uint8_t randomMac[6];
              for (int i = 0; i < 6; i++) randomMac[i] = random(0x00, 0xFF);
              char buf[18];
@@ -1471,7 +1481,7 @@ void setMacAddressMenu() {
     };
 
     addOptionToMainMenu();
-    loopOptions(options, MENU_TYPE_REGULAR, ("Current: " + currentMAC).c_str());
+    loopOptions(options, MENU_TYPE_REGULAR, ("Atual: " + currentMAC).c_str());
 }
 
 /*********************************************************************
@@ -1491,8 +1501,8 @@ RELOAD:
         {String("CS  =" + String(points.cs)).c_str(), [&]() { opt = 4; }},
         {String("CE/GDO0=" + String(points.io0)).c_str(), [&]() { opt = 5; }},
         {String("NC/GDO2=" + String(points.io2)).c_str(), [&]() { opt = 6; }},
-        {"Save Config", [&]() { opt = 7; }, changed},
-        {"Main Menu", [&]() { opt = 0; }},
+        {"Salvar configuracao", [&]() { opt = 7; }, changed},
+        {"Menu principal", [&]() { opt = 0; }},
     };
 
     loopOptions(options);
@@ -1542,8 +1552,8 @@ RELOAD:
     options = {
         {String("RX = " + String(points.rx)).c_str(), [&]() { opt = 1; }},
         {String("TX = " + String(points.tx)).c_str(), [&]() { opt = 2; }},
-        {"Save Config", [&]() { opt = 7; }, changed},
-        {"Main Menu", [&]() { opt = 0; }},
+        {"Salvar configuracao", [&]() { opt = 7; }, changed},
+        {"Menu principal", [&]() { opt = 0; }},
     };
 
     loopOptions(options);
@@ -1578,7 +1588,7 @@ RELOAD:
 **********************************************************************/
 void setI2CPinsMenu(BruceConfigPins::I2CPins &value) {
 #if defined(SOC_HP_I2C_NUM) && SOC_HP_I2C_NUM < 2 && SYS_I2C_SDA >= 0 && SYS_I2C_SCL >= 0
-    displayError("I2C Pins cannot be changed on this board", true);
+    displayError("Os pinos I2C nao podem ser alterados nesta placa", true);
     return;
 #else
     uint8_t opt = 0;
@@ -1589,8 +1599,8 @@ RELOAD:
     options = {
         {String("SDA = " + String(points.sda)).c_str(), [&]() { opt = 1; }},
         {String("SCL = " + String(points.scl)).c_str(), [&]() { opt = 2; }},
-        {"Save Config", [&]() { opt = 7; }, changed},
-        {"Main Menu", [&]() { opt = 0; }},
+        {"Salvar configuracao", [&]() { opt = 7; }, changed},
+        {"Menu principal", [&]() { opt = 0; }},
     };
 
     loopOptions(options);
@@ -1628,7 +1638,7 @@ void setTheme() {
     FS *fs = &LittleFS;
     options = {
         {"Little FS", [&]() { fs = &LittleFS; }},
-        {"Default",
+        {"Padrao",
          [&]() {
              bruceConfig.removeTheme();
              bruceConfig.themePath = "";
@@ -1647,10 +1657,10 @@ void setTheme() {
              bruceConfig.saveFile();
              fs = nullptr;
          }                                     },
-        {"Main Menu", [&]() { fs = nullptr; }  }
+        {"Menu principal", [&]() { fs = nullptr; }  }
     };
     if (setupSdCard()) {
-        options.insert(options.begin(), {"SD Card", [&]() { fs = &SD; }});
+        options.insert(options.begin(), {"Cartao SD", [&]() { fs = &SD; }});
     }
     loopOptions(options);
     if (fs == nullptr) return;
@@ -1698,7 +1708,7 @@ void installAppStoreJS() {
 
     if (!WiFi.isConnected()) { wifiConnectMenu(WIFI_STA); }
     if (!WiFi.isConnected()) {
-        displayWarning("WiFi not connected", true);
+        displayWarning("WiFi nao conectado", true);
         return;
     }
 
@@ -1710,14 +1720,14 @@ void installAppStoreJS() {
 
     if (!fs->exists("/BruceJS")) {
         if (!fs->mkdir("/BruceJS")) {
-            displayWarning("Failed to create /BruceJS directory", true);
+            displayWarning("Falha ao criar diretorio /BruceJS", true);
             return;
         }
     }
 
     if (!fs->exists("/BruceJS/Tools")) {
         if (!fs->mkdir("/BruceJS/Tools")) {
-            displayWarning("Failed to create /BruceJS/Tools directory", true);
+            displayWarning("Falha ao criar /BruceJS/Tools", true);
             return;
         }
     }
@@ -1727,20 +1737,20 @@ void installAppStoreJS() {
     int httpCode = http.GET();
     if (httpCode != 200) {
         http.end();
-        displayWarning("Failed to download App Store", true);
+        displayWarning("Falha ao baixar a App Store", true);
         return;
     }
 
     File file = fs->open("/BruceJS/Tools/App Store.js", FILE_WRITE);
     if (!file) {
-        displayWarning("Failed to save App Store", true);
+        displayWarning("Falha ao salvar a App Store", true);
         return;
     }
     file.print(http.getString());
     http.end();
     file.close();
 
-    displaySuccess("App Store installed", true);
-    displaySuccess("Goto JS Interpreter -> Tools -> App Store", true);
+    displaySuccess("App Store instalada", true);
+    displaySuccess("Acesse Interpretador JS -> Ferramentas -> App Store", true);
 }
 #endif

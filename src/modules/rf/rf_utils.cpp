@@ -584,8 +584,8 @@ void rf_range_selection(float currentFrequency) {
         options.clear();
     }
 
-    if (bruceConfigPins.rfFxdFreq) displayTextLine("Scan freq set to " + String(bruceConfigPins.rfFreq));
-    else displayTextLine("Range set to " + String(subghz_frequency_ranges[bruceConfigPins.rfScanRange]));
+    if (bruceConfigPins.rfFxdFreq) displayTextLine("Frequencia definida: " + String(bruceConfigPins.rfFreq));
+    else displayTextLine("Faixa definida: " + String(subghz_frequency_ranges[bruceConfigPins.rfScanRange]));
 }
 
 // keeloq_encrypt / keeloq_decrypt / keeloq_normal_learning moved to
