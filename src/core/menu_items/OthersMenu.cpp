@@ -5,8 +5,10 @@
 #include "modules/badusb_ble/ducky_typer.h"
 #include "modules/bjs_interpreter/interpreter.h"
 #include "modules/others/clicker.h"
+#include "modules/others/dice_app.h"
 #include "modules/others/ibutton.h"
 #include "modules/others/mic.h"
+#include "modules/others/pixel_paint_app.h"
 #include "modules/others/qrcode_menu.h"
 #include "modules/others/tururururu.h"
 #include "modules/others/u2f.h"
@@ -14,6 +16,7 @@
 
 void OthersMenu::optionsMenu() {
     options = {
+        {"Aplicativos",  [this]() { appsMenu(); }       },
         {"QRCodes",      qrcode_menu                  },
         {"Megalodon",    shark_setup                  },
 
@@ -34,7 +37,24 @@ void OthersMenu::optionsMenu() {
     };
 
     addOptionToMainMenu();
-    loopOptions(options, MENU_TYPE_SUBMENU, "Others");
+    loopOptions(options, MENU_TYPE_SUBMENU, "Ferramentas");
+}
+
+void OthersMenu::appsMenu() {
+    while (true) {
+        int selectedApp = -1;
+        bool leave = false;
+        std::vector<Option> appOptions = {
+            {"D20",              [&]() { selectedApp = 0; }},
+            {"Mini Pixel Paint", [&]() { selectedApp = 1; }},
+            {"Voltar",           [&]() { leave = true; }    },
+        };
+
+        const int selected = loopOptions(appOptions, MENU_TYPE_SUBMENU, "Aplicativos");
+        if (selected < 0 || leave) return;
+        if (selectedApp == 0) dice_app();
+        else if (selectedApp == 1) pixel_paint_app();
+    }
 }
 
 void OthersMenu::badUsbHidMenu() {
