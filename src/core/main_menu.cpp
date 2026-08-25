@@ -1,5 +1,6 @@
 #include "main_menu.h"
 #include "display.h"
+#include "led_control.h"
 #include "utils.h"
 #include <globals.h>
 
@@ -104,6 +105,7 @@ MainMenu::MainMenu() {
 MainMenu::~MainMenu() {}
 
 void MainMenu::begin(void) {
+    setLedState(MaliLedState::MENU);
     returnToMenu = false;
     options = {};
 

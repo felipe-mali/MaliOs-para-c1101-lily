@@ -1,4 +1,5 @@
 #include "display.h"
+#include "core/led_control.h"
 #include "core/wifi/webInterface.h" // for server
 #include "core/wifi/wg.h"           //for isConnectedWireguard to print wireguard lock
 #include "mykeyboard.h"
@@ -317,6 +318,7 @@ int8_t displayMessage(
 }
 
 void displayError(const String &txt, bool waitKeyPress) {
+    setLedState(MaliLedState::ERROR);
     displayRedStripe(txt);
     Serial.println("ERR: " + txt);
 #ifndef HAS_SCREEN
@@ -348,6 +350,7 @@ void displayInfo(const String &txt, bool waitKeyPress) {
 }
 
 void displaySuccess(const String &txt, bool waitKeyPress) {
+    setLedState(MaliLedState::SUCCESS);
     displayRedStripe(txt, TFT_WHITE, TFT_DARKGREEN);
     Serial.println("SUCCESS: " + txt);
 #ifndef HAS_SCREEN

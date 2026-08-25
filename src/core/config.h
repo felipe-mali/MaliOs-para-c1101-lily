@@ -56,6 +56,7 @@ public:
     int ledEffect = 0;
     int ledEffectSpeed = 5;
     int ledEffectDirection = 1;
+    bool ledStatusEffects = true;
 #endif
 
     // Wifi
@@ -154,6 +155,7 @@ public:
     void validateLedEffectSpeedValue();
     void setLedEffectDirection(int value);
     void validateLedEffectDirectionValue();
+    void setLedStatusEffects(bool value);
 #endif
 
     // Wifi

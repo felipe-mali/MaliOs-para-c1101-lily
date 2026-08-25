@@ -2,6 +2,17 @@
 #define __LED_CONTROL_H__
 #include <globals.h>
 
+enum class MaliLedState : uint8_t {
+    OFF,
+    IDLE,
+    MENU,
+    LOADING,
+    SUCCESS,
+    ERROR,
+    NFC_SCAN,
+    RF_SCAN,
+};
+
 #ifdef HAS_RGB_LED
 #include <Arduino.h>
 #include <FastLED.h>
@@ -39,8 +50,32 @@ void ledPreviewMode(bool enable);
 void setLedBrightness(int value);
 void setLedBrightnessConfig();
 
+void setLedState(MaliLedState state);
+MaliLedState getLedState();
+void updateLedEffects();
+
+class MaliLedStateGuard {
+public:
+    explicit MaliLedStateGuard(MaliLedState state);
+    ~MaliLedStateGuard();
+
+    MaliLedStateGuard(const MaliLedStateGuard &) = delete;
+    MaliLedStateGuard &operator=(const MaliLedStateGuard &) = delete;
+
+private:
+    MaliLedState previousState;
+};
+
 #else
 inline void blinkLed(int blinkTime = 50) {};
+inline void setLedState(MaliLedState state) {}
+inline MaliLedState getLedState() { return MaliLedState::OFF; }
+inline void updateLedEffects() {}
+
+class MaliLedStateGuard {
+public:
+    explicit MaliLedStateGuard(MaliLedState state) {}
+};
 #endif
 
 #endif

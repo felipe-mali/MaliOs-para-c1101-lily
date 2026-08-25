@@ -32,6 +32,7 @@ JsonDocument BruceConfig::toJson() const {
     setting["ledEffect"] = ledEffect;
     setting["ledEffectSpeed"] = ledEffectSpeed;
     setting["ledEffectDirection"] = ledEffectDirection;
+    setting["ledStatusEffects"] = ledStatusEffects;
 #endif
 
     JsonObject _webUI = setting["webUI"].to<JsonObject>();
@@ -255,6 +256,12 @@ void BruceConfig::fromFile(bool checkFS) {
     } else {
         count++;
         log_e("Fail");
+    }
+    if (!setting["ledStatusEffects"].isNull()) {
+        ledStatusEffects = setting["ledStatusEffects"].as<bool>();
+    } else {
+        ledStatusEffects = true;
+        count++;
     }
 #endif
 
@@ -635,6 +642,11 @@ void BruceConfig::setLedEffectDirection(int value) {
 void BruceConfig::validateLedEffectDirectionValue() {
     if (ledEffectDirection > 1 || ledEffectDirection == 0) ledEffectDirection = 1;
     if (ledEffectDirection < -1) ledEffectDirection = -1;
+}
+
+void BruceConfig::setLedStatusEffects(bool value) {
+    ledStatusEffects = value;
+    saveFile();
 }
 #endif
 

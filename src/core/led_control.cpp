@@ -20,6 +20,147 @@ int previewLedEffect;
 int previewLedEffectSpeed;
 int previewLedEffectDirection;
 
+namespace {
+constexpr CRGB MALI_WINE(95, 6, 6);
+constexpr CRGB MALI_SUCCESS_GREEN(24, 165, 88);
+constexpr CRGB MALI_ERROR_RED(208, 0, 0);
+constexpr CRGB MALI_SCAN_PURPLE(110, 44, 167);
+
+constexpr uint32_t STATUS_UPDATE_MS = 25;
+constexpr uint32_t LOADING_STEP_MS = 90;
+constexpr uint32_t SUCCESS_DURATION_MS = 300;
+constexpr uint32_t ERROR_DURATION_MS = 600;
+constexpr uint32_t NFC_PULSE_MS = 2000;
+constexpr uint32_t RF_PULSE_MS = 1500;
+
+portMUX_TYPE ledStateMux = portMUX_INITIALIZER_UNLOCKED;
+MaliLedState currentLedState = MaliLedState::MENU;
+MaliLedState restoreLedState = MaliLedState::MENU;
+uint32_t ledStateStartedAt = 0;
+uint32_t ledStateRevision = 1;
+
+bool isTemporaryLedState(MaliLedState state) {
+    return state == MaliLedState::SUCCESS || state == MaliLedState::ERROR;
+}
+
+CRGB scaleLedColor(const CRGB &color, uint8_t percent) {
+    return CRGB(
+        (static_cast<uint16_t>(color.r) * percent) / 100,
+        (static_cast<uint16_t>(color.g) * percent) / 100,
+        (static_cast<uint16_t>(color.b) * percent) / 100
+    );
+}
+
+uint8_t pulseBrightness(uint32_t elapsed, uint32_t period) {
+    uint32_t phase = elapsed % period;
+    uint32_t halfPeriod = period / 2;
+    uint32_t ramp = phase <= halfPeriod ? phase : period - phase;
+    return 10 + (20 * ramp) / halfPeriod;
+}
+} // namespace
+
+void setLedState(MaliLedState state) {
+    uint32_t now = millis();
+
+    portENTER_CRITICAL(&ledStateMux);
+    if (isTemporaryLedState(state)) {
+        if (!isTemporaryLedState(currentLedState)) restoreLedState = currentLedState;
+        currentLedState = state;
+        ledStateStartedAt = now;
+        ledStateRevision++;
+    } else if (isTemporaryLedState(currentLedState)) {
+        // Preserve a visible SUCCESS/ERROR effect while updating its eventual destination.
+        restoreLedState = state;
+    } else if (currentLedState != state) {
+        currentLedState = state;
+        restoreLedState = state;
+        ledStateStartedAt = now;
+        ledStateRevision++;
+    }
+    portEXIT_CRITICAL(&ledStateMux);
+}
+
+MaliLedState getLedState() {
+    portENTER_CRITICAL(&ledStateMux);
+    MaliLedState state = isTemporaryLedState(currentLedState) ? restoreLedState : currentLedState;
+    portEXIT_CRITICAL(&ledStateMux);
+    return state;
+}
+
+MaliLedStateGuard::MaliLedStateGuard(MaliLedState state) : previousState(getLedState()) {
+    setLedState(state);
+}
+
+MaliLedStateGuard::~MaliLedStateGuard() { setLedState(previousState); }
+
+void updateLedEffects() {
+    if (!bruceConfig.ledStatusEffects || isPreviewLed) return;
+
+    uint32_t now = millis();
+    MaliLedState state;
+    uint32_t startedAt;
+    uint32_t revision;
+
+    portENTER_CRITICAL(&ledStateMux);
+    state = currentLedState;
+    startedAt = ledStateStartedAt;
+
+    uint32_t duration = state == MaliLedState::SUCCESS ? SUCCESS_DURATION_MS
+                         : state == MaliLedState::ERROR ? ERROR_DURATION_MS
+                                                       : 0;
+    if (duration > 0 && now - startedAt >= duration) {
+        currentLedState = restoreLedState;
+        state = currentLedState;
+        ledStateStartedAt = now;
+        startedAt = now;
+        ledStateRevision++;
+    }
+    revision = ledStateRevision;
+    portEXIT_CRITICAL(&ledStateMux);
+
+    uint32_t elapsed = now - startedAt;
+    uint32_t frame = revision;
+    if (state == MaliLedState::LOADING) frame ^= elapsed / LOADING_STEP_MS;
+    else if (state == MaliLedState::NFC_SCAN || state == MaliLedState::RF_SCAN)
+        frame ^= elapsed / STATUS_UPDATE_MS;
+    else if (state == MaliLedState::SUCCESS) frame ^= elapsed / 220;
+    else if (state == MaliLedState::ERROR) frame ^= elapsed / 100;
+
+    static uint32_t lastFrame = UINT32_MAX;
+    static MaliLedState lastState = MaliLedState::OFF;
+    if (state == lastState && frame == lastFrame) return;
+    lastState = state;
+    lastFrame = frame;
+
+    fill_solid(leds, LED_COUNT, CRGB::Black);
+    switch (state) {
+        case MaliLedState::OFF: break;
+        case MaliLedState::IDLE: fill_solid(leds, LED_COUNT, scaleLedColor(MALI_WINE, 8)); break;
+        case MaliLedState::MENU: fill_solid(leds, LED_COUNT, scaleLedColor(MALI_WINE, 25)); break;
+        case MaliLedState::LOADING: {
+            uint16_t active = (elapsed / LOADING_STEP_MS) % LED_COUNT;
+            uint16_t tail = (active + LED_COUNT - 1) % LED_COUNT;
+            leds[tail] = scaleLedColor(MALI_WINE, 7);
+            leds[active] = scaleLedColor(MALI_WINE, 30);
+            break;
+        }
+        case MaliLedState::SUCCESS:
+            if (elapsed < 220) fill_solid(leds, LED_COUNT, scaleLedColor(MALI_SUCCESS_GREEN, 70));
+            break;
+        case MaliLedState::ERROR:
+            if ((elapsed / 100) % 2 == 0)
+                fill_solid(leds, LED_COUNT, scaleLedColor(MALI_ERROR_RED, 65));
+            break;
+        case MaliLedState::NFC_SCAN:
+            fill_solid(leds, LED_COUNT, scaleLedColor(MALI_SCAN_PURPLE, pulseBrightness(elapsed, NFC_PULSE_MS)));
+            break;
+        case MaliLedState::RF_SCAN:
+            fill_solid(leds, LED_COUNT, scaleLedColor(MALI_SCAN_PURPLE, pulseBrightness(elapsed, RF_PULSE_MS)));
+            break;
+    }
+    FastLED.show();
+}
+
 CRGB hsvToRgb(uint16_t h, uint8_t s, uint8_t v) {
     uint8_t f = (h % 60) * 255 / 60;
     uint8_t p = (255 - s) * (uint16_t)v / 255;
@@ -87,6 +228,12 @@ void ledEffectTask(void *pvParameters) {
     int frame = 0;
     uint64_t start_time = esp_timer_get_time() / 1000;
     while (1) {
+        if (bruceConfig.ledStatusEffects && !isPreviewLed) {
+            updateLedEffects();
+            vTaskDelay(pdMS_TO_TICKS(STATUS_UPDATE_MS));
+            continue;
+        }
+
         CRGB baseColor = isPreviewLed ? previewLedColor : bruceConfig.ledColor;
         int ledEffect = isPreviewLed ? previewLedEffect : bruceConfig.ledEffect;
         int ledEffectSpeed = isPreviewLed ? previewLedEffectSpeed : bruceConfig.ledEffectSpeed;
@@ -726,6 +873,11 @@ void setLedEffectDirectionConfig() {
 }
 
 void ledSetup() {
+    if (bruceConfig.ledStatusEffects) {
+        ledEffects(true);
+        return;
+    }
+
     if (bruceConfig.ledEffect == LED_EFFECT_SOLID) { ledEffects(false); }
 
     if (bruceConfig.ledEffect > LED_EFFECT_SOLID) {

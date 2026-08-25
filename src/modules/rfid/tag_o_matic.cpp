@@ -9,6 +9,7 @@
 #include "tag_o_matic.h"
 #include "core/bus_HAL.h"
 #include "core/display.h"
+#include "core/led_control.h"
 #include "core/mykeyboard.h"
 #include "esp_task_wdt.h" //Include for Headless mode (long write trigger watchdog in JS)
 
@@ -62,6 +63,8 @@ void TagOMatic::set_rfid_module() {
 }
 
 void TagOMatic::setup() {
+    bool scanning = _initial_state == READ_MODE || _initial_state == SCAN_MODE || _initial_state == CHECK_MODE;
+    MaliLedStateGuard ledState(scanning ? MaliLedState::NFC_SCAN : MaliLedState::MENU);
     returnToMenu = false;
     set_rfid_module();
 
@@ -125,6 +128,8 @@ void TagOMatic::select_state() {
 }
 
 void TagOMatic::set_state(RFID_State state) {
+    bool scanning = state == READ_MODE || state == SCAN_MODE || state == CHECK_MODE;
+    setLedState(scanning ? MaliLedState::NFC_SCAN : MaliLedState::MENU);
     current_state = state;
     display_banner();
     if (_scanned_set.size() > 0) {

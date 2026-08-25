@@ -108,6 +108,11 @@ void ConfigMenu::ledMenu() {
                  bruceConfig.ledBlinkEnabled = !bruceConfig.ledBlinkEnabled;
                  bruceConfig.saveFile();
              }                                                                            },
+            {String("Efeitos de status: ") + (bruceConfig.ledStatusEffects ? "LIG" : "DESL"),
+             [this]() {
+                 bruceConfig.setLedStatusEffects(!bruceConfig.ledStatusEffects);
+                 ledSetup();
+             }                                                                            },
             {"Voltar",                                                             []() {}},
         };
 

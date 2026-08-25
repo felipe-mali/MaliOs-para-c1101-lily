@@ -31,6 +31,7 @@ static bool rf_m5_raw_is_plausible(bool hasCrc, int rawBits, int rawTe) {
 }
 
 RFScan::RFScan() {
+    MaliLedStateGuard ledState(MaliLedState::RF_SCAN);
     if (bruceConfigPins.rfModule == M5_RF_MODULE) ReadRAW = false;
     setup();
 }
@@ -743,6 +744,7 @@ bool rfSaveSignal(float frequency, RfCodes codes, bool raw, char *key, bool auto
 }
 
 String rf_scan(float start_freq, float stop_freq, int max_loops) {
+    MaliLedStateGuard ledState(MaliLedState::RF_SCAN);
     // derived from https://github.com/mcore1976/cc1101-tool/blob/main/cc1101-tool-esp32.ino#L480
 
     if (bruceConfigPins.rfModule != CC1101_SPI_MODULE) {
@@ -808,6 +810,7 @@ String rf_scan(float start_freq, float stop_freq, int max_loops) {
 }
 
 String rfReceiveSignal(float frequency, int max_loops, bool raw, bool headless) {
+    MaliLedStateGuard ledState(MaliLedState::RF_SCAN);
     RfCodes received;
 
     if (!frequency) frequency = bruceConfigPins.rfFreq; // default from config
