@@ -3,7 +3,7 @@
 #include "sd_functions.h"
 #include <ArduinoJson.h>
 
-#define DEFAULT_PRICOLOR 0x5820
+#define DEFAULT_PRICOLOR 0x6064
 #define DEFAULT_SECCOLOR 0xBD95
 
 struct themeFiles {
