@@ -7,6 +7,7 @@
 #include "core/wifi/wifi_common.h"
 #include "core/wifi/wifi_mac.h"
 #include "modules/ethernet/ARPScanner.h"
+#include "modules/mali/MaliWiki.h"
 #include "modules/wifi/ap_info.h"
 #include "modules/wifi/clients.h"
 #include "modules/wifi/evil_portal.h"
@@ -99,6 +100,7 @@ void WifiMenu::optionsMenu() {
     options.push_back({"Configurar", [this]() { configMenu(); }});
 
     addOptionToMainMenu();
+    options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::WIFI); }});
 
     loopOptions(options, MENU_TYPE_SUBMENU, "WiFi");
 

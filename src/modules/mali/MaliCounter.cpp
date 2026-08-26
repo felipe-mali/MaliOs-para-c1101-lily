@@ -1,13 +1,21 @@
 #include "MaliCounter.h"
 
 #include "core/display.h"
+#include "core/radio_mem.h"
 #include "modules/NRF24/nrf_common.h"
 #include "modules/rf/rf_utils.h"
 #include <globals.h>
 
 #include <WiFi.h>
+#include <esp_attr.h>
+#include <esp_heap_caps.h>
+#include <esp_system.h>
 #include <esp_wifi.h>
 #include <soc/soc_caps.h>
+
+#if defined(USE_W5500_VIA_SPI) && !defined(LITE_VERSION)
+#include <ETH.h>
+#endif
 
 #if SOC_BLE_SUPPORTED
 #include <NimBLEDevice.h>
@@ -16,8 +24,12 @@
 namespace {
 constexpr uint32_t RENDER_INTERVAL_MS = 150;
 constexpr uint32_t BLE_SCAN_MS = 900;
+constexpr uint32_t WIFI_SCAN_TIMEOUT_MS = 5000;
+constexpr uint32_t BLE_SCAN_TIMEOUT_MS = 3000;
+constexpr uint32_t RADIO_SETTLE_MS = 120;
 constexpr uint8_t NRF_CHANNELS = 80;
 constexpr int SUB_RSSI_THRESHOLD = -75;
+constexpr uint32_t RESET_CONTEXT_MAGIC = 0x4D414C49; // "MALI"
 
 const float SUB_FREQUENCIES[] = {
     300.00f,
@@ -38,8 +50,20 @@ enum class Phase {
     NRF_SWEEP,
     CC_START,
     CC_SWEEP,
+    SETTLE,
     PAUSE,
 };
+
+struct MaliResetContext {
+    uint32_t magic;
+    uint32_t active;
+    uint32_t cycle;
+    uint32_t phase;
+    uint32_t freeHeap;
+    uint32_t largestDma;
+};
+
+RTC_NOINIT_ATTR MaliResetContext resetContext;
 
 struct CounterStats {
     uint16_t wifiNetworks = 0;
@@ -120,6 +144,7 @@ const char *phaseName(Phase phase) {
         case Phase::NRF_SWEEP: return "nRF24 em recepcao";
         case Phase::CC_START:
         case Phase::CC_SWEEP: return "CC1101 em recepcao";
+        case Phase::SETTLE: return "Estabilizando radios";
         case Phase::PAUSE: return "Ciclo concluido";
     }
     return "Aguardando";
@@ -127,17 +152,41 @@ const char *phaseName(Phase phase) {
 
 int32_t average(int32_t total, uint32_t count) { return count == 0 ? 0 : total / static_cast<int32_t>(count); }
 
+const char *resetReasonName(esp_reset_reason_t reason) {
+    switch (reason) {
+        case ESP_RST_UNKNOWN: return "UNKNOWN";
+        case ESP_RST_POWERON: return "POWERON";
+        case ESP_RST_EXT: return "EXTERNAL";
+        case ESP_RST_SW: return "SOFTWARE";
+        case ESP_RST_PANIC: return "PANIC";
+        case ESP_RST_INT_WDT: return "INT_WDT";
+        case ESP_RST_TASK_WDT: return "TASK_WDT";
+        case ESP_RST_WDT: return "WDT";
+        case ESP_RST_DEEPSLEEP: return "DEEPSLEEP";
+        case ESP_RST_BROWNOUT: return "BROWNOUT";
+        case ESP_RST_SDIO: return "SDIO";
+        case ESP_RST_USB: return "USB";
+        case ESP_RST_JTAG: return "JTAG";
+        case ESP_RST_EFUSE: return "EFUSE";
+        case ESP_RST_PWR_GLITCH: return "POWER_GLITCH";
+        case ESP_RST_CPU_LOCKUP: return "CPU_LOCKUP";
+    }
+    return "INVALID";
+}
+
 class PassiveCounterSession {
 public:
     void run() {
-        resetCycle();
+        _initialWifiMode = WiFi.getMode();
+        beginCycle();
+        logState("session-start");
         draw(true);
 
         delay(120);
         check(EscPress);
         check(SelPress);
 
-        while (!check(EscPress)) {
+        while (!_failed && !check(EscPress)) {
             if (check(NextPress) || check(SelPress)) {
                 _page = (_page + 1) % 5;
                 draw(true);
@@ -154,22 +203,39 @@ public:
         }
 
         cleanup();
+        resetContext.active = 0;
+        Serial.printf(
+            "[MALI][Counter] session-end cycles=%lu failed=%u\n",
+            static_cast<unsigned long>(_cycles),
+            _failed
+        );
+        Serial.flush();
+        if (_failed) displayError(_failure, true);
     }
 
 private:
     CounterStats _stats;
     Phase _phase = Phase::WIFI_START;
+    Phase _nextPhase = Phase::WIFI_START;
     uint8_t _page = 0;
     uint8_t _nrfChannel = 0;
     uint8_t _subIndex = 0;
     uint32_t _pauseStarted = 0;
+    uint32_t _phaseStarted = 0;
+    uint32_t _settleStarted = 0;
     uint32_t _lastRender = 0;
     uint32_t _cycles = 0;
+    String _failure;
+    wifi_mode_t _initialWifiMode = WIFI_MODE_NULL;
     bool _wifiScanStarted = false;
-    bool _wifiOwned = false;
+    bool _wifiReady = false;
+    bool _wifiModeChanged = false;
     bool _bleOwned = false;
     bool _nrfOwned = false;
+    bool _nrfPinsClaimed = false;
     bool _ccOwned = false;
+    bool _ccPinsClaimed = false;
+    bool _failed = false;
 #if SOC_BLE_SUPPORTED
     NimBLEScan *_bleScan = nullptr;
 #endif
@@ -179,12 +245,67 @@ private:
                pins.cs != GPIO_NUM_NC && pins.io0 != GPIO_NUM_NC;
     }
 
-    void resetCycle() {
-        cleanup();
+    void rememberContext() const {
+        resetContext.magic = RESET_CONTEXT_MAGIC;
+        resetContext.active = 1;
+        resetContext.cycle = _cycles;
+        resetContext.phase = static_cast<uint32_t>(_phase);
+        resetContext.freeHeap = ESP.getFreeHeap();
+        resetContext.largestDma = radioLargestDmaBlock();
+    }
+
+    void logState(const char *event) const {
+        rememberContext();
+        const bool heapOk = heap_caps_check_integrity_all(false);
+        Serial.printf(
+            "[MALI][Counter] cycle=%lu phase=%s event=%s heap=%u min=%u internal=%u largest=%u "
+            "dma=%u stack_hwm=%u heap_ok=%u\n",
+            static_cast<unsigned long>(_cycles),
+            phaseName(_phase),
+            event,
+            static_cast<unsigned>(ESP.getFreeHeap()),
+            static_cast<unsigned>(ESP.getMinFreeHeap()),
+            static_cast<unsigned>(heap_caps_get_free_size(MALLOC_CAP_INTERNAL)),
+            static_cast<unsigned>(heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL)),
+            static_cast<unsigned>(radioLargestDmaBlock()),
+            static_cast<unsigned>(uxTaskGetStackHighWaterMark(nullptr)),
+            heapOk
+        );
+        Serial.flush();
+    }
+
+    void fail(const String &message) {
+        if (_failed) return;
+        _failure = message;
+        _failed = true;
+        logState("FAIL");
+        Serial.printf("[MALI][Counter][ERROR] %s\n", message.c_str());
+        Serial.flush();
+    }
+
+    bool heapHealthyBefore(const char *subsystem) {
+        if (heap_caps_check_integrity_all(true)) return true;
+        fail(String("Heap inconsistente antes de ") + subsystem);
+        return false;
+    }
+
+    void setPhase(Phase phase) {
+        _phase = phase;
+        _phaseStarted = millis();
+        logState("enter");
+    }
+
+    void settleBefore(Phase nextPhase) {
+        _nextPhase = nextPhase;
+        _settleStarted = millis();
+        setPhase(Phase::SETTLE);
+    }
+
+    void beginCycle() {
         _stats = CounterStats();
         _nrfChannel = 0;
         _subIndex = 0;
-        _phase = Phase::WIFI_START;
+        setPhase(Phase::WIFI_START);
     }
 
     void step() {
@@ -197,10 +318,13 @@ private:
             case Phase::NRF_SWEEP: sweepNrf(); break;
             case Phase::CC_START: startCc(); break;
             case Phase::CC_SWEEP: sweepCc(); break;
+            case Phase::SETTLE:
+                if (millis() - _settleStarted >= RADIO_SETTLE_MS) setPhase(_nextPhase);
+                break;
             case Phase::PAUSE:
                 if (millis() - _pauseStarted >= 750) {
                     _cycles++;
-                    resetCycle();
+                    beginCycle();
                 }
                 break;
         }
@@ -208,32 +332,69 @@ private:
 
     void startWifi() {
 #if SOC_WIFI_SUPPORTED
-        _wifiOwned = WiFi.getMode() == WIFI_MODE_NULL;
-        if (_wifiOwned && !WiFi.mode(WIFI_STA)) {
-            _wifiOwned = false;
-            _phase = Phase::BLE_START;
-            return;
+        if (!heapHealthyBefore("Wi-Fi")) return;
+
+        if (!_wifiReady) {
+            const bool staAlreadyEnabled = (_initialWifiMode & WIFI_MODE_STA) != 0;
+            if (!staAlreadyEnabled) {
+                if (!radioHasMemForWifi()) {
+                    fail("Pouca RAM contigua para Wi-Fi");
+                    return;
+                }
+
+                const wifi_mode_t scanMode = static_cast<wifi_mode_t>(_initialWifiMode | WIFI_MODE_STA);
+                if (!WiFi.mode(scanMode)) {
+                    fail("Falha ao iniciar Wi-Fi");
+                    return;
+                }
+                _wifiModeChanged = true;
+            }
+            _wifiReady = true;
+            logState("wifi-ready");
         }
 
         WiFi.scanDelete();
-        int16_t result = WiFi.scanNetworks(true, true, true, 80);
+        const int16_t result = WiFi.scanNetworks(true, true, true, 80);
         _wifiScanStarted = result == WIFI_SCAN_RUNNING;
         if (_wifiScanStarted) {
-            _phase = Phase::WIFI_WAIT;
+            setPhase(Phase::WIFI_WAIT);
+        } else if (result >= 0) {
+            collectWifiResults(result);
         } else {
-            finishWifi();
-            _phase = Phase::BLE_START;
+            fail("Falha ao iniciar busca Wi-Fi");
         }
 #else
-        _phase = Phase::BLE_START;
+        settleBefore(Phase::BLE_START);
 #endif
     }
 
     void pollWifi() {
 #if SOC_WIFI_SUPPORTED
-        int16_t result = WiFi.scanComplete();
-        if (result == WIFI_SCAN_RUNNING) return;
+        if (millis() - _phaseStarted > WIFI_SCAN_TIMEOUT_MS) {
+            esp_wifi_scan_stop();
+            WiFi.scanDelete();
+            _wifiScanStarted = false;
+            fail("Timeout na busca Wi-Fi");
+            return;
+        }
 
+        const int16_t result = WiFi.scanComplete();
+        if (result == WIFI_SCAN_RUNNING) return;
+        if (result == WIFI_SCAN_FAILED) {
+            _wifiScanStarted = false;
+            WiFi.scanDelete();
+            fail("Falha durante busca Wi-Fi");
+            return;
+        }
+
+        collectWifiResults(result);
+#else
+        settleBefore(Phase::BLE_START);
+#endif
+    }
+
+    void collectWifiResults(int16_t result) {
+#if SOC_WIFI_SUPPORTED
         if (result > 0) {
             uint16_t channelMask = 0;
             for (int16_t i = 0; i < result; ++i) {
@@ -249,87 +410,163 @@ private:
             }
         }
 
-        finishWifi();
+        WiFi.scanDelete();
+        _wifiScanStarted = false;
+        logState("wifi-scan-complete");
 #endif
-        _phase = Phase::BLE_START;
+        settleBefore(Phase::BLE_START);
     }
 
     void finishWifi() {
 #if SOC_WIFI_SUPPORTED
+        if (_wifiScanStarted) {
+            const esp_err_t stopResult = esp_wifi_scan_stop();
+            Serial.printf("[MALI][Counter] wifi-scan-stop result=%s\n", esp_err_to_name(stopResult));
+        }
         WiFi.scanDelete();
         _wifiScanStarted = false;
-        if (_wifiOwned) WiFi.mode(WIFI_MODE_NULL);
-        _wifiOwned = false;
+        if (_wifiModeChanged) {
+            const bool restored = WiFi.mode(_initialWifiMode);
+            Serial.printf(
+                "[MALI][Counter] wifi-restore mode=%d result=%u\n",
+                static_cast<int>(_initialWifiMode),
+                restored
+            );
+        }
+        _wifiReady = false;
+        _wifiModeChanged = false;
 #endif
     }
 
     void startBle() {
 #if SOC_BLE_SUPPORTED
-        if (NimBLEDevice::isInitialized()) {
-            _phase = Phase::NRF_START;
-            return;
+        if (!heapHealthyBefore("BLE")) return;
+
+        if (!_bleOwned) {
+            if (NimBLEDevice::isInitialized()) {
+                fail("BLE ja esta em uso por outra funcao");
+                return;
+            }
+            if (radioLargestDmaBlock() < RADIO_BLE_MIN_DMA_BLOCK) {
+                fail("Pouca RAM contigua para BLE");
+                return;
+            }
+            if (!NimBLEDevice::init("")) {
+                fail("Falha ao iniciar BLE");
+                return;
+            }
+
+            _bleOwned = true;
+            _bleScan = NimBLEDevice::getScan();
+            if (_bleScan == nullptr) {
+                fail("Falha ao obter scanner BLE");
+                return;
+            }
+
+            _bleScan->setActiveScan(false);
+            _bleScan->setInterval(80);
+            _bleScan->setWindow(40);
+            _bleScan->setDuplicateFilter(false);
+            _bleScan->setMaxResults(32);
+            logState("ble-ready");
         }
 
-        NimBLEDevice::init("");
-        _bleOwned = true;
-        _bleScan = NimBLEDevice::getScan();
         if (_bleScan == nullptr) {
-            finishBle();
-            _phase = Phase::NRF_START;
+            fail("Scanner BLE indisponivel");
             return;
         }
-
         bleCallbacks.bind(&_stats);
         _bleScan->clearResults();
         _bleScan->setScanCallbacks(&bleCallbacks, true);
-        _bleScan->setActiveScan(false);
-        _bleScan->setInterval(80);
-        _bleScan->setWindow(40);
-        _bleScan->setDuplicateFilter(false);
-        _bleScan->setMaxResults(32);
 
         if (_bleScan->start(BLE_SCAN_MS, false, true)) {
-            _phase = Phase::BLE_WAIT;
+            setPhase(Phase::BLE_WAIT);
         } else {
-            finishBle();
-            _phase = Phase::NRF_START;
+            bleCallbacks.bind(nullptr);
+            _bleScan->setScanCallbacks(nullptr);
+            fail("Falha ao iniciar busca BLE");
         }
 #else
-        _phase = Phase::NRF_START;
+        settleBefore(Phase::NRF_START);
 #endif
     }
 
     void pollBle() {
 #if SOC_BLE_SUPPORTED
+        if (millis() - _phaseStarted > BLE_SCAN_TIMEOUT_MS) {
+            finishBleScan();
+            fail("Timeout na busca BLE");
+            return;
+        }
         if (_bleScan != nullptr && _bleScan->isScanning()) return;
-        finishBle();
+        if (!finishBleScan()) {
+            fail("Falha ao encerrar busca BLE");
+            return;
+        }
+        logState("ble-scan-complete");
 #endif
-        _phase = Phase::NRF_START;
+        settleBefore(Phase::NRF_START);
+    }
+
+    bool finishBleScan() {
+#if SOC_BLE_SUPPORTED
+        if (_bleScan != nullptr) {
+            bleCallbacks.bind(nullptr);
+            _bleScan->setScanCallbacks(nullptr);
+            if (_bleScan->isScanning()) {
+                const bool stopRequested = _bleScan->stop();
+                const uint32_t stopStarted = millis();
+                while (_bleScan->isScanning() && millis() - stopStarted < 1200) delay(10);
+                if (!stopRequested || _bleScan->isScanning()) {
+                    Serial.println("[MALI][Counter][ERROR] BLE scan did not stop");
+                    return false;
+                }
+            }
+            _bleScan->clearResults();
+        }
+#endif
+        return true;
     }
 
     void finishBle() {
 #if SOC_BLE_SUPPORTED
-        if (_bleScan != nullptr) {
-            _bleScan->stop();
-            _bleScan->clearResults();
-            _bleScan = nullptr;
+        const bool scanStopped = finishBleScan();
+        if (_bleOwned && scanStopped) {
+            delay(RADIO_SETTLE_MS);
+            const bool deinitialized = NimBLEDevice::deinit(true);
+            Serial.printf("[MALI][Counter] ble-deinit result=%u\n", deinitialized);
+            if (!deinitialized && !_failed) fail("Falha ao encerrar BLE");
+        } else if (_bleOwned) {
+            Serial.println("[MALI][Counter][ERROR] BLE deinit skipped: scan still active");
+            if (!_failed) fail("Falha ao parar BLE na saida");
         }
-        bleCallbacks.bind(nullptr);
-        if (_bleOwned) NimBLEDevice::deinit(true);
+        _bleScan = nullptr;
         _bleOwned = false;
 #endif
     }
 
     void startNrf() {
 #if defined(USE_NRF24_VIA_SPI)
-        if (gpsConnected || !spiReady(bruceConfigPins.NRF24_bus)) {
-            _phase = Phase::CC_START;
+        if (!heapHealthyBefore("nRF24")) return;
+        if (!spiReady(bruceConfigPins.NRF24_bus)) {
+            fail("Pinos nRF24 nao configurados");
             return;
         }
+        if (gpsConnected) {
+            fail("nRF24 indisponivel: GPIO 43/44 usados pelo GPS");
+            return;
+        }
+#if defined(USE_W5500_VIA_SPI) && !defined(LITE_VERSION)
+        if (ETH.started()) {
+            fail("nRF24 indisponivel: GPIO 43/44 usados pelo W5500");
+            return;
+        }
+#endif
 
-        if (!nrf_start(NRF_MODE_SPI)) {
+        _nrfPinsClaimed = true;
+        if (!nrf_start(NRF_MODE_SPI) || !NRFradio.isChipConnected()) {
             finishNrf();
-            _phase = Phase::CC_START;
+            fail("nRF24 nao encontrado");
             return;
         }
 
@@ -344,9 +581,10 @@ private:
         };
         for (uint8_t i = 0; i < 6; ++i) NRFradio.openReadingPipe(i, noiseAddress[i]);
         NRFradio.setDataRate(RF24_1MBPS);
-        _phase = Phase::NRF_SWEEP;
+        logState("nrf-ready");
+        setPhase(Phase::NRF_SWEEP);
 #else
-        _phase = Phase::CC_START;
+        settleBefore(Phase::CC_START);
 #endif
     }
 
@@ -369,10 +607,11 @@ private:
 
         if (_nrfChannel >= NRF_CHANNELS) {
             finishNrf();
-            _phase = Phase::CC_START;
+            logState("nrf-sweep-complete");
+            settleBefore(Phase::CC_START);
         }
 #else
-        _phase = Phase::CC_START;
+        settleBefore(Phase::CC_START);
 #endif
     }
 
@@ -382,33 +621,37 @@ private:
             NRFradio.stopListening();
             NRFradio.powerDown();
         }
-        if (bruceConfigPins.NRF24_bus.io0 != GPIO_NUM_NC) {
+        if (_nrfPinsClaimed && bruceConfigPins.NRF24_bus.io0 != GPIO_NUM_NC) {
             pinMode(bruceConfigPins.NRF24_bus.io0, OUTPUT);
             digitalWrite(bruceConfigPins.NRF24_bus.io0, LOW);
         }
-        if (bruceConfigPins.NRF24_bus.cs != GPIO_NUM_NC) {
+        if (_nrfPinsClaimed && bruceConfigPins.NRF24_bus.cs != GPIO_NUM_NC) {
             pinMode(bruceConfigPins.NRF24_bus.cs, OUTPUT);
             digitalWrite(bruceConfigPins.NRF24_bus.cs, HIGH);
         }
         _nrfOwned = false;
+        _nrfPinsClaimed = false;
 #endif
     }
 
     void startCc() {
 #if defined(USE_CC1101_VIA_SPI)
+        if (!heapHealthyBefore("CC1101")) return;
         if (bruceConfigPins.rfModule != CC1101_SPI_MODULE || !spiReady(bruceConfigPins.CC1101_bus)) {
-            beginPause();
+            fail("CC1101 nao configurado");
             return;
         }
 
+        _ccPinsClaimed = true;
         if (!initRfModule("rx", SUB_FREQUENCIES[0])) {
             finishCc();
-            beginPause();
+            fail("CC1101 nao encontrado");
             return;
         }
 
         _ccOwned = true;
-        _phase = Phase::CC_SWEEP;
+        logState("cc1101-ready");
+        setPhase(Phase::CC_SWEEP);
 #else
         beginPause();
 #endif
@@ -430,6 +673,7 @@ private:
 
         if (_subIndex >= sizeof(SUB_FREQUENCIES) / sizeof(SUB_FREQUENCIES[0])) {
             finishCc();
+            logState("cc1101-sweep-complete");
             beginPause();
         }
 #else
@@ -440,27 +684,27 @@ private:
     void finishCc() {
 #if defined(USE_CC1101_VIA_SPI)
         if (_ccOwned) deinitRfModule();
-        if (bruceConfigPins.CC1101_bus.cs != GPIO_NUM_NC) {
+        if (_ccPinsClaimed && bruceConfigPins.CC1101_bus.cs != GPIO_NUM_NC) {
             pinMode(bruceConfigPins.CC1101_bus.cs, OUTPUT);
             digitalWrite(bruceConfigPins.CC1101_bus.cs, HIGH);
         }
         _ccOwned = false;
+        _ccPinsClaimed = false;
 #endif
     }
 
     void beginPause() {
         _pauseStarted = millis();
-        _phase = Phase::PAUSE;
+        setPhase(Phase::PAUSE);
     }
 
     void cleanup() {
-#if SOC_WIFI_SUPPORTED
-        if (_wifiScanStarted) esp_wifi_scan_stop();
-#endif
-        finishWifi();
-        finishBle();
-        finishNrf();
+        logState("cleanup-start");
         finishCc();
+        finishNrf();
+        finishBle();
+        finishWifi();
+        logState("cleanup-end");
     }
 
     void printLine(int16_t y, const String &text, uint16_t color = 0) {
@@ -560,5 +804,24 @@ private:
 } // namespace
 
 namespace MaliCounter {
+void printBootDiagnostics() {
+    const esp_reset_reason_t reason = esp_reset_reason();
+    Serial.printf("[RESET] reason=%d name=%s\n", static_cast<int>(reason), resetReasonName(reason));
+
+    if (resetContext.magic == RESET_CONTEXT_MAGIC && resetContext.active == 1 &&
+        resetContext.phase <= static_cast<uint32_t>(Phase::PAUSE)) {
+        const Phase previousPhase = static_cast<Phase>(resetContext.phase);
+        Serial.printf(
+            "[MALI][Counter][PREVIOUS_RESET] cycle=%lu phase=%s heap=%lu dma=%lu\n",
+            static_cast<unsigned long>(resetContext.cycle),
+            phaseName(previousPhase),
+            static_cast<unsigned long>(resetContext.freeHeap),
+            static_cast<unsigned long>(resetContext.largestDma)
+        );
+    }
+    resetContext.active = 0;
+    Serial.flush();
+}
+
 void run() { PassiveCounterSession().run(); }
 }

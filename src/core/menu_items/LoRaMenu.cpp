@@ -2,6 +2,7 @@
 #include "LoRaMenu.h"
 #include "core/display.h"
 #include "core/utils.h"
+#include "modules/mali/MaliWiki.h"
 #include "modules/lora/LoRaRF.h"
 
 void LoRaMenu::optionsMenu() {
@@ -11,6 +12,7 @@ void LoRaMenu::optionsMenu() {
         {"Alterar frequencia", []() { chfreq(); }        },
     };
     addOptionToMainMenu();
+    options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::LORA); }});
     String txt = "LoRa";
     loopOptions(options, MENU_TYPE_SUBMENU, txt.c_str());
 }

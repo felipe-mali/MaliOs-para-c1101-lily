@@ -1,6 +1,7 @@
 #include "NRF24.h"
 #include "core/display.h"
 #include "core/utils.h"
+#include "modules/mali/MaliWiki.h"
 #include "modules/NRF24/nrf_common.h"
 #include "modules/NRF24/nrf_jammer.h"
 #include "modules/NRF24/nrf_mousejack.h"
@@ -20,6 +21,7 @@ void NRF24Menu::optionsMenu() {
 #endif
 
     addOptionToMainMenu();
+    options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::NRF24); }});
 
     loopOptions(options, MENU_TYPE_SUBMENU, "NRF24");
 }

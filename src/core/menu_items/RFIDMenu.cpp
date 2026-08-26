@@ -2,6 +2,7 @@
 #include "core/display.h"
 #include "core/settings.h"
 #include "core/utils.h"
+#include "modules/mali/MaliWiki.h"
 #include "modules/rfid/PN532KillerTools.h"
 #include "modules/rfid/amiibo.h"
 #include "modules/rfid/chameleon.h"
@@ -62,6 +63,7 @@ void RFIDMenu::optionsMenu() {
 #endif
 
     addOptionToMainMenu();
+    options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::RFID); }});
 
     vTaskDelay(pdMS_TO_TICKS(200));
 

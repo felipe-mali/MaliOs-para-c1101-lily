@@ -4,6 +4,7 @@
 #include "core/utils.h"
 #include "modules/badusb_ble/ducky_typer.h"
 #include "modules/bjs_interpreter/interpreter.h"
+#include "modules/mali/MaliWiki.h"
 #include "modules/others/clicker.h"
 #include "modules/others/dice_app.h"
 #include "modules/others/ibutton.h"
@@ -37,6 +38,7 @@ void OthersMenu::optionsMenu() {
     };
 
     addOptionToMainMenu();
+    options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::OTHERS); }});
     loopOptions(options, MENU_TYPE_SUBMENU, "Ferramentas");
 }
 
@@ -70,6 +72,7 @@ void OthersMenu::badUsbHidMenu() {
 #endif
 
         {"Voltar",       [this]() { optionsMenu(); }              },
+        {"? Ajuda",      []() { MaliWiki::open(MaliWiki::Category::USB_HID); }},
     };
 
     loopOptions(options, MENU_TYPE_SUBMENU, "BadUSB & HID");

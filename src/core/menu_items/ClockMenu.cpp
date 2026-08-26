@@ -1,6 +1,7 @@
 #include "ClockMenu.h"
 #include "core/display.h"
 #include "core/settings.h"
+#include "modules/mali/MaliWiki.h"
 #include "modules/others/timer.h"
 
 void ClockMenu::optionsMenu() {
@@ -22,7 +23,8 @@ void ClockMenu::showSubMenu() {
     options = {
         {"Temporizador",     [=]() { Timer(); }            },
         {"Voltar ao relogio", [=]() {}                      },
-        {"Sair",             [=]() { returnToMenu = true; }}
+        {"Sair",             [=]() { returnToMenu = true; }},
+        {"? Ajuda",          []() { MaliWiki::open(MaliWiki::Category::CLOCK); }}
         // Add more options here
     };
 

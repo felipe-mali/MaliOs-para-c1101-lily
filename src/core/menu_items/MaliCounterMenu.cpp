@@ -2,6 +2,7 @@
 
 #include "core/utils.h"
 #include "modules/mali/MaliCounter.h"
+#include "modules/mali/MaliWiki.h"
 
 void MaliCounterMenu::optionsMenu() {
     std::vector<Option> counterOptions = {
@@ -10,6 +11,7 @@ void MaliCounterMenu::optionsMenu() {
              displayInfo("Atividade passiva; eventos de radio nao equivalem a dispositivos.", true);
          }},
         {"Menu principal", backToMenu},
+        {"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::MALI_COUNTER); }},
     };
 
     loopOptions(counterOptions, MENU_TYPE_SUBMENU, "Mali Counter");

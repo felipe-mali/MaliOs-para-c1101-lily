@@ -3,6 +3,7 @@
 #include "core/settings.h"
 #include "core/utils.h"
 #include "modules/bjs_interpreter/interpreter.h" // for JavaScript interpreter
+#include "modules/mali/MaliWiki.h"
 #include <algorithm>                             // for std::sort
 
 void ScriptsMenu::optionsMenu() {
@@ -17,6 +18,7 @@ void ScriptsMenu::optionsMenu() {
 
     options.push_back({"Carregar...", run_bjs_script});
     addOptionToMainMenu();
+    options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::SCRIPTS); }});
 
     loopOptions(options, MENU_TYPE_SUBMENU, "Scripts");
 #endif

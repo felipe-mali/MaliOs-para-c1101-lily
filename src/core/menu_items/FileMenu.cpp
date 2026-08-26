@@ -5,6 +5,7 @@
 #include "core/utils.h"
 #include "core/connect/file_sharing.h"
 #include "core/connect/serial_commands.h"
+#include "modules/mali/MaliWiki.h"
 
 void FileMenu::optionsMenu() {
     options.clear();
@@ -28,6 +29,7 @@ void FileMenu::optionsMenu() {
     options.push_back({"USB Mass Storage", [=]() { MassStorage(); }});
 #endif
     addOptionToMainMenu();
+    options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::FILES); }});
 
     loopOptions(options, MENU_TYPE_SUBMENU, "Arquivos");
 }

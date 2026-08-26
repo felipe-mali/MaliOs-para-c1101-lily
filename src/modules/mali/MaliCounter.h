@@ -2,6 +2,7 @@
 #define __MALI_COUNTER_H__
 
 namespace MaliCounter {
+void printBootDiagnostics();
 void run();
 }
 

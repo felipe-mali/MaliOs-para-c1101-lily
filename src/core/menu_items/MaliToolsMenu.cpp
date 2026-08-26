@@ -3,6 +3,7 @@
 #include "core/main_menu.h"
 #include "core/utils.h"
 #include "modules/mali/MaliSystemInfo.h"
+#include "modules/mali/MaliWiki.h"
 
 void MaliToolsMenu::optionsMenu() {
     returnToMenu = false;
@@ -14,6 +15,7 @@ void MaliToolsMenu::optionsMenu() {
             {"Acesso Rapido", [this]() { quickAccessMenu(); }     },
             {"Sobre o MaliOS", MaliSystemInfo::showAbout          },
             {"Menu Principal", backToMenu                         },
+            {"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::MALI_TOOLS); }},
         };
 
         int selected = loopOptions(maliOptions, MENU_TYPE_SUBMENU, "Mali Tools");

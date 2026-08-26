@@ -2,6 +2,7 @@
 #include "core/display.h"
 #include "core/utils.h"
 #include "modules/fm/fm.h"
+#include "modules/mali/MaliWiki.h"
 
 void FMMenu::optionsMenu() {
     options = {
@@ -15,6 +16,7 @@ void FMMenu::optionsMenu() {
 #endif
     };
     addOptionToMainMenu();
+    options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::FM_RADIO); }});
 
     loopOptions(options, MENU_TYPE_SUBMENU, "FM");
 }

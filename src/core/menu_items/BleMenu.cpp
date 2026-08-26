@@ -2,6 +2,7 @@
 #include "core/display.h"
 #include "core/utils.h"
 #include "modules/badusb_ble/ducky_typer.h"
+#include "modules/mali/MaliWiki.h"
 #include "modules/ble/ble_common.h"
 #include "modules/ble/ble_ninebot.h"
 #include "modules/ble/ble_spam.h"
@@ -43,6 +44,7 @@ void BleMenu::optionsMenu() {
     options.push_back({"Sniffer BLE", [=]() { BLE_SnifferMenu(); }});
 #endif
     addOptionToMainMenu();
+    options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::BLE); }});
 
     loopOptions(options, MENU_TYPE_SUBMENU, "Bluetooth", 0, false);
 }

@@ -2,6 +2,7 @@
 #include "core/display.h"
 #include "core/settings.h"
 #include "core/utils.h"
+#include "modules/mali/MaliWiki.h"
 #include "modules/ir/TV-B-Gone.h"
 #include "modules/ir/custom_ir.h"
 #include "modules/ir/ir_jammer.h"
@@ -22,6 +23,7 @@ void IRMenu::optionsMenu() {
         {"Configurar", [this]() { configMenu(); }},
     };
     addOptionToMainMenu();
+    options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::IR); }});
 
     String txt = "Infravermelho";
     txt += " Tx: " + String(bruceConfigPins.irTx) + " Rx: " + String(bruceConfigPins.irRx) +

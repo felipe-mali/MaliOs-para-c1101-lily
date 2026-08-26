@@ -2,6 +2,7 @@
 #include "core/display.h"
 #include "core/settings.h"
 #include "core/utils.h"
+#include "modules/mali/MaliWiki.h"
 #include "modules/rf/record.h"
 #include "modules/rf/rf_bruteforce.h"
 #include "modules/rf/rf_jammer.h"
@@ -33,6 +34,7 @@ void RFMenu::optionsMenu() {
         {"Configurar",      [this]() { configMenu(); }},
     };
     addOptionToMainMenu();
+    options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::SUB_GHZ); }});
 
     delay(200);
     String txt = "Radiofrequencia";

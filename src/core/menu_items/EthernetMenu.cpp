@@ -3,6 +3,7 @@
 #include "core/display.h"
 #include "core/settings.h"
 #include "core/utils.h"
+#include "modules/mali/MaliWiki.h"
 #include "modules/ethernet/ARPScanner.h"
 #include "modules/ethernet/DHCPStarvation.h"
 #include "modules/ethernet/EthernetHelper.h"
@@ -52,6 +53,7 @@ void EthernetMenu::optionsMenu() {
          }}
     };
     addOptionToMainMenu();
+    options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::ETHERNET); }});
 
     delay(200);
 

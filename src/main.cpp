@@ -11,6 +11,7 @@
 #include "esp_heap_caps.h"
 #include "esp_task_wdt.h"
 #include "esp_wifi.h"
+#include "modules/mali/MaliCounter.h"
 #include <functional>
 #include <string>
 #include <vector>
@@ -450,6 +451,7 @@ void setup() {
         SAFE_STACK_BUFFER_SIZE / 4
     ); // Must be invoked before Serial.begin(). Default is 256 chars
     Serial.begin(115200);
+    MaliCounter::printBootDiagnostics();
 
     log_d("Total heap: %d", ESP.getHeapSize());
     log_d("Free heap: %d", ESP.getFreeHeap());
