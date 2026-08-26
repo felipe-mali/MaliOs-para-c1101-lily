@@ -59,6 +59,7 @@ void WifiMenu::optionsMenu() {
     if (WiFi.getMode() & WIFI_MODE_STA && WiFi.isConnected()) {
         options.push_back({"Info do AP", displayAPInfo});
     }
+    options.push_back({"WebUI", loopOptionsWebUi});
     options.push_back({"Ataques Wi-Fi", wifi_atk_menu});
     options.push_back({"Evil Portal", [=]() {
                            // WebUI cleanup now handled automatically inside EvilPortal constructor

@@ -3,7 +3,6 @@
 #include "core/massStorage.h"
 #include "core/sd_functions.h"
 #include "core/utils.h"
-#include "core/wifi/webInterface.h"
 #include "core/connect/file_sharing.h"
 #include "core/connect/serial_commands.h"
 
@@ -11,7 +10,6 @@ void FileMenu::optionsMenu() {
     options.clear();
     if (setupSdCard()) options.push_back({"SD Card", [=]() { loopSD(SD); }});
     options.push_back({"LittleFS", [=]() { loopSD(LittleFS); }});
-    options.push_back({"WebUI", loopOptionsWebUi});
 
 #if !defined(LITE_VERSION)
     options.push_back({"Conectar", [=]() {
@@ -27,7 +25,7 @@ void FileMenu::optionsMenu() {
 #endif
 
 #if defined(SOC_USB_OTG_SUPPORTED)
-    options.push_back({"Armazenamento USB", [=]() { MassStorage(); }});
+    options.push_back({"USB Mass Storage", [=]() { MassStorage(); }});
 #endif
     addOptionToMainMenu();
 
