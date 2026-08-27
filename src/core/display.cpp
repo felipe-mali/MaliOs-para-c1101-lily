@@ -1,6 +1,7 @@
 #include "display.h"
 #include "core/led_control.h"
 #include "core/wifi/webInterface.h" // for server
+#include "core/wifi/MaliWifiWebApi.h"
 #include "core/wifi/wg.h"           //for isConnectedWireguard to print wireguard lock
 #include "mykeyboard.h"
 #include "settings.h" //for timeStr
@@ -573,6 +574,7 @@ int loopOptions(
     while (1) {
         // Check for shutdown before drawing menu to avoid drawing a black bar on the screen
         if (exit) break;
+        MaliWifiWebApi::service();
         if (MaliQrService::processPendingDisplay()) {
             // The QR page clears the screen when it closes. Rebuild the active
             // menu and restart the select-button grace period before continuing.

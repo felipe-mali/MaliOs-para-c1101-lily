@@ -139,6 +139,15 @@ const WikiEntry wikiEntries[] PROGMEM = {
     ),
     WIKI_ENTRY(
         WIFI,
+        "Mali Portal",
+        "Inicia o portal cativo de laboratorio com o template seguro selecionado no Portal Studio do WebUI.",
+        "Permite demonstrar navegacao cativa com dados ficticios, sem depender de servicos externos.",
+        "Abrir o Mali Lab em aparelhos proprios de uma bancada de treinamento.",
+        "Wi-Fi ESP32-S3 e LittleFS para os templates.",
+        "Use somente em aparelhos e redes proprios ou em laboratorio autorizado. O Mali Lab nao solicita senhas reais."
+    ),
+    WIKI_ENTRY(
+        WIFI,
         "Evil Portal",
         "Cria AP e portal cativo DNS/HTTP com pagina padrao ou HTML do armazenamento e registra envios em CSV.",
         "Demonstra riscos de portais falsos em treinamento autorizado.",

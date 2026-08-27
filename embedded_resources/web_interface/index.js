@@ -251,11 +251,12 @@ async function uploadFile() {
     let fd = new FormData();
     let filename = file.webkitRelativePath || file.name;
     let fileId = stringToId(filename);
-    fd.append("file", file, filename);
     fd.append("folder", currentPath);
     fd.append("fs", currentDrive);
+    fd.append("file", file, filename);
 
-    let realUrl = `/upload`;
+    const uploadQuery = new URLSearchParams({ folder: currentPath, fs: currentDrive });
+    let realUrl = `/upload?${uploadQuery.toString()}`;
     if (IS_DEV) realUrl = "/bruce" + realUrl;
     let req = new XMLHttpRequest();
     req.upload.onprogress = (e) => {
@@ -1136,7 +1137,7 @@ $(".act-save-credential").addEventListener("click", async (e) => {
   }
 
   Dialog.loading.show("Saving WiFi Credentials...");
-  await requestGet("/wifi", {
+  await requestPost("/wifi", {
     usr: username,
     pwd: password,
   });
@@ -1671,6 +1672,10 @@ const qrStudioStatus = $("#qr-status");
 const qrStudioSize = $("#qr-payload-size");
 const qrStudioPreviewButton = $("#qr-preview-button");
 const qrStudioShowButton = $("#qr-show-button");
+const qrFavoriteName = $("#qr-favorite-name");
+const qrFavoritesList = $("#qr-favorites-list");
+const qrHistoryList = $("#qr-history-list");
+let qrFavoriteOriginalName = "";
 
 function qrStudioUtf8Length(value) {
   if (window.TextEncoder) return new TextEncoder().encode(value).length;
@@ -1730,7 +1735,7 @@ function qrStudioBuildRequest() {
     formData.append("type", "pix");
     formData.append("key", key);
     formData.append("amount", amount);
-    return { formData: formData, payload: null };
+    return { formData: formData, payload: null, type: type };
   }
 
   let payload = "";
@@ -1738,8 +1743,20 @@ function qrStudioBuildRequest() {
     const ssid = qrStudioRequire($("#qr-wifi-ssid").value, "O SSID");
     const security = $("#qr-wifi-security").value;
     const password = $("#qr-wifi-password").value;
-    if (security === "WPA" && !password)
-      throw new Error("Informe a senha da rede WPA/WPA2.");
+    const ssidBytes = qrStudioUtf8Length(ssid);
+    const passwordBytes = qrStudioUtf8Length(password);
+    if (ssidBytes > 32)
+      throw new Error("O SSID deve ter no maximo 32 bytes.");
+    if (
+      security === "WPA" &&
+      !(
+        (passwordBytes >= 8 && passwordBytes <= 63) ||
+        (password.length === 64 && /^[0-9a-f]{64}$/i.test(password))
+      )
+    )
+      throw new Error(
+        "A senha WPA/WPA2 deve ter 8 a 63 bytes ou ser uma PSK hexadecimal de 64 digitos.",
+      );
 
     payload = `WIFI:T:${security};S:${qrStudioEscapeWifi(ssid)};`;
     if (security === "WPA")
@@ -1782,6 +1799,7 @@ function qrStudioBuildRequest() {
     const lines = [
       "BEGIN:VCARD",
       "VERSION:3.0",
+      `N:${qrStudioEscapeVcard(name)};;;;`,
       `FN:${qrStudioEscapeVcard(name)}`,
     ];
     if (phone) lines.push(`TEL:${qrStudioEscapeVcard(phone)}`);
@@ -1799,7 +1817,25 @@ function qrStudioBuildRequest() {
     );
 
   formData.append("payload", payload);
-  return { formData: formData, payload: payload };
+  return { formData: formData, payload: payload, type: type };
+}
+
+function qrStudioLabel(type) {
+  return {
+    pix: "PIX",
+    wifi: "Wi-Fi",
+    url: "URL",
+    text: "Texto",
+    phone: "Telefone",
+    email: "E-mail",
+    vcard: "Contato",
+  }[type] || "QR";
+}
+
+function qrStudioMayPersist(request) {
+  if (request.type !== "wifi") return true;
+  if ($("#qr-wifi-security").value === "nopass") return true;
+  return $("#qr-wifi-persist").checked;
 }
 
 function qrStudioUpdateSize() {
@@ -1839,6 +1875,173 @@ async function qrStudioPost(path, formData, expectBinary) {
   }
 
   return expectBinary ? response.arrayBuffer() : response.text();
+}
+
+async function qrStudioFetch(path, options, expectJson) {
+  const response = await fetch((IS_DEV ? "/bruce" : "") + path, {
+    credentials: "same-origin",
+    ...(options || {}),
+  });
+  if (response.status === 401) {
+    handleAuthError();
+    throw new Error("Sessao expirada.");
+  }
+  if (!response.ok) {
+    const detail = (await response.text()).trim();
+    throw new Error(detail || `Solicitacao recusada (${response.status}).`);
+  }
+  return expectJson ? response.json() : response.text();
+}
+
+function qrStudioActionButton(label, action, danger) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = `btn-action qr-list-action${danger ? " danger" : ""}`;
+  button.textContent = label;
+  button.addEventListener("click", action);
+  return button;
+}
+
+async function qrStudioPreviewPayload(payload) {
+  const formData = new FormData();
+  formData.append("payload", payload);
+  qrStudioSetBusy(true);
+  try {
+    const preview = await qrStudioPost("/api/qr/preview", formData, true);
+    qrStudioDrawPreview(preview);
+    qrStudioSetStatus("Preview gerado com sucesso.", "success");
+  } finally {
+    qrStudioSetBusy(false);
+  }
+}
+
+async function qrStudioShowPayload(payload, label) {
+  const formData = new FormData();
+  formData.append("payload", payload);
+  formData.append("history", "1");
+  formData.append("label", label || "QR salvo");
+  await qrStudioPost("/api/qr/show", formData, false);
+  qrStudioSetStatus("QR Code enviado para o Mali.", "success");
+}
+
+function qrStudioRenderEmpty(container, message) {
+  container.replaceChildren();
+  const empty = document.createElement("p");
+  empty.className = "qr-library-empty";
+  empty.textContent = message;
+  container.appendChild(empty);
+}
+
+function qrStudioLoadFavoriteForEdit(item) {
+  qrStudioType.value = "text";
+  $("#qr-text").value = item.payload;
+  qrFavoriteName.value = item.name;
+  qrFavoriteOriginalName = item.name;
+  $("#qr-favorite-edit-note").classList.remove("hidden");
+  qrStudioSelectType();
+  qrStudioForm.scrollIntoView({ behavior: "smooth", block: "start" });
+  qrStudioSetStatus("Favorito carregado para edicao.", "success");
+}
+
+async function qrStudioLoadFavorites() {
+  try {
+    const data = await qrStudioFetch("/api/qr/favorites", {}, true);
+    const items = Array.isArray(data.items) ? data.items : [];
+    if (!items.length) {
+      qrStudioRenderEmpty(qrFavoritesList, "Nenhum favorito salvo.");
+      return;
+    }
+    qrFavoritesList.replaceChildren();
+    items.forEach((item) => {
+      const row = document.createElement("article");
+      row.className = "qr-library-row";
+      const info = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = item.name || "Favorito";
+      const meta = document.createElement("small");
+      meta.textContent = `${qrStudioUtf8Length(item.payload || "")} bytes`;
+      info.append(title, meta);
+
+      const actions = document.createElement("div");
+      actions.className = "qr-library-actions";
+      actions.append(
+        qrStudioActionButton("Preview", () =>
+          qrStudioPreviewPayload(item.payload).catch((error) =>
+            qrStudioSetStatus(error.message, "error"),
+          ),
+        ),
+        qrStudioActionButton("Exibir", () =>
+          qrStudioShowPayload(item.payload, item.name).catch((error) =>
+            qrStudioSetStatus(error.message, "error"),
+          ),
+        ),
+        qrStudioActionButton("Editar", () => qrStudioLoadFavoriteForEdit(item)),
+        qrStudioActionButton(
+          "Excluir",
+          async () => {
+            if (!window.confirm(`Excluir o favorito "${item.name}"?`)) return;
+            try {
+              await qrStudioFetch(
+                `/api/qr/favorites?name=${encodeURIComponent(item.name)}`,
+                { method: "DELETE" },
+                false,
+              );
+              await qrStudioLoadFavorites();
+              qrStudioSetStatus("Favorito excluido.", "success");
+            } catch (error) {
+              qrStudioSetStatus(error.message, "error");
+            }
+          },
+          true,
+        ),
+      );
+      row.append(info, actions);
+      qrFavoritesList.appendChild(row);
+    });
+  } catch (error) {
+    qrStudioRenderEmpty(qrFavoritesList, error.message || "Falha ao carregar favoritos.");
+  }
+}
+
+async function qrStudioLoadHistory() {
+  try {
+    const data = await qrStudioFetch("/api/qr/history", {}, true);
+    $("#qr-history-limit").value = String(data.limit || 5);
+    const items = Array.isArray(data.items) ? data.items : [];
+    if (!items.length) {
+      qrStudioRenderEmpty(qrHistoryList, "O historico esta vazio.");
+      return;
+    }
+    qrHistoryList.replaceChildren();
+    items.forEach((item, index) => {
+      const row = document.createElement("article");
+      row.className = "qr-library-row";
+      const info = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = item.label || `QR recente ${index + 1}`;
+      const meta = document.createElement("small");
+      meta.textContent = `${qrStudioUtf8Length(item.payload || "")} bytes`;
+      info.append(title, meta);
+      const actions = document.createElement("div");
+      actions.className = "qr-library-actions";
+      actions.append(
+        qrStudioActionButton("Preview", () =>
+          qrStudioPreviewPayload(item.payload).catch((error) =>
+            qrStudioSetStatus(error.message, "error"),
+          ),
+        ),
+        qrStudioActionButton("Exibir", () =>
+          qrStudioShowPayload(item.payload, item.label || "QR recente").catch(
+            (error) => qrStudioSetStatus(error.message, "error"),
+          ),
+        ),
+      );
+      row.append(info, actions);
+      qrHistoryList.appendChild(row);
+    });
+  } catch (error) {
+    qrStudioRenderEmpty(qrHistoryList, error.message || "Falha ao carregar historico.");
+  }
 }
 
 function qrStudioDrawPreview(buffer) {
@@ -1894,19 +2097,457 @@ function qrStudioSelectType() {
   qrStudioUpdateSize();
 }
 
-document.querySelectorAll("[data-webui-target]").forEach((button) => {
-  button.addEventListener("click", () => {
-    const target = button.getAttribute("data-webui-target");
-    const showQrStudio = target === "qr";
-    document.querySelectorAll(".files-view").forEach((element) => {
-      element.classList.toggle("hidden", showQrStudio);
-    });
-    $(".qr-studio").classList.toggle("hidden", !showQrStudio);
-    document.querySelectorAll("[data-webui-target]").forEach((navButton) => {
-      navButton.classList.toggle("active", navButton === button);
-    });
+let wifiStatusCache = null;
+
+function showWebuiView(target) {
+  const validTargets = ["home", "files", "qr", "wifi", "portal", "scripts", "system"];
+  if (!validTargets.includes(target)) target = "home";
+  document.querySelectorAll(".webui-view").forEach((element) => {
+    element.classList.toggle("hidden", !element.classList.contains(`${target}-view`));
   });
+  document.querySelectorAll("[data-webui-target]").forEach((button) => {
+    button.classList.toggle(
+      "active",
+      button.getAttribute("data-webui-target") === target,
+    );
+  });
+  if (target === "qr") {
+    qrStudioLoadFavorites();
+    qrStudioLoadHistory();
+  } else if (target === "wifi") {
+    maliWifiLoadStatus();
+  } else if (target === "portal") {
+    portalStudioLoad();
+  } else if (target === "home" || target === "system") {
+    maliSystemLoad();
+  }
+  if (window.history && window.history.replaceState)
+    window.history.replaceState(null, "", `#${target}`);
+}
+
+document.querySelectorAll("[data-webui-target]").forEach((button) => {
+  button.addEventListener("click", () =>
+    showWebuiView(button.getAttribute("data-webui-target")),
+  );
 });
+
+document.querySelectorAll("[data-open-view]").forEach((button) => {
+  button.addEventListener("click", () =>
+    showWebuiView(button.getAttribute("data-open-view")),
+  );
+});
+
+function maliWifiText(id, value, fallback) {
+  $(id).textContent = value === null || value === undefined || value === "" ? fallback || "--" : value;
+}
+
+async function maliWifiLoadStatus() {
+  try {
+    const status = await qrStudioFetch("/api/wifi/status", {}, true);
+    wifiStatusCache = status;
+    const badge = $("#wifi-state-badge");
+    const active = status.connected || (status.ap && status.ap.active);
+    badge.textContent = status.busy
+      ? "PROCESSANDO"
+      : status.connected
+        ? "CONECTADO"
+        : status.ap && status.ap.active
+          ? "AP ATIVO"
+          : "DESCONECTADO";
+    badge.classList.toggle("active", active);
+    badge.classList.toggle("busy", !!status.busy);
+    maliWifiText("#wifi-mode", status.mode);
+    maliWifiText("#wifi-ssid-current", status.ssid);
+    maliWifiText("#wifi-ip", status.ip);
+    maliWifiText("#wifi-rssi", status.rssi === null ? null : `${status.rssi} dBm`);
+    maliWifiText("#wifi-channel", status.channel);
+    maliWifiText("#wifi-mac", status.mac);
+    maliWifiText(
+      "#wifi-ap-state",
+      status.ap && status.ap.active
+        ? `${status.ap.ssid || "AP"} · ${status.ap.stations || 0} cliente(s)`
+        : "Inativo",
+    );
+    maliWifiText("#wifi-ap-ip", status.ap && status.ap.ip);
+    const actionStatus = $("#wifi-action-status");
+    actionStatus.textContent = status.lastError || status.lastAction || "";
+    actionStatus.classList.toggle("error", !!status.lastError);
+  } catch (error) {
+    const actionStatus = $("#wifi-action-status");
+    actionStatus.textContent = error.message || "Nao foi possivel consultar o Wi-Fi.";
+    actionStatus.classList.add("error");
+  }
+}
+
+async function maliWifiPost(path, formData) {
+  await qrStudioPost(path, formData || new FormData(), false);
+  await new Promise((resolve) => window.setTimeout(resolve, 350));
+  await maliWifiLoadStatus();
+}
+
+$("#wifi-connect-security").addEventListener("change", (event) => {
+  const open = event.target.value === "open";
+  $("#wifi-connect-password-wrap").classList.toggle("hidden", open);
+  if (open) $("#wifi-connect-password").value = "";
+});
+
+$("#wifi-connect-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const ssid = $("#wifi-connect-ssid").value.trim();
+  const security = $("#wifi-connect-security").value;
+  const password = $("#wifi-connect-password").value;
+  try {
+    if (!ssid || qrStudioUtf8Length(ssid) > 32)
+      throw new Error("O SSID deve possuir entre 1 e 32 bytes.");
+    const passwordBytes = qrStudioUtf8Length(password);
+    if (
+      security !== "open" &&
+      !(
+        (passwordBytes >= 8 && passwordBytes <= 63) ||
+        (password.length === 64 && /^[0-9a-f]{64}$/i.test(password))
+      )
+    )
+      throw new Error("A senha WPA deve ter 8 a 63 bytes ou 64 digitos hexadecimais.");
+    const formData = new FormData();
+    formData.append("ssid", ssid);
+    formData.append("security", security);
+    formData.append("password", security === "open" ? "" : password);
+    $("#wifi-action-status").textContent = "Enfileirando conexao...";
+    await maliWifiPost("/api/wifi/connect", formData);
+    $("#wifi-connect-password").value = "";
+  } catch (error) {
+    $("#wifi-action-status").textContent = error.message || "Falha ao conectar.";
+    $("#wifi-action-status").classList.add("error");
+  }
+});
+
+$("#wifi-refresh").addEventListener("click", maliWifiLoadStatus);
+$("#wifi-disconnect").addEventListener("click", async () => {
+  if (!window.confirm("Desconectar o STA? A pagina pode perder a conexao atual.")) return;
+  try {
+    await maliWifiPost("/api/wifi/disconnect");
+  } catch (error) {
+    $("#wifi-action-status").textContent = error.message;
+  }
+});
+$("#wifi-ap-start").addEventListener("click", async () => {
+  try {
+    await maliWifiPost("/api/wifi/ap/start");
+  } catch (error) {
+    $("#wifi-action-status").textContent = error.message;
+  }
+});
+$("#wifi-ap-stop").addEventListener("click", async () => {
+  if (!window.confirm("Parar o AP? Esta pagina sera desconectada se estiver usando o AP.")) return;
+  try {
+    await maliWifiPost("/api/wifi/ap/stop");
+  } catch (error) {
+    $("#wifi-action-status").textContent = error.message;
+  }
+});
+$("#wifi-copy-ip").addEventListener("click", async () => {
+  const ip = wifiStatusCache &&
+    (wifiStatusCache.ip || (wifiStatusCache.ap && wifiStatusCache.ap.ip));
+  if (!ip) return;
+  try {
+    await navigator.clipboard.writeText(ip);
+  } catch (_) {
+    const helper = document.createElement("textarea");
+    helper.value = ip;
+    document.body.appendChild(helper);
+    helper.select();
+    document.execCommand("copy");
+    helper.remove();
+  }
+  $("#wifi-action-status").textContent = "IP copiado.";
+});
+
+window.setInterval(() => {
+  if (!$(".wifi-view").classList.contains("hidden")) maliWifiLoadStatus();
+}, 5000);
+
+let portalStudioLoaded = false;
+let portalCurrentName = "";
+let portalTemplates = [];
+
+function portalStudioSetStatus(message, error) {
+  const status = $("#portal-status");
+  status.textContent = message || "";
+  status.classList.toggle("error", !!error);
+}
+
+function portalStudioValidName(name) {
+  return name.length <= 48 && /^[A-Za-z0-9_-]+\.html$/.test(name);
+}
+
+function portalStudioPreview() {
+  $("#portal-preview-frame").srcdoc = $("#portal-template-content").value;
+}
+
+async function portalStudioOpen(name) {
+  portalStudioSetStatus("Carregando template...");
+  try {
+    const content = await qrStudioFetch(
+      `/api/portal/template?name=${encodeURIComponent(name)}`,
+      {},
+      false,
+    );
+    portalCurrentName = name;
+    $("#portal-template-name").value = name;
+    $("#portal-template-content").value = content;
+    portalStudioPreview();
+    portalStudioRenderList();
+    portalStudioSetStatus("Template carregado.");
+  } catch (error) {
+    portalStudioSetStatus(error.message || "Falha ao carregar template.", true);
+  }
+}
+
+function portalStudioRenderList() {
+  const container = $("#portal-template-list");
+  container.replaceChildren();
+  let selectedName = "";
+  portalTemplates.forEach((template) => {
+    if (template.selected) selectedName = template.name;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `portal-template-item${template.name === portalCurrentName ? " active" : ""}`;
+    const label = document.createElement("strong");
+    label.textContent = template.name;
+    const detail = document.createElement("small");
+    detail.textContent = `${template.size} B${template.selected ? " Â· EM USO" : ""}${template.builtIn ? " Â· PADRAO" : ""}`;
+    button.append(label, detail);
+    button.addEventListener("click", () => portalStudioOpen(template.name));
+    container.appendChild(button);
+  });
+  if (!portalTemplates.length) {
+    const empty = document.createElement("p");
+    empty.textContent = "Nenhum template encontrado.";
+    container.appendChild(empty);
+  }
+  const badge = $("#portal-selected-badge");
+  badge.textContent = selectedName || "NENHUM";
+  badge.classList.toggle("active", !!selectedName);
+}
+
+async function portalStudioLoad(force) {
+  try {
+    const response = await qrStudioFetch("/api/portal/templates", {}, true);
+    portalTemplates = Array.isArray(response.items) ? response.items : [];
+    portalStudioRenderList();
+    const selected = portalTemplates.find((item) => item.selected) || portalTemplates[0];
+    if (selected && (force || !portalStudioLoaded || !portalCurrentName)) {
+      await portalStudioOpen(selected.name);
+    }
+    portalStudioLoaded = true;
+  } catch (error) {
+    portalStudioSetStatus(error.message || "Falha ao listar templates.", true);
+  }
+}
+
+async function portalStudioPost(path, fields) {
+  const form = new FormData();
+  Object.entries(fields).forEach(([key, value]) => form.append(key, value));
+  return qrStudioPost(path, form, false);
+}
+
+$("#portal-refresh").addEventListener("click", () => portalStudioLoad(true));
+$("#portal-preview").addEventListener("click", portalStudioPreview);
+$("#portal-new").addEventListener("click", () => {
+  portalCurrentName = "";
+  $("#portal-template-name").value = "novo_portal.html";
+  $("#portal-template-content").value = "<!doctype html>\n<html lang=\"pt-BR\">\n<head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Laboratorio</title></head>\n<body><h1>Portal de laboratorio</h1><p>Use apenas dados ficticios.</p></body>\n</html>";
+  portalStudioPreview();
+  portalStudioRenderList();
+  portalStudioSetStatus("Novo template local. Salve para gravar no MaliOS.");
+});
+$("#portal-save").addEventListener("click", async () => {
+  const name = $("#portal-template-name").value.trim();
+  const content = $("#portal-template-content").value;
+  try {
+    if (!portalStudioValidName(name)) throw new Error("Use nome .html com letras, numeros, _ ou -.");
+    if (!content || new TextEncoder().encode(content).length > 24576)
+      throw new Error("O HTML deve possuir entre 1 byte e 24 KiB.");
+    await portalStudioPost("/api/portal/template", { name, content });
+    portalCurrentName = name;
+    await portalStudioLoad(false);
+    portalStudioSetStatus("Template salvo.");
+  } catch (error) {
+    portalStudioSetStatus(error.message || "Falha ao salvar template.", true);
+  }
+});
+$("#portal-select").addEventListener("click", async () => {
+  const name = $("#portal-template-name").value.trim();
+  try {
+    if (!portalTemplates.some((item) => item.name === name))
+      throw new Error("Salve o template antes de seleciona-lo.");
+    await portalStudioPost("/api/portal/select", { name });
+    await portalStudioLoad(false);
+    portalStudioSetStatus("Template selecionado. Abra MaliOS > Rede > Mali Portal no dispositivo.");
+  } catch (error) {
+    portalStudioSetStatus(error.message || "Falha ao selecionar template.", true);
+  }
+});
+$("#portal-duplicate").addEventListener("click", async () => {
+  const source = $("#portal-template-name").value.trim();
+  const destination = window.prompt("Nome da copia (.html):", source.replace(/\.html$/, "_copia.html"));
+  if (!destination) return;
+  try {
+    if (!portalStudioValidName(destination)) throw new Error("Nome de destino invalido.");
+    await portalStudioPost("/api/portal/duplicate", { source, destination });
+    await portalStudioLoad(false);
+    await portalStudioOpen(destination);
+    portalStudioSetStatus("Template duplicado.");
+  } catch (error) {
+    portalStudioSetStatus(error.message || "Falha ao duplicar template.", true);
+  }
+});
+$("#portal-delete").addEventListener("click", async () => {
+  const name = $("#portal-template-name").value.trim();
+  if (!window.confirm(`Excluir ${name}?`)) return;
+  try {
+    await qrStudioFetch(`/api/portal/template?name=${encodeURIComponent(name)}`, { method: "DELETE" }, false);
+    portalCurrentName = "";
+    await portalStudioLoad(true);
+    portalStudioSetStatus("Template excluido.");
+  } catch (error) {
+    portalStudioSetStatus(error.message || "Falha ao excluir template.", true);
+  }
+});
+$("#portal-upload-input").addEventListener("change", async (event) => {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  try {
+    if (file.size < 1 || file.size > 24576) throw new Error("O arquivo deve ter no maximo 24 KiB.");
+    if (!portalStudioValidName(file.name)) throw new Error("Use um nome .html simples, sem pastas ou espacos.");
+    $("#portal-template-name").value = file.name;
+    $("#portal-template-content").value = await file.text();
+    portalCurrentName = "";
+    portalStudioPreview();
+    portalStudioSetStatus("Arquivo carregado no editor. Pressione SALVAR para gravar.");
+  } catch (error) {
+    portalStudioSetStatus(error.message || "Falha ao importar HTML.", true);
+  } finally {
+    event.target.value = "";
+  }
+});
+
+function maliFormatBytes(value) {
+  if (value === null || value === undefined) return "Nao verificado";
+  const units = ["B", "KiB", "MiB", "GiB"];
+  let amount = Number(value);
+  let unit = 0;
+  while (amount >= 1024 && unit < units.length - 1) {
+    amount /= 1024;
+    unit += 1;
+  }
+  return `${amount.toFixed(unit ? 1 : 0)} ${units[unit]}`;
+}
+
+function maliFormatUptime(totalSeconds) {
+  let seconds = Math.max(0, Number(totalSeconds) || 0);
+  const days = Math.floor(seconds / 86400);
+  seconds %= 86400;
+  const hours = Math.floor(seconds / 3600);
+  seconds %= 3600;
+  const minutes = Math.floor(seconds / 60);
+  const tail = `${hours}h ${minutes}m ${Math.floor(seconds % 60)}s`;
+  return days ? `${days}d ${tail}` : tail;
+}
+
+function maliSystemFillList(selector, entries) {
+  const list = $(selector);
+  list.replaceChildren();
+  entries.forEach(([label, value]) => {
+    const term = document.createElement("dt");
+    const detail = document.createElement("dd");
+    term.textContent = label;
+    detail.textContent = value === null || value === undefined || value === "" ? "Nao verificado" : String(value);
+    list.append(term, detail);
+  });
+}
+
+async function maliSystemLoad() {
+  const dashboardStatus = $("#dashboard-status");
+  const systemStatus = $("#system-status");
+  if (dashboardStatus) dashboardStatus.textContent = "Atualizando diagnostico...";
+  if (systemStatus) systemStatus.textContent = "Atualizando diagnostico...";
+  try {
+    const status = await qrStudioFetch("/api/system/status", {}, true);
+    $("#dashboard-model").textContent = status.model || "Nao verificado";
+    $("#dashboard-version").textContent = `${status.firmware || "MaliOS"} ${status.maliVersion || "dev"}`;
+    $("#dashboard-heap").textContent = maliFormatBytes(status.memory && status.memory.heapFree);
+    $("#dashboard-uptime").textContent = maliFormatUptime(status.uptimeSeconds);
+    if (dashboardStatus) dashboardStatus.textContent = "Dados locais atualizados.";
+
+    const memory = status.memory || {};
+    const storage = status.storage || {};
+    const littlefs = storage.littlefs || {};
+    const sd = storage.sd || {};
+    const network = status.network || {};
+    const energy = status.energy || {};
+    maliSystemFillList("#system-device", [
+      ["Modelo", status.model],
+      ["Firmware", `${status.firmware || "MaliOS"} ${status.maliVersion || "dev"}`],
+      ["Bruce base", status.bruceVersion],
+      ["Chip", `${status.chip || "--"} rev. ${status.chipRevision ?? "--"}`],
+      ["CPU", status.cpuMHz ? `${status.cpuMHz} MHz` : null],
+      ["Tempo ligado", maliFormatUptime(status.uptimeSeconds)],
+      ["Ultimo reset", status.reset ? `${status.reset.reason} (${status.reset.code})` : null],
+    ]);
+    maliSystemFillList("#system-memory", [
+      ["Heap livre", maliFormatBytes(memory.heapFree)],
+      ["Heap minimo", maliFormatBytes(memory.heapMinimum)],
+      ["Maior bloco", maliFormatBytes(memory.heapLargest)],
+      ["PSRAM livre / total", memory.psramPresent ? `${maliFormatBytes(memory.psramFree)} / ${maliFormatBytes(memory.psramTotal)}` : "Nao verificado"],
+      ["Flash total", maliFormatBytes(storage.flashTotal)],
+      ["LittleFS usado / total", `${maliFormatBytes(littlefs.used)} / ${maliFormatBytes(littlefs.total)}`],
+      ["microSD usado / total", sd.mounted ? `${maliFormatBytes(sd.used)} / ${maliFormatBytes(sd.total)}` : "Nao verificado"],
+    ]);
+    maliSystemFillList("#system-runtime", [
+      ["Modo Wi-Fi", network.mode],
+      ["SSID", network.ssid],
+      ["IP", network.ip || network.apIp],
+      ["RSSI", network.rssi === null || network.rssi === undefined ? null : `${network.rssi} dBm`],
+      ["Access Point", network.apActive ? "Ativo" : "Inativo"],
+      ["Bateria", energy.batteryPercent === null || energy.batteryPercent === undefined ? null : `${energy.batteryPercent}%`],
+      ["Carregando", energy.charging ? "Sim" : "Nao"],
+    ]);
+
+    const hardwareContainer = $("#system-hardware");
+    hardwareContainer.replaceChildren();
+    (Array.isArray(status.hardware) ? status.hardware : []).forEach((hardware) => {
+      const item = document.createElement("div");
+      item.className = `system-hardware-item${hardware.status === "Ativo" ? " active" : ""}`;
+      const name = document.createElement("strong");
+      const hardwareStatus = document.createElement("span");
+      const detail = document.createElement("small");
+      name.textContent = hardware.name || "Hardware";
+      hardwareStatus.className = "hardware-status";
+      hardwareStatus.textContent = hardware.status || "Nao verificado";
+      detail.textContent = hardware.detail || "Sem informacao adicional";
+      item.append(name, hardwareStatus, detail);
+      hardwareContainer.appendChild(item);
+    });
+    if (systemStatus) {
+      systemStatus.textContent = "Diagnostico atualizado sem inicializar perifericos.";
+      systemStatus.classList.remove("error");
+    }
+  } catch (error) {
+    const message = error.message || "Nao foi possivel carregar o Dashboard.";
+    if (dashboardStatus) dashboardStatus.textContent = message;
+    if (systemStatus) {
+      systemStatus.textContent = message;
+      systemStatus.classList.add("error");
+    }
+  }
+}
+
+$("#system-refresh").addEventListener("click", maliSystemLoad);
+window.setInterval(() => {
+  if (!$(".home-view").classList.contains("hidden") || !$(".system-view").classList.contains("hidden"))
+    maliSystemLoad();
+}, 10000);
 
 qrStudioType.addEventListener("change", qrStudioSelectType);
 $("#qr-wifi-security").addEventListener("change", qrStudioSelectType);
@@ -1943,6 +2584,11 @@ qrStudioShowButton.addEventListener("click", async () => {
   qrStudioSetStatus("");
   try {
     const request = qrStudioBuildRequest();
+    request.formData.append(
+      "history",
+      qrStudioMayPersist(request) ? "1" : "0",
+    );
+    request.formData.append("label", qrStudioLabel(request.type));
     qrStudioSetBusy(true);
     qrStudioSetStatus("Enviando QR Code para o display...");
     await qrStudioPost("/api/qr/show", request.formData, false);
@@ -1957,7 +2603,57 @@ qrStudioShowButton.addEventListener("click", async () => {
   }
 });
 
+$("#qr-favorite-save").addEventListener("click", async () => {
+  qrStudioSetStatus("");
+  try {
+    const name = qrStudioRequire(qrFavoriteName.value, "O nome do favorito");
+    const request = qrStudioBuildRequest();
+    if (!qrStudioMayPersist(request)) {
+      throw new Error(
+        "Para salvar um QR Wi-Fi protegido, autorize explicitamente a persistencia da senha.",
+      );
+    }
+    request.formData.append("name", name);
+    if (qrFavoriteOriginalName)
+      request.formData.append("originalName", qrFavoriteOriginalName);
+    await qrStudioPost("/api/qr/favorites", request.formData, false);
+    qrFavoriteOriginalName = name;
+    $("#qr-favorite-edit-note").classList.remove("hidden");
+    await qrStudioLoadFavorites();
+    qrStudioSetStatus("Favorito salvo.", "success");
+  } catch (error) {
+    qrStudioSetStatus(error.message || "Nao foi possivel salvar o favorito.", "error");
+  }
+});
+
+$("#qr-favorites-refresh").addEventListener("click", qrStudioLoadFavorites);
+$("#qr-history-refresh").addEventListener("click", qrStudioLoadHistory);
+
+$("#qr-history-clear").addEventListener("click", async () => {
+  if (!window.confirm("Limpar todo o historico de QR Codes?")) return;
+  try {
+    await qrStudioFetch("/api/qr/history/clear", { method: "POST" }, false);
+    await qrStudioLoadHistory();
+    qrStudioSetStatus("Historico limpo.", "success");
+  } catch (error) {
+    qrStudioSetStatus(error.message || "Nao foi possivel limpar o historico.", "error");
+  }
+});
+
+$("#qr-history-limit").addEventListener("change", async (event) => {
+  const formData = new FormData();
+  formData.append("limit", event.target.value);
+  try {
+    await qrStudioPost("/api/qr/history/limit", formData, false);
+    await qrStudioLoadHistory();
+    qrStudioSetStatus("Limite do historico atualizado.", "success");
+  } catch (error) {
+    qrStudioSetStatus(error.message || "Nao foi possivel salvar o limite.", "error");
+  }
+});
+
 qrStudioSelectType();
+showWebuiView(window.location.hash.replace("#", "") || "home");
 
 (async function () {
   await fetchSystemInfo();

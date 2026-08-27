@@ -1,18 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bruce</title>
-    <link rel="stylesheet" href="/index.css" />
+    <title>MaliOS WebUI</title>
     <link rel="stylesheet" href="/theme.css" />
+    <link rel="stylesheet" href="/index.css" />
   </head>
 
   <body>
     <div class="container">
       <div class="header">
         <div class="title" onclick="Dialog.show('info')">
-          Bruce [<span class="bruce-version">dev</span>]
+          <span class="mali-brand">MALI OS</span>
+          <span class="mali-version">v<span class="bruce-version">dev</span></span>
         </div>
         <div class="left-part">
           <button class="btn-action act-oinput" data-action="serial">
@@ -35,6 +36,13 @@
         <button
           class="btn-action active"
           type="button"
+          data-webui-target="home"
+        >
+          Dashboard
+        </button>
+        <button
+          class="btn-action"
+          type="button"
           data-webui-target="files"
         >
           Arquivos
@@ -42,8 +50,57 @@
         <button class="btn-action" type="button" data-webui-target="qr">
           QR Studio
         </button>
+        <button class="btn-action" type="button" data-webui-target="wifi">
+          Wi-Fi
+        </button>
+        <button class="btn-action" type="button" data-webui-target="portal">
+          Portal Studio
+        </button>
+        <button class="btn-action" type="button" data-webui-target="scripts">
+          Scripts
+        </button>
+        <button class="btn-action" type="button" data-webui-target="system">
+          Sistema
+        </button>
       </nav>
-      <div class="free-space files-view">
+      <section class="webui-view home-view mali-home" aria-labelledby="mali-home-title">
+        <div class="mali-hero">
+          <div>
+            <span class="mali-kicker">CONTROLE LOCAL · OFFLINE</span>
+            <h1 id="mali-home-title">MALI OS</h1>
+            <p>Ferramentas do T-Embed, arquivos e diagnostico em uma interface local.</p>
+          </div>
+          <span class="mali-online-dot">WEBUI ATIVO</span>
+        </div>
+        <div class="dashboard-summary" aria-live="polite">
+          <div><span>MODELO</span><strong id="dashboard-model">--</strong></div>
+          <div><span>FIRMWARE</span><strong id="dashboard-version">--</strong></div>
+          <div><span>HEAP LIVRE</span><strong id="dashboard-heap">--</strong></div>
+          <div><span>TEMPO LIGADO</span><strong id="dashboard-uptime">--</strong></div>
+        </div>
+        <p id="dashboard-status" class="mali-inline-status" role="status"></p>
+        <div class="mali-card-grid">
+          <button class="mali-card" type="button" data-open-view="files">
+            <strong>Arquivos</strong><span>SD e LittleFS</span>
+          </button>
+          <button class="mali-card" type="button" data-open-view="qr">
+            <strong>QR Studio</strong><span>PIX, Wi-Fi, URL e contato</span>
+          </button>
+          <button class="mali-card" type="button" data-open-view="wifi">
+            <strong>Wi-Fi</strong><span>Status e administracao segura</span>
+          </button>
+          <button class="mali-card" type="button" data-open-view="portal">
+            <strong>Portal Studio</strong><span>Templates do Mali Lab</span>
+          </button>
+          <button class="mali-card" type="button" data-open-view="scripts">
+            <strong>Scripts</strong><span>Gerencie JavaScript pelo File Manager</span>
+          </button>
+          <button class="mali-card" type="button" data-open-view="system">
+            <strong>Sistema</strong><span>Firmware, memoria e hardware</span>
+          </button>
+        </div>
+      </section>
+      <div class="webui-view free-space files-view hidden">
         <span
           class="btn-action act-browse block-space free-sd"
           data-path="/"
@@ -59,7 +116,7 @@
           LittleFS [<span>0 MB</span>]
         </span>
       </div>
-      <div class="action-content files-view">
+      <div class="webui-view action-content files-view hidden">
         <span class="breadcrumb">
           <button
             class="icon-action"
@@ -213,7 +270,7 @@
           </button>
         </div>
       </div>
-      <div class="content files-view">
+      <div class="webui-view content files-view hidden">
         <table class="table explorer">
           <thead>
             <tr>
@@ -225,7 +282,7 @@
           <tbody></tbody>
         </table>
       </div>
-      <section class="qr-studio hidden" aria-labelledby="qr-studio-title">
+      <section class="webui-view qr-studio qr-view hidden" aria-labelledby="qr-studio-title">
         <div class="qr-studio-head">
           <h1 id="qr-studio-title">QR Studio</h1>
           <p>
@@ -289,11 +346,17 @@
                   id="qr-wifi-password"
                   name="wifi-password"
                   type="password"
-                  maxlength="63"
+                  maxlength="64"
                   autocomplete="new-password"
                 />
               </div>
-              <small>A senha permanece apenas nesta pagina e nao e salva.</small>
+              <label class="qr-consent" for="qr-wifi-persist">
+                <input id="qr-wifi-persist" type="checkbox" />
+                Permitir salvar esta senha em Favoritos e Ultimos QR
+              </label>
+              <small>
+                Desmarcado por padrao: a senha permanece apenas nesta pagina.
+              </small>
             </div>
 
             <div class="qr-fields hidden" data-qr-fields="url">
@@ -407,6 +470,23 @@
                 EXIBIR NO MALI
               </button>
             </div>
+            <div class="qr-favorite-editor">
+              <label for="qr-favorite-name">Nome do favorito</label>
+              <div>
+                <input
+                  id="qr-favorite-name"
+                  type="text"
+                  maxlength="48"
+                  placeholder="Ex.: Site, PIX Empresa"
+                />
+                <button id="qr-favorite-save" class="btn-action" type="button">
+                  SALVAR FAVORITO
+                </button>
+              </div>
+              <small id="qr-favorite-edit-note" class="hidden">
+                Editando favorito existente. Salvar atualiza o registro.
+              </small>
+            </div>
             <p
               id="qr-status"
               class="qr-status"
@@ -420,6 +500,195 @@
             <p>Preview gerado pelo proprio MaliOS.</p>
           </div>
         </div>
+        <div class="qr-library-grid">
+          <section class="qr-library-card" aria-labelledby="qr-favorites-title">
+            <div class="qr-library-head">
+              <h2 id="qr-favorites-title">Favoritos</h2>
+              <button id="qr-favorites-refresh" class="btn-action" type="button">
+                ATUALIZAR
+              </button>
+            </div>
+            <div id="qr-favorites-list" class="qr-library-list"></div>
+          </section>
+          <section class="qr-library-card" aria-labelledby="qr-history-title">
+            <div class="qr-library-head">
+              <h2 id="qr-history-title">Ultimos QR</h2>
+              <div class="qr-history-controls">
+                <button id="qr-history-refresh" class="btn-action" type="button">
+                  ATUALIZAR
+                </button>
+                <label for="qr-history-limit">Limite</label>
+                <select id="qr-history-limit">
+                  <option value="3">3</option>
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                </select>
+                <button id="qr-history-clear" class="btn-action" type="button">
+                  LIMPAR
+                </button>
+              </div>
+            </div>
+            <div id="qr-history-list" class="qr-library-list"></div>
+          </section>
+        </div>
+      </section>
+      <section class="webui-view wifi-view mali-page hidden" aria-labelledby="wifi-page-title">
+        <div class="mali-page-head">
+          <div>
+            <span class="mali-kicker">REDE DO DISPOSITIVO</span>
+            <h1 id="wifi-page-title">Wi-Fi</h1>
+          </div>
+          <button id="wifi-refresh" class="btn-action" type="button">ATUALIZAR</button>
+        </div>
+        <p class="mali-page-note">
+          A senha digitada e usada somente para esta conexao e nao e exibida nem salva pelo WebUI.
+        </p>
+        <div class="wifi-layout">
+          <section class="mali-panel">
+            <div class="mali-panel-head">
+              <h2>Status</h2>
+              <span id="wifi-state-badge" class="mali-badge">CARREGANDO</span>
+            </div>
+            <dl class="wifi-status-grid">
+              <div><dt>Modo</dt><dd id="wifi-mode">--</dd></div>
+              <div><dt>SSID</dt><dd id="wifi-ssid-current">--</dd></div>
+              <div><dt>IP local</dt><dd id="wifi-ip">--</dd></div>
+              <div><dt>RSSI</dt><dd id="wifi-rssi">--</dd></div>
+              <div><dt>Canal</dt><dd id="wifi-channel">--</dd></div>
+              <div><dt>MAC</dt><dd id="wifi-mac">--</dd></div>
+              <div><dt>AP</dt><dd id="wifi-ap-state">--</dd></div>
+              <div><dt>IP do AP</dt><dd id="wifi-ap-ip">--</dd></div>
+            </dl>
+            <p id="wifi-action-status" class="mali-inline-status" role="status"></p>
+            <button id="wifi-copy-ip" class="btn-action" type="button">COPIAR IP</button>
+          </section>
+          <section class="mali-panel">
+            <div class="mali-panel-head"><h2>Conectar em STA</h2></div>
+            <form id="wifi-connect-form" class="mali-form" novalidate>
+              <label for="wifi-connect-ssid">SSID</label>
+              <input id="wifi-connect-ssid" maxlength="32" autocomplete="off" />
+              <label for="wifi-connect-security">Seguranca</label>
+              <select id="wifi-connect-security">
+                <option value="wpa">WPA / WPA2</option>
+                <option value="open">Rede aberta</option>
+              </select>
+              <div id="wifi-connect-password-wrap">
+                <label for="wifi-connect-password">Senha</label>
+                <input
+                  id="wifi-connect-password"
+                  type="password"
+                  maxlength="64"
+                  autocomplete="new-password"
+                />
+              </div>
+              <div class="mali-form-actions">
+                <button class="btn-action btn-default" type="submit">CONECTAR</button>
+                <button id="wifi-disconnect" class="btn-action" type="button">DESCONECTAR STA</button>
+              </div>
+            </form>
+          </section>
+          <section class="mali-panel wifi-ap-panel">
+            <div class="mali-panel-head"><h2>Access Point MaliOS</h2></div>
+            <p>
+              Usa o SSID e a senha de AP ja configurados no firmware. As credenciais nao sao expostas aqui.
+            </p>
+            <div class="mali-form-actions">
+              <button id="wifi-ap-start" class="btn-action btn-default" type="button">INICIAR AP</button>
+              <button id="wifi-ap-stop" class="btn-action" type="button">PARAR AP</button>
+            </div>
+            <small>Parar o AP encerra esta pagina se o navegador estiver conectado por ele.</small>
+          </section>
+        </div>
+      </section>
+      <section class="webui-view portal-view mali-page hidden" aria-labelledby="portal-studio-title">
+        <div class="mali-page-head">
+          <div>
+            <span class="mali-kicker">LABORATORIO LOCAL</span>
+            <h1 id="portal-studio-title">Portal Studio</h1>
+          </div>
+          <button id="portal-refresh" class="btn-action" type="button">ATUALIZAR</button>
+        </div>
+        <p class="mali-page-note">
+          Gerencie templates locais do Mali Portal. Use dados ficticios e somente equipamentos ou redes autorizados.
+        </p>
+        <div class="portal-studio-layout">
+          <section class="mali-panel portal-template-panel">
+            <div class="mali-panel-head">
+              <h2>Templates no LittleFS</h2>
+              <span id="portal-selected-badge" class="mali-badge">--</span>
+            </div>
+            <div id="portal-template-list" class="portal-template-list"></div>
+            <label class="portal-upload-label" for="portal-upload-input">Importar arquivo HTML</label>
+            <input id="portal-upload-input" type="file" accept=".html,text/html" />
+            <small>Limite por template: 24 KiB. Maximo: 16 templates.</small>
+          </section>
+          <section class="mali-panel portal-editor-panel">
+            <div class="mali-panel-head"><h2>Editor</h2></div>
+            <label for="portal-template-name">Nome do arquivo</label>
+            <input id="portal-template-name" maxlength="48" value="mali_lab.html" autocomplete="off" />
+            <label for="portal-template-content">HTML</label>
+            <textarea id="portal-template-content" rows="18" spellcheck="false"></textarea>
+            <div class="portal-editor-actions">
+              <button id="portal-new" class="btn-action" type="button">NOVO</button>
+              <button id="portal-save" class="btn-action btn-default" type="button">SALVAR</button>
+              <button id="portal-select" class="btn-action" type="button">USAR NO MALI PORTAL</button>
+              <button id="portal-duplicate" class="btn-action" type="button">DUPLICAR</button>
+              <button id="portal-delete" class="btn-action portal-danger" type="button">EXCLUIR</button>
+            </div>
+            <p id="portal-status" class="mali-inline-status" role="status"></p>
+          </section>
+          <section class="mali-panel portal-preview-panel">
+            <div class="mali-panel-head">
+              <h2>Preview local protegido</h2>
+              <button id="portal-preview" class="btn-action" type="button">ATUALIZAR PREVIEW</button>
+            </div>
+            <iframe id="portal-preview-frame" title="Preview do portal" sandbox=""></iframe>
+            <small>Scripts, formularios e navegacao ficam bloqueados somente nesta previa.</small>
+          </section>
+        </div>
+      </section>
+      <section class="webui-view scripts-view mali-page hidden" aria-labelledby="scripts-page-title">
+        <div class="mali-page-head">
+          <div><span class="mali-kicker">AUTOMACAO LOCAL</span><h1 id="scripts-page-title">Scripts</h1></div>
+          <button class="btn-action" type="button" data-open-view="files">ABRIR ARQUIVOS</button>
+        </div>
+        <div class="scripts-layout">
+          <section class="mali-panel">
+            <div class="mali-panel-head"><h2>JavaScript no MaliOS</h2></div>
+            <p>Use o File Manager para enviar, editar e executar arquivos suportados pelo interpretador herdado do Bruce.</p>
+            <p>Os scripts permanecem no SD ou LittleFS selecionado. Revise o conteudo antes de executar.</p>
+          </section>
+          <section class="mali-panel">
+            <div class="mali-panel-head"><h2>Fluxo recomendado</h2></div>
+            <ol><li>Abra Arquivos.</li><li>Selecione SD ou LittleFS.</li><li>Envie ou edite o script.</li><li>Execute apenas codigo conhecido.</li></ol>
+          </section>
+        </div>
+      </section>
+      <section class="webui-view system-view mali-page hidden" aria-labelledby="system-page-title">
+        <div class="mali-page-head">
+          <div><span class="mali-kicker">DIAGNOSTICO</span><h1 id="system-page-title">Sistema</h1></div>
+          <button id="system-refresh" class="btn-action" type="button">ATUALIZAR</button>
+        </div>
+        <p class="mali-page-note">Somente leitura. O Dashboard nao inicializa radios nem altera o modo USB.</p>
+        <div class="system-layout">
+          <section class="mali-panel">
+            <div class="mali-panel-head"><h2>Dispositivo</h2></div>
+            <dl id="system-device" class="system-detail-list"></dl>
+          </section>
+          <section class="mali-panel">
+            <div class="mali-panel-head"><h2>Memoria e armazenamento</h2></div>
+            <dl id="system-memory" class="system-detail-list"></dl>
+          </section>
+          <section class="mali-panel">
+            <div class="mali-panel-head"><h2>Rede e energia</h2></div>
+            <dl id="system-runtime" class="system-detail-list"></dl>
+          </section>
+          <section class="mali-panel system-hardware-panel">
+            <div class="mali-panel-head"><h2>Status de hardware</h2></div>
+            <div id="system-hardware" class="system-hardware-list"></div>
+          </section>
+        </div>
+        <p id="system-status" class="mali-inline-status" role="status"></p>
       </section>
     </div>
     <template id="t">

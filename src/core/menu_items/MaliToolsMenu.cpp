@@ -2,6 +2,7 @@
 
 #include "core/main_menu.h"
 #include "core/utils.h"
+#include "modules/mali/MaliQrMenu.h"
 #include "modules/mali/MaliSystemInfo.h"
 #include "modules/mali/MaliWiki.h"
 
@@ -12,6 +13,7 @@ void MaliToolsMenu::optionsMenu() {
             {"Info. do Sistema", MaliSystemInfo::showSystemInfo   },
             {"Status do Hardware", MaliSystemInfo::showHardwareStatus},
             {"Energia", MaliSystemInfo::showEnergy               },
+            {"QR", MaliQrMenu::open                              },
             {"Acesso Rapido", [this]() { quickAccessMenu(); }     },
             {"Sobre o MaliOS", MaliSystemInfo::showAbout          },
             {"Menu Principal", backToMenu                         },

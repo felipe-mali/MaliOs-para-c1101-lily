@@ -1,5 +1,6 @@
 #include "MaliQrService.h"
 
+#include "MaliQrStore.h"
 #include "modules/others/qrcode_menu.h"
 #include <cmath>
 #include <cstring>
@@ -10,6 +11,8 @@ namespace {
 
 struct PendingQrDisplay {
     char payload[MaliQrService::kMaxPayloadBytes + 1];
+    char label[49];
+    bool recordHistory;
 };
 
 StaticQueue_t displayQueueControl;
@@ -155,10 +158,11 @@ bool validatePayload(const String &payload, String &errorOut) {
     return true;
 }
 
-QueueResult enqueueDisplay(const String &payload) {
+QueueResult enqueueDisplay(const String &payload, bool recordHistory, const String &historyLabel) {
     const size_t length = payload.length();
     String validationError;
     if (!validatePayload(payload, validationError)) return QueueResult::Invalid;
+    if (historyLabel.length() > 48) return QueueResult::Invalid;
 
     begin();
     if (!displayQueue) return QueueResult::Full;
@@ -166,6 +170,9 @@ QueueResult enqueueDisplay(const String &payload) {
     PendingQrDisplay pending = {};
     memcpy(pending.payload, payload.c_str(), length);
     pending.payload[length] = '\0';
+    memcpy(pending.label, historyLabel.c_str(), historyLabel.length());
+    pending.label[historyLabel.length()] = '\0';
+    pending.recordHistory = recordHistory;
 
     if (xQueueSend(displayQueue, &pending, 0) != pdPASS) return QueueResult::Full;
 
@@ -174,20 +181,39 @@ QueueResult enqueueDisplay(const String &payload) {
 }
 
 bool processPendingDisplay() {
+    MaliQrStore::service();
     begin();
     if (!displayQueue) return false;
 
     PendingQrDisplay pending = {};
-    if (xQueueReceive(displayQueue, &pending, 0) != pdPASS) return false;
+    if (xQueuePeek(displayQueue, &pending, 0) != pdPASS) return false;
 
     const size_t length = strnlen(pending.payload, sizeof(pending.payload));
     if (length == 0 || length > kMaxPayloadBytes) {
         Serial.println("[MaliQr] Pedido descartado por tamanho invalido");
+        xQueueReceive(displayQueue, &pending, 0);
         return true;
     }
 
     Serial.printf("[MaliQr] Exibindo pedido (%u bytes)\n", static_cast<unsigned>(length));
-    qrcode_display(String(pending.payload));
+    const QrDisplayResult result = qrcode_display_try(String(pending.payload), 0);
+    if (result == QrDisplayResult::EncoderBusy) {
+        // Keep the accepted request queued. It will be retried from the next
+        // UI loop instead of being silently lost while a preview is encoding.
+        return false;
+    }
+
+    xQueueReceive(displayQueue, &pending, 0);
+    if (result == QrDisplayResult::Displayed && pending.recordHistory) {
+        String storeError;
+        const MaliQrStore::RecordResult recordResult = MaliQrStore::recordSuccessfulDisplay(
+            String(pending.payload), String(pending.label), &storeError
+        );
+        if (recordResult == MaliQrStore::RecordResult::Invalid ||
+            recordResult == MaliQrStore::RecordResult::StorageUnavailable) {
+            Serial.println("[MaliQr] Historico nao registrado: " + storeError);
+        }
+    }
     return true;
 }
 

@@ -26,7 +26,9 @@ bool validatePayload(const String &payload, String &errorOut);
 // Validates and copies a payload into the single-entry display queue.
 // This function is safe to call from an AsyncWebServer task and never touches
 // the TFT. A full queue is left unchanged.
-QueueResult enqueueDisplay(const String &payload);
+QueueResult enqueueDisplay(
+    const String &payload, bool recordHistory = true, const String &historyLabel = ""
+);
 
 // Consumes at most one queued request and displays it from the caller's UI
 // context. Returns true when a request was consumed.

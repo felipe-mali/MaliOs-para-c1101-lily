@@ -21,7 +21,8 @@ class EvilPortal {
 public:
     EvilPortal(
         String tssid = "", uint8_t channel = 6, bool deauth = false, bool verifyPwd = false,
-        bool autoMode = false, bool backgroundMode = false, String templateFile = ""
+        bool autoMode = false, bool backgroundMode = false, String templateFile = "",
+        FS *templateFs = nullptr
     );
     ~EvilPortal();
 
@@ -58,6 +59,7 @@ private:
     bool _autoMode;
     bool _backgroundMode;
     String _autoTemplateFile;
+    FS *_autoTemplateFs = nullptr;
 
     wifi_mode_t _originalWifiMode;
     bool _wifiWasConnected;
@@ -72,7 +74,7 @@ private:
     String htmlPage;
     String htmlFileName;
     bool isDefaultHtml = true;
-    FS *fsHtmlFile;
+    FS *fsHtmlFile = nullptr;
 
     String lastCred;
     int totalCapturedCredentials = 0;

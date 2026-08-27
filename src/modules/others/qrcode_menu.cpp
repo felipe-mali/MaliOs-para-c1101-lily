@@ -6,15 +6,11 @@
 #include "core/settings.h"
 #include "core/utils.h"
 #include "modules/mali/MaliQrService.h"
+#include "modules/mali/MaliQrStore.h"
 
-void qrcode_display(const String &qrcodeUrl) {
+QrDisplayResult qrcode_display_try(const String &qrcodeUrl, TickType_t timeoutTicks) {
 #ifdef HAS_SCREEN
-    if (!MaliQrService::lockEncoder(pdMS_TO_TICKS(1000))) {
-        Serial.println("[MaliQr] Encoder ocupado; exibicao cancelada");
-        displayError("QR ocupado");
-        delay(1000);
-        return;
-    }
+    if (!MaliQrService::lockEncoder(timeoutTicks)) return QrDisplayResult::EncoderBusy;
 
     QRcode qrcode(&tft);
     qrcode.init();
@@ -26,13 +22,31 @@ void qrcode_display(const String &qrcodeUrl) {
         tft.fillScreen(bruceConfig.bgColor);
         displayError("Sem memoria para QR");
         delay(1200);
-        return;
+        return QrDisplayResult::EncodeFailed;
     }
 
     delay(300); // Due to M5 sel press, it could be confusing with next line
     while (!check(EscPress) && !check(SelPress)) delay(100);
     tft.fillScreen(bruceConfig.bgColor);
 #endif
+    return QrDisplayResult::Displayed;
+}
+
+void qrcode_display(const String &qrcodeUrl) {
+    const QrDisplayResult result = qrcode_display_try(qrcodeUrl, pdMS_TO_TICKS(1000));
+    if (result == QrDisplayResult::EncoderBusy) {
+        Serial.println("[MaliQr] Encoder ocupado; exibicao cancelada");
+        displayError("QR ocupado");
+        delay(1000);
+    } else if (result == QrDisplayResult::Displayed && !qrcodeUrl.startsWith("WIFI:")) {
+        String storeError;
+        const MaliQrStore::RecordResult recordResult =
+            MaliQrStore::recordSuccessfulDisplay(qrcodeUrl, "", &storeError);
+        if (recordResult == MaliQrStore::RecordResult::Invalid ||
+            recordResult == MaliQrStore::RecordResult::StorageUnavailable) {
+            Serial.println("[MaliQr] Historico nao registrado: " + storeError);
+        }
+    }
 }
 
 void display_custom_qrcode() {

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bruce</title>
-    <link rel="stylesheet" href="/index.css">
+    <title>MaliOS WebUI</title>
     <link rel="stylesheet" href="/theme.css">
+    <link rel="stylesheet" href="/index.css">
 </head>
 
 <body>
@@ -14,18 +14,18 @@
         <form action="/login" method="POST">
             <div class="dialog login">
                 <div class="dialog-head">
-                    Login
+                    MALI OS · ACESSO LOCAL
                 </div>
                 <div class="dialog-body">
                     <div id="notice" style="display: none;font-weight: bold;padding-bottom: 5px;"></div>
-                    <label for="username" class="oinput-label">Username</label>
+                    <label for="username" class="oinput-label">Usuario</label>
                     <input type="text" name="username" id="username" class="oinput-text-submit"
                         style="margin-bottom: 10px">
-                    <label for="password" class="oinput-label">Password</label>
+                    <label for="password" class="oinput-label">Senha</label>
                     <input type="password" name="password" class="oinput-text-submit">
                 </div>
                 <div class="dialog-footer">
-                    <input type="submit" class="btn-action" value="Login">
+                    <input type="submit" class="btn-action" value="ENTRAR">
                 </div>
             </div>
         </form>
@@ -35,8 +35,8 @@
 
         const params = new URLSearchParams(location.search);
         const notice = document.getElementById('notice');
-        if (params.has('failed')) notice.style.display = 'block', notice.textContent = 'Login Failed - Please try again.';
-        else if (params.has('loggedout')) notice.style.display = 'block', notice.textContent = 'You have been logged out successfully.';
+        if (params.has('failed')) notice.style.display = 'block', notice.textContent = 'Acesso recusado. Verifique usuario e senha.';
+        else if (params.has('loggedout')) notice.style.display = 'block', notice.textContent = 'Sessao encerrada com sucesso.';
     </script>
 </body>
 

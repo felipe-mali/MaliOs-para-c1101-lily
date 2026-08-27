@@ -1,5 +1,8 @@
 #include "webInterface.h"
 #include "MaliQrWebApi.h"
+#include "MaliPortalWebApi.h"
+#include "MaliSystemWebApi.h"
+#include "MaliWifiWebApi.h"
 #include "core/display.h"    // using displayRedStripe as error msg
 #include "core/mykeyboard.h" // using keyboard when calling rename
 #include "core/passwords.h"
@@ -11,6 +14,7 @@
 #include "core/wifi/wifi_common.h" // using common wifisetup
 #include "esp_task_wdt.h"
 #include "modules/mali/MaliQrService.h"
+#include "modules/mali/MaliQrStore.h"
 #include "webFiles.h"
 #include <MD5Builder.h>
 #include <cstddef>
@@ -19,7 +23,6 @@
 #include <globals.h>
 
 File uploadFile;
-FS _webFS = LittleFS;
 // WiFi as a Client
 const int default_webserverporthttp = 80;
 
@@ -28,8 +31,65 @@ IPAddress AP_GATEWAY(172, 0, 0, 1); // Gateway
 
 AsyncWebServer *server = nullptr; // initialise webserver
 const char *host = "bruce";
-String uploadFolder = "";
 static bool mdnsRunning = false;
+
+namespace {
+constexpr size_t WEB_PATH_MAX_BYTES = 255;
+constexpr size_t WEB_FILENAME_MAX_BYTES = 96;
+constexpr size_t WEB_EDITOR_MAX_BYTES = 64 * 1024;
+
+struct WebUploadState {
+    FS *fs = nullptr;
+    bool failed = false;
+    uint16_t status = 200;
+    bool encryptedChunkWritten = false;
+    char path[WEB_PATH_MAX_BYTES + 1] = {0};
+    char message[80] = {0};
+};
+
+bool isSafeWebPath(const String &path, bool absolute) {
+    if (path.isEmpty() || path.length() > WEB_PATH_MAX_BYTES) return false;
+    if ((path[0] == '/') != absolute) return false;
+    String segment;
+    const size_t start = absolute ? 1 : 0;
+    for (size_t i = start; i <= path.length(); ++i) {
+        const char c = i < path.length() ? path[i] : '/';
+        if (c == '/') {
+            if (segment == "." || segment == "..") return false;
+            if (segment.isEmpty() && i < path.length()) return false;
+            segment = "";
+            continue;
+        }
+        if (c == '\\' || static_cast<uint8_t>(c) < 0x20 || c == 0x7f) return false;
+        segment += c;
+    }
+    return true;
+}
+
+bool isSafeWebFilename(const String &name) {
+    return name.length() <= WEB_FILENAME_MAX_BYTES && isSafeWebPath(name, false) &&
+           name.indexOf('/') < 0;
+}
+
+FS *selectWebFileSystem(const String &name) {
+    if (name == "LittleFS") return &LittleFS;
+    if (name == "SD") return setupSdCard() ? static_cast<FS *>(&SD) : nullptr;
+    return nullptr;
+}
+
+String joinWebPath(const String &folder, const String &relativePath) {
+    return folder == "/" ? "/" + relativePath : folder + "/" + relativePath;
+}
+
+void failUpload(WebUploadState *state, uint16_t status, const char *message) {
+    if (!state || state->failed) return;
+    state->failed = true;
+    state->status = status;
+    strlcpy(state->message, message, sizeof(state->message));
+    if (state->fs && state->path[0] != '\0' && state->fs->exists(state->path))
+        state->fs->remove(state->path);
+}
+} // namespace
 
 // Generate random token
 String generateToken(int length = 24) {
@@ -44,6 +104,9 @@ String generateToken(int length = 24) {
 **  Turn off the WebUI
 **********************************************************************/
 void stopWebUi() {
+    if (MaliQrStore::isDirty() && !MaliQrStore::flush()) {
+        Serial.println("[MaliQrStore] Historico pendente nao foi salvo ao fechar WebUI");
+    }
     tft.setLogging(false);
     isWebUIActive = false;
     server->end();
@@ -131,10 +194,8 @@ String listFiles(FS &fs, const String &folder) {
     String returnText = "pa:" + folder + ":0\n";
     // Serial.println("Listing files stored on SD");
 
-    _webFS = fs;
-
     File root = fs.open(folder);
-    uploadFolder = folder;
+    if (!root || !root.isDirectory()) return "";
 
     while (true) {
         bool isDir;
@@ -225,47 +286,63 @@ void createDirRecursive(const String &path, FS fs) {
 void handleUpload(
     AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final
 ) {
-    if (checkUserWebAuth(request)) {
-        if (uploadFolder == "/") uploadFolder = "";
-        if (!index) {
-            if (request->hasArg("password")) filename = filename + ".enc";
-            // Serial.println("File: " + uploadFolder + "/" + filename);
-            String relativePath = filename;
-            String fullPath = uploadFolder + "/" + relativePath;
-            String dirPath = fullPath.substring(0, fullPath.lastIndexOf("/"));
-            if (dirPath.length() > 0) { createDirRecursive(dirPath, _webFS); }
-        RETRY:
-            request->_tempFile = _webFS.open(uploadFolder + "/" + filename, "w");
-            if (!request->_tempFile) {
-                // Serial.println("Failed to open file for writing: " + uploadFolder + "/" + filename);
-                goto RETRY;
-            }
+    if (!checkUserWebAuth(request)) return;
+    WebUploadState *state = static_cast<WebUploadState *>(request->_tempObject);
+    if (!index) {
+        state = static_cast<WebUploadState *>(calloc(1, sizeof(WebUploadState)));
+        request->_tempObject = state;
+        if (!state) return;
+        const String fsName = request->hasArg("fs") ? request->arg("fs") : "";
+        const String folder = request->hasArg("folder") ? request->arg("folder") : "";
+        state->fs = selectWebFileSystem(fsName);
+        if (!state->fs) failUpload(state, 400, "Invalid or unavailable file system");
+        if (!isSafeWebPath(folder, true)) failUpload(state, 400, "Invalid destination path");
+        if (request->hasArg("password")) {
+            if (request->arg("password").length() > 64)
+                failUpload(state, 400, "Invalid encryption password");
+            filename += ".enc";
         }
-
-        if (len) {
-            if (request->hasArg("password")) {
-                // encryption requested
-                static int chunck_no = 0;
-                if (chunck_no != 0) {
-                    // TODO: handle multiple chunks
-                    request->send(404, "text/html", "file is too big");
-                    return;
-                } else chunck_no += 1;
-                String enc_password = request->arg("password");
-                String plaintext = String((char *)data).substring(0, len);
-                String cyphertxt = encryptString(plaintext, enc_password);
-                if (cyphertxt == "") { return; }
-                if (request->_tempFile)
-                    request->_tempFile.write((const uint8_t *)cyphertxt.c_str(), cyphertxt.length());
-            } else {
-                if (request->_tempFile) request->_tempFile.write(data, len);
-            }
+        if (!isSafeWebPath(filename, false)) failUpload(state, 400, "Invalid upload filename");
+        if (state->failed) return;
+        const String fullPath = joinWebPath(folder, filename);
+        if (!isSafeWebPath(fullPath, true)) {
+            failUpload(state, 400, "Invalid upload path");
+            return;
         }
-        if (final) {
-            // close the file handle as the upload is now done
+        strlcpy(state->path, fullPath.c_str(), sizeof(state->path));
+        const String dirPath = fullPath.substring(0, fullPath.lastIndexOf('/'));
+        if (!dirPath.isEmpty()) createDirRecursive(dirPath, *state->fs);
+        request->_tempFile = state->fs->open(fullPath, "w");
+        if (!request->_tempFile) failUpload(state, 500, "Failed to open upload destination");
+    }
+    if (!state || state->failed) return;
+    if (len) {
+        if (request->hasArg("password")) {
+            if (state->encryptedChunkWritten || index != 0) {
+                if (request->_tempFile) request->_tempFile.close();
+                failUpload(state, 413, "Encrypted upload exceeds one chunk");
+                return;
+            }
+            state->encryptedChunkWritten = true;
+            String plaintext;
+            plaintext.reserve(len);
+            plaintext.concat(reinterpret_cast<const char *>(data), len);
+            const String cyphertxt = encryptString(plaintext, request->arg("password"));
+            if (cyphertxt.isEmpty() || !request->_tempFile ||
+                request->_tempFile.write(
+                    reinterpret_cast<const uint8_t *>(cyphertxt.c_str()), cyphertxt.length()
+                ) != cyphertxt.length()) {
+                if (request->_tempFile) request->_tempFile.close();
+                failUpload(state, 500, "Failed to encrypt or write upload");
+                return;
+            }
+        } else if (!request->_tempFile || request->_tempFile.write(data, len) != len) {
             if (request->_tempFile) request->_tempFile.close();
+            failUpload(state, 500, "Failed to write upload");
+            return;
         }
     }
+    if (final && request->_tempFile) request->_tempFile.close();
 }
 
 void notFound(AsyncWebServerRequest *request) { request->send(404, "text/plain", "Nothing in here Sharky"); }
@@ -397,9 +474,17 @@ static bool startMdnsResponder() {
 **********************************************************************/
 void configureWebServer() {
     mdnsRunning = startMdnsResponder();
-    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
     server->onNotFound(notFound);
     registerMaliQrWebApi(*server, [](AsyncWebServerRequest *request) { return checkUserWebAuth(request); });
+    registerMaliPortalWebApi(
+        *server, [](AsyncWebServerRequest *request) { return checkUserWebAuth(request); }
+    );
+    registerMaliSystemWebApi(
+        *server, [](AsyncWebServerRequest *request) { return checkUserWebAuth(request); }
+    );
+    MaliWifiWebApi::registerRoutes(
+        *server, [](AsyncWebServerRequest *request) { return checkUserWebAuth(request); }
+    );
 
     // Index
     server->on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -410,15 +495,22 @@ void configureWebServer() {
 
     // Login
     server->on("/login", HTTP_POST, [](AsyncWebServerRequest *request) {
+        if (request->contentLength() > 256) {
+            request->send(413, "text/plain; charset=utf-8", "Request too large");
+            return;
+        }
         if (request->hasParam("username", true) && request->hasParam("password", true)) {
             String username = request->getParam("username", true)->value();
             String password = request->getParam("password", true)->value();
 
-            if (username == bruceConfig.webUI.user && password == bruceConfig.webUI.pwd) {
+            if (username.length() <= 32 && password.length() <= 64 &&
+                username == bruceConfig.webUI.user && password == bruceConfig.webUI.pwd) {
                 String token = generateToken();
                 AsyncWebServerResponse *response = request->beginResponse(302);
                 response->addHeader("Location", "/");
-                response->addHeader("Set-Cookie", "BRUCESESSION=" + token + "; Path=/; HttpOnly");
+                response->addHeader(
+                    "Set-Cookie", "BRUCESESSION=" + token + "; Path=/; HttpOnly; SameSite=Strict"
+                );
                 request->send(response);
                 bruceConfig.addWebUISession(token);
                 return;
@@ -445,7 +537,10 @@ void configureWebServer() {
         }
         AsyncWebServerResponse *response = request->beginResponse(302);
         response->addHeader("Location", "/?loggedout");
-        response->addHeader("Set-Cookie", "BRUCESESSION=0; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT");
+        response->addHeader(
+            "Set-Cookie",
+            "BRUCESESSION=0; Path=/; HttpOnly; SameSite=Strict; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+        );
         request->send(response);
     });
 
@@ -521,24 +616,29 @@ void configureWebServer() {
 
     // Rename file or folder
     server->on("/rename", HTTP_POST, [](AsyncWebServerRequest *request) {
-        if (checkUserWebAuth(request)) {
-            if (request->hasArg("fileName") && request->hasArg("filePath")) {
-                String fs = request->arg("fs").c_str();
-                String fileName = request->arg("fileName").c_str();
-                String filePath = request->arg("filePath").c_str();
-                String filePath2 = filePath.substring(0, filePath.lastIndexOf('/') + 1) + fileName;
-                // Rename the file of folder
-                if (fs == "SD") {
-                    if (SD.rename(filePath, filePath2))
-                        request->send(200, "text/plain", filePath + " renamed to " + filePath2);
-                    else request->send(200, "text/plain", "Fail renaming file.");
-                } else {
-                    if (LittleFS.rename(filePath, filePath2))
-                        request->send(200, "text/plain", filePath + " renamed to " + filePath2);
-                    else request->send(200, "text/plain", "Fail renaming file.");
-                }
-            }
+        if (!checkUserWebAuth(request)) return;
+        if (!request->hasArg("fs") || !request->hasArg("fileName") ||
+            !request->hasArg("filePath")) {
+            request->send(400, "text/plain", "ERROR: fs, fileName and filePath are required");
+            return;
         }
+        FS *fs = selectWebFileSystem(request->arg("fs"));
+        const String fileName = request->arg("fileName");
+        const String filePath = request->arg("filePath");
+        if (!fs || !isSafeWebFilename(fileName) || !isSafeWebPath(filePath, true) ||
+            filePath == "/") {
+            request->send(400, "text/plain", "Invalid file system or path");
+            return;
+        }
+        const String destination =
+            filePath.substring(0, filePath.lastIndexOf('/') + 1) + fileName;
+        if (!isSafeWebPath(destination, true)) {
+            request->send(400, "text/plain", "Invalid destination path");
+            return;
+        }
+        if (fs->rename(filePath, destination))
+            request->send(200, "text/plain", filePath + " renamed to " + destination);
+        else request->send(500, "text/plain", "Fail renaming file.");
     });
 
     // Route to send a generic command (Tasmota compatible API)
@@ -586,31 +686,35 @@ void configureWebServer() {
 
     // List files
     server->on("/listfiles", HTTP_GET, [](AsyncWebServerRequest *request) {
-        if (checkUserWebAuth(request)) {
-            String folder = "/";
-            if (request->hasArg("folder")) { folder = request->arg("folder"); }
-            if (strcmp(request->arg("fs").c_str(), "SD") == 0) {
-                request->send(200, "text/plain", listFiles(SD, folder));
-            } else {
-                request->send(200, "text/plain", listFiles(LittleFS, folder));
-            }
+        if (!checkUserWebAuth(request)) return;
+        const String folder = request->hasArg("folder") ? request->arg("folder") : "/";
+        FS *fs = request->hasArg("fs") ? selectWebFileSystem(request->arg("fs")) : nullptr;
+        if (!fs || !isSafeWebPath(folder, true)) {
+            request->send(400, "text/plain", "Invalid file system or folder");
+            return;
         }
+        if (!fs->exists(folder)) {
+            request->send(404, "text/plain", "Folder not found");
+            return;
+        }
+        request->send(200, "text/plain", listFiles(*fs, folder));
     });
 
     // Download, create folder and delete
     server->on("/file", HTTP_GET, [](AsyncWebServerRequest *request) {
-        if (checkUserWebAuth(request)) {
-            if (request->hasArg("name") && request->hasArg("action")) {
-                String fileName = request->arg("name").c_str();
-                String fileAction = request->arg("action").c_str();
-                String fileSys = request->arg("fs").c_str();
-                bool useSD = false;
-                if (fileSys == "SD") useSD = true;
-
-                FS *fs;
-                if (useSD) {
-                    fs = &SD;
-                } else fs = &LittleFS;
+        if (!checkUserWebAuth(request)) return;
+        if (request->hasArg("name") && request->hasArg("action") && request->hasArg("fs")) {
+                String fileName = request->arg("name");
+                String fileAction = request->arg("action");
+                FS *fs = selectWebFileSystem(request->arg("fs"));
+                const bool validAction = fileAction == "download" || fileAction == "image" ||
+                                         fileAction == "delete" || fileAction == "create" ||
+                                         fileAction == "createfile" || fileAction == "edit";
+                if (!fs || !isSafeWebPath(fileName, true) || !validAction ||
+                    (fileName == "/" && fileAction == "delete")) {
+                    request->send(400, "text/plain", "Invalid file system, path or action");
+                    return;
+                }
 
                 log_i("filename: %s\n", fileName.c_str());
                 log_i("fileAction: %s\n", fileAction.c_str());
@@ -664,6 +768,11 @@ void configureWebServer() {
                     } else if (strcmp(fileAction.c_str(), "edit") == 0) {
                         File editFile = fs->open(fileName, FILE_READ);
                         if (editFile) {
+                            if (editFile.size() > WEB_EDITOR_MAX_BYTES) {
+                                editFile.close();
+                                request->send(413, "text/plain", "File is too large for the web editor");
+                                return;
+                            }
                             String fileContent = editFile.readString();
                             request->send(200, "text/plain", fileContent);
                             editFile.close();
@@ -675,30 +784,26 @@ void configureWebServer() {
                         request->send(400, "text/plain", "ERROR: invalid action param supplied");
                     }
                 }
-            } else {
-                request->send(400, "text/plain", "ERROR: name and action params required");
-            }
+        } else {
+            request->send(400, "text/plain", "ERROR: fs, name and action params required");
         }
     });
 
     // Edit file
     server->on("/edit", HTTP_POST, [](AsyncWebServerRequest *request) {
-        if (checkUserWebAuth(request)) {
-            if (request->hasArg("name") && request->hasArg("content") && request->hasArg("fs")) {
+        if (!checkUserWebAuth(request)) return;
+        if (request->contentLength() > WEB_EDITOR_MAX_BYTES + 8192) {
+            request->send(413, "text/plain", "Edit request is too large");
+            return;
+        }
+        if (request->hasArg("name") && request->hasArg("content") && request->hasArg("fs")) {
                 String fileName = request->arg("name");
                 String fileContent = request->arg("content");
-                bool useSD = false;
-
-                if (strcmp(request->arg("fs").c_str(), "SD") == 0) { useSD = true; }
-
-                fs::FS *fs = useSD ? (fs::FS *)&SD : (fs::FS *)&LittleFS;
-                String fsType = useSD ? "SD" : "LittleFS";
-
-                if (useSD) {              // LittleFS is already mounted
-                    if (!setupSdCard()) { // only tries to mount SD if editting on SD
-                        request->send(500, "text/plain", "Failed to initialize file system: " + fsType);
-                        return;
-                    }
+                FS *fs = selectWebFileSystem(request->arg("fs"));
+                if (!fs || !isSafeWebPath(fileName, true) ||
+                    fileContent.length() > WEB_EDITOR_MAX_BYTES) {
+                    request->send(400, "text/plain", "Invalid file system, path or content size");
+                    return;
                 }
 
                 File editFile = fs->open(fileName, FILE_WRITE);
@@ -713,9 +818,8 @@ void configureWebServer() {
                     request->send(500, "text/plain", "Failed to open file for writing: " + fileName);
                 }
 
-            } else {
-                request->send(400, "text/plain", "ERROR: name, content, and fs parameters required");
-            }
+        } else {
+            request->send(400, "text/plain", "ERROR: name, content, and fs parameters required");
         }
     });
 
@@ -723,21 +827,38 @@ void configureWebServer() {
     server->on(
         "/upload",
         HTTP_POST,
-        [](AsyncWebServerRequest *request) { request->send(200, "text/plain", "File upload completed"); },
+        [](AsyncWebServerRequest *request) {
+            if (!checkUserWebAuth(request)) return;
+            WebUploadState *state = static_cast<WebUploadState *>(request->_tempObject);
+            if (!state) {
+                request->send(400, "text/plain", "Invalid upload request");
+                return;
+            }
+            const uint16_t status = state->failed ? state->status : 200;
+            const String message = state->failed ? state->message : "File upload completed";
+            free(state);
+            request->_tempObject = nullptr;
+            request->send(status, "text/plain", message);
+        },
         handleUpload
     );
 
     // Wi-Fi configuration
-    server->on("/wifi", HTTP_GET, [](AsyncWebServerRequest *request) {
+    server->on("/wifi", HTTP_POST, [](AsyncWebServerRequest *request) {
         if (checkUserWebAuth(request)) {
-            if (request->hasArg("usr") && request->hasArg("pwd")) {
-                const char *usr = request->arg("usr").c_str();
-                const char *pwd = request->arg("pwd").c_str();
-                bruceConfig.setWebUICreds(usr, pwd);
-                request->send(
-                    200, "text/plain", "User: " + String(usr) + " configured with password: " + String(pwd)
-                );
+            if (request->contentLength() > 256 || !request->hasParam("usr", true) ||
+                !request->hasParam("pwd", true)) {
+                request->send(400, "text/plain; charset=utf-8", "Credenciais ausentes ou invalidas");
+                return;
             }
+            const String &usr = request->getParam("usr", true)->value();
+            const String &pwd = request->getParam("pwd", true)->value();
+            if (usr.isEmpty() || usr.length() > 32 || pwd.isEmpty() || pwd.length() > 64) {
+                request->send(400, "text/plain; charset=utf-8", "Credenciais fora dos limites");
+                return;
+            }
+            bruceConfig.setWebUICreds(usr.c_str(), pwd.c_str());
+            request->send(200, "text/plain; charset=utf-8", "Credenciais do WebUI atualizadas");
         }
     });
     server->begin();
@@ -777,6 +898,7 @@ void startWebUi(bool mode_ap) {
     drawWebUiScreen(mode_ap);
 #ifdef HAS_SCREEN // Headless always run in the background!
     while (!check(EscPress)) {
+        MaliWifiWebApi::service();
         // Consume TFT work in this foreground UI task, never in AsyncTCP.
         if (MaliQrService::processPendingDisplay()) drawWebUiScreen(mode_ap);
         vTaskDelay(pdMS_TO_TICKS(70));

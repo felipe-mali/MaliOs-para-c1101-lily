@@ -16,10 +16,11 @@ static DNSServer &sharedEvilPortalDnsServer() {
 
 EvilPortal::EvilPortal(
     String tssid, uint8_t channel, bool deauth, bool verifyPwd, bool autoMode, bool backgroundMode,
-    String templateFile
+    String templateFile, FS *templateFs
 )
     : apName(tssid), _channel(channel), _deauth(deauth), _verifyPwd(verifyPwd), _autoMode(autoMode),
-      _backgroundMode(backgroundMode), _autoTemplateFile(templateFile), webServer(80), _launchTime(millis()) {
+      _backgroundMode(backgroundMode), _autoTemplateFile(templateFile), _autoTemplateFs(templateFs),
+      webServer(80), _launchTime(millis()) {
     dnsServer = &sharedEvilPortalDnsServer();
 
     _originalWifiMode = WiFi.getMode();
@@ -516,7 +517,9 @@ void EvilPortal::loadCustomHtml() {
 
 bool EvilPortal::loadCustomHtmlFromPath(const String &path) {
     if (path.isEmpty()) return false;
-    if (!getFsStorage(fsHtmlFile) || !fsHtmlFile->exists(path)) return false;
+    if (_autoTemplateFs) fsHtmlFile = _autoTemplateFs;
+    else if (!getFsStorage(fsHtmlFile)) return false;
+    if (!fsHtmlFile || !fsHtmlFile->exists(path)) return false;
 
     htmlFileName = path;
     String fileBaseName =
@@ -524,6 +527,19 @@ bool EvilPortal::loadCustomHtmlFromPath(const String &path) {
     fileBaseName.toLowerCase();
     outputFile = fileBaseName + "_creds.csv";
     isDefaultHtml = false;
+
+    // Preserve Bruce's optional first-line AP metadata for templates launched
+    // directly by Mali Portal, without changing legacy template selection.
+    File htmlFile = fsHtmlFile->open(htmlFileName, FILE_READ);
+    if (htmlFile) {
+        String firstLine = htmlFile.readStringUntil('\n');
+        htmlFile.close();
+        const int apStart = firstLine.indexOf("<!-- AP=\"");
+        if (apStart >= 0) {
+            const int apEnd = firstLine.indexOf("\" -->", apStart);
+            if (apEnd > apStart + 9) apName = firstLine.substring(apStart + 9, apEnd);
+        }
+    }
     return true;
 }
 

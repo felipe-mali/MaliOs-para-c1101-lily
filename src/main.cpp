@@ -6,6 +6,7 @@
 #include "core/ram_profile.h"
 #include "core/serial_commands/cli.h"
 #include "core/utils.h"
+#include "core/wifi/MaliWifiWebApi.h"
 #include "current_year.h"
 #include "esp32-hal-psram.h"
 #include "esp_heap_caps.h"
@@ -599,6 +600,7 @@ void loop() {
         previousMillis = millis(); // ensure that will not dim screen when get back to menu
     }
 #endif
+    MaliWifiWebApi::service();
     MaliQrService::processPendingDisplay();
     tft.fillScreen(bruceConfig.bgColor);
 
@@ -616,6 +618,7 @@ void loop() {
 #else
 
 void loop() {
+    MaliWifiWebApi::service();
     MaliQrService::processPendingDisplay();
     tft.setLogging();
     Serial.println(

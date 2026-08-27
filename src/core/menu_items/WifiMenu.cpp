@@ -8,6 +8,7 @@
 #include "core/wifi/wifi_mac.h"
 #include "modules/ethernet/ARPScanner.h"
 #include "modules/mali/MaliWiki.h"
+#include "modules/mali/MaliPortalStore.h"
 #include "modules/wifi/ap_info.h"
 #include "modules/wifi/clients.h"
 #include "modules/wifi/evil_portal.h"
@@ -61,6 +62,17 @@ void WifiMenu::optionsMenu() {
         options.push_back({"Info do AP", displayAPInfo});
     }
     options.push_back({"WebUI", loopOptionsWebUi});
+    options.push_back({"Mali Portal", []() {
+                           String name;
+                           String path;
+                           String error;
+                           if (!MaliPortalStore::selected(name, path, error)) {
+                               displayError(error, true);
+                               return;
+                           }
+                           Serial.println("[MaliPortal] Iniciando template seguro: " + name);
+                           EvilPortal("", 6, false, false, true, false, path, &LittleFS);
+                       }});
     options.push_back({"Ataques Wi-Fi", wifi_atk_menu});
     options.push_back({"Evil Portal", [=]() {
                            // WebUI cleanup now handled automatically inside EvilPortal constructor
