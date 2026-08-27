@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "targets": {
+    "/": {
+      "targetKind": "existing-ui",
+      "projectId": "b62e74bf-507d-495e-9ac9-33888d3f3e85",
+      "baselineDraftId": "e0f09d30-f51b-480a-a628-27338aa54bc8",
+      "activeDraftId": "e0f09d30-f51b-480a-a628-27338aa54bc8",
+      "designSystemPath": ".superdesign/design-system.md",
+      "contextFiles": [
+        ".superdesign/design-system.md",
+        "embedded_resources/web_interface/index.html",
+        "embedded_resources/web_interface/index.css"
+      ],
+      "fingerprints": {
+        ".superdesign/design-system.md": "ac2a96322e5bf89ab3a65b5fb16b2ab3ab6eaba79b4c5a485a82d34015e801a6",
+        "embedded_resources/web_interface/index.html": "1b4186faa033d45d6ae5da503d3ee389b13939dc254dabf30d935608cdef7543",
+        "embedded_resources/web_interface/index.css": "4e3c8aee59dfa6e27613c18225c0de010d01681215ee009b40f34e65053aa3db"
+      },
+      "components": [],
+      "drafts": {
+        "e0f09d30-f51b-480a-a628-27338aa54bc8": {
+          "title": "MALI OS — Dashboard local",
+          "visualDirection": "near-black technical console with burgundy accents, responsive dashboard and preserved Bruce controls",
+          "currentVersion": 2
+        }
+      },
+      "updatedAt": "2026-08-27T08:20:55.0020028-03:00"
+    }
+  }
+}

@@ -1,3 +1,29 @@
+# Theme
+
+## Compact token summary
+
+- Runtime theme variables: `--color` (primary accent), `--sec-color` (secondary accent emitted by the backend), `--background` (page canvas).
+- Embedded fallbacks: primary `#ff3ec8`, background `#242424`, derived `--light-color: color-mix(in srgb, var(--color) 20%, gray 20%)`.
+- MaliOS example override: primary `#ad007b`, secondary `#ce6db5`, background `#000000`.
+- Typeface: local monospace stack, beginning with DejaVu Sans Mono and Consolas; no external font.
+- Base body: 12px text, 10px outer padding; authenticated container max-width 800px.
+- Geometry: primarily square 1px borders; dialogs use a 3px radius; no shadow scale.
+- Breakpoint: `max-width: 600px`; header wraps, action groups become full width and file table action column narrows.
+- State language: transparent buttons with accent border; hover/active invert accent and background.
+
+## Raw source: `embedded_resources/web_interface/theme.css.example`
+
+```css
+:root {
+  --color: #ad007b;
+  --sec-color: #ce6db5;
+  --background: #000000;
+}
+```
+
+## Raw source: `embedded_resources/web_interface/index.css`
+
+```css
 :root {
   --color: #ff3ec8;
   --background: #242424;
@@ -129,15 +155,6 @@ svg > path {
   margin-bottom: 2px;
   width: 100px;
 }
-.webui-navigation {
-  display: flex;
-  gap: 6px;
-  padding: 6px;
-  border-bottom: 1px solid var(--color);
-}
-.webui-navigation .btn-action {
-  min-width: 100px;
-}
 .container .free-space {
   border-bottom: 1px solid var(--color);
   justify-content: space-between;
@@ -205,112 +222,6 @@ svg > path {
 }
 .table .col-action.executable .act-play {
   display: inherit;
-}
-.qr-studio {
-  padding: 14px;
-}
-.qr-studio-head {
-  border-bottom: 1px solid var(--color);
-  margin: -14px -14px 14px;
-  padding: 12px 14px;
-}
-.qr-studio-head h1 {
-  font-size: 18px;
-  margin: 0 0 5px;
-}
-.qr-studio-head p,
-.qr-preview p {
-  margin: 0;
-}
-.qr-studio-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
-  gap: 18px;
-}
-.qr-studio-form,
-.qr-fields {
-  display: grid;
-  gap: 7px;
-}
-.qr-studio-form > label,
-.qr-fields > label,
-.qr-wifi-password > label {
-  font-weight: bold;
-}
-.qr-fields {
-  border-top: 1px dashed var(--light-color);
-  margin-top: 3px;
-  padding-top: 10px;
-}
-.qr-studio-form input,
-.qr-studio-form select,
-.qr-studio-form textarea {
-  width: 100%;
-  border: 1px solid var(--color);
-  background-color: var(--background);
-  outline: 0;
-  padding: 6px;
-}
-.qr-studio-form input:focus,
-.qr-studio-form select:focus,
-.qr-studio-form textarea:focus {
-  box-shadow: 0 0 0 1px var(--color);
-}
-.qr-studio-form textarea {
-  min-height: 72px;
-  resize: vertical;
-}
-.qr-studio-form small {
-  opacity: 0.8;
-  line-height: 1.35;
-}
-.qr-wifi-password {
-  display: grid;
-  gap: 7px;
-}
-.qr-byte-count {
-  border-top: 1px dashed var(--light-color);
-  margin-top: 3px;
-  padding-top: 8px;
-}
-.qr-byte-count.invalid,
-.qr-status.error {
-  color: #ff6b6b;
-}
-.qr-status.success {
-  color: #6bff9d;
-}
-.qr-studio-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-}
-.qr-studio-actions .btn-action {
-  min-height: 30px;
-}
-.qr-status {
-  min-height: 2.8em;
-  margin: 2px 0 0;
-  white-space: pre-wrap;
-}
-.qr-preview {
-  border-left: 1px solid var(--color);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
-  padding-left: 18px;
-  text-align: center;
-}
-.qr-preview canvas {
-  display: block;
-  width: auto;
-  max-width: 100%;
-  height: auto;
-  background: #fff;
-  border: 1px solid var(--color);
-  image-rendering: pixelated;
 }
 .dialog-background {
   position: fixed;
@@ -662,12 +573,6 @@ svg > path {
     width: auto;
     min-width: 90px;
   }
-  .webui-navigation {
-    flex-wrap: wrap;
-  }
-  .webui-navigation .btn-action {
-    flex: 1 1 auto;
-  }
   .container .free-space {
     flex-direction: column;
   }
@@ -702,13 +607,7 @@ svg > path {
   .container .content .table .col-size {
     width: 64px;
   }
-  .qr-studio-layout {
-    grid-template-columns: 1fr;
-  }
-  .qr-preview {
-    border-top: 1px solid var(--color);
-    border-left: 0;
-    padding-top: 14px;
-    padding-left: 0;
-  }
 }
+
+```
+

@@ -5,35 +5,30 @@
 #include "core/mykeyboard.h"
 #include "core/settings.h"
 #include "core/utils.h"
-
-uint16_t crc_ccitt_update(uint16_t crc, uint8_t data) {
-    crc = (uint8_t)(crc >> 8) | (crc << 8);
-    crc ^= data;
-    crc ^= (uint8_t)(crc & 0xff) >> 4;
-    crc ^= crc << 12;
-    crc ^= (crc & 0x00ff) << 5;
-    return crc;
-}
-
-String calculate_crc(String input) {
-    size_t len = input.length();
-    uint8_t *data = (uint8_t *)input.c_str();
-    uint16_t crc = 0xffff;
-
-    for (size_t i = 0; i < len; i++) { crc = crc_ccitt_update(crc, data[i]); }
-
-    String crc_str = String(crc, HEX);
-    crc_str.toUpperCase();
-    while (crc_str.length() < 4) crc_str = "0" + crc_str; // Pad with zeros if needed
-
-    return crc_str;
-}
+#include "modules/mali/MaliQrService.h"
 
 void qrcode_display(const String &qrcodeUrl) {
 #ifdef HAS_SCREEN
+    if (!MaliQrService::lockEncoder(pdMS_TO_TICKS(1000))) {
+        Serial.println("[MaliQr] Encoder ocupado; exibicao cancelada");
+        displayError("QR ocupado");
+        delay(1000);
+        return;
+    }
+
     QRcode qrcode(&tft);
     qrcode.init();
-    qrcode.create(qrcodeUrl);
+    const bool created = qrcode.create(qrcodeUrl);
+    MaliQrService::unlockEncoder();
+
+    if (!created) {
+        Serial.println("[MaliQr] Memoria insuficiente para gerar QR");
+        tft.fillScreen(bruceConfig.bgColor);
+        displayError("Sem memoria para QR");
+        delay(1200);
+        return;
+    }
+
     delay(300); // Due to M5 sel press, it could be confusing with next line
     while (!check(EscPress) && !check(SelPress)) delay(100);
     tft.fillScreen(bruceConfig.bgColor);
@@ -48,19 +43,19 @@ void display_custom_qrcode() {
 void pix_qrcode() {
     String key = keyboard("", 25, "PIX Key:");
     if (key == "\x1B") return;
-    String key_length = key.length() >= 10 ? String(key.length()) : "0" + String(key.length());
     String amount = num_keyboard("1000.00", 10, "Int amount:");
     if (amount == "\x1B") return;
-    amount = String(amount.toFloat());
-    String amount_length = amount.length() >= 10 ? String(amount.length()) : "0" + String(amount.length());
 
-    String data0 = "0014BR.GOV.BCB.PIX01" + key_length + key;
+    String payload;
+    String error;
+    if (!MaliQrService::buildPixPayload(key, amount, payload, error)) {
+        Serial.println("[MaliQr] PIX invalido: " + error);
+        displayError(error);
+        delay(1200);
+        return;
+    }
 
-    String pix_code = "00020126" + String(data0.length()) + data0 + "52040000530398654" + amount_length +
-                      amount + "5802BR5909Bruce PIX6014Rio de Janeiro62070503***6304";
-    String crc = calculate_crc(pix_code);
-
-    return qrcode_display(pix_code + crc);
+    return qrcode_display(payload);
 }
 
 void qrcode_menu() {

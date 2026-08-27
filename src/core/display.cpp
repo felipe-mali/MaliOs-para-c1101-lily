@@ -5,6 +5,7 @@
 #include "mykeyboard.h"
 #include "settings.h" //for timeStr
 #include "utils.h"
+#include "modules/mali/MaliQrService.h"
 #include <JPEGDecoder.h>
 #include <interface.h> //for charging ischarging to print charging indicator
 #include <memory>
@@ -572,6 +573,14 @@ int loopOptions(
     while (1) {
         // Check for shutdown before drawing menu to avoid drawing a black bar on the screen
         if (exit) break;
+        if (MaliQrService::processPendingDisplay()) {
+            // The QR page clears the screen when it closes. Rebuild the active
+            // menu and restart the select-button grace period before continuing.
+            drawMainBorder();
+            firstRender = true;
+            redraw = true;
+            menuOpenTs = millis();
+        }
         if (menuType == MENU_TYPE_MAIN) {
             checkReboot();
             if (devModeCounter >= 5 && !bruceConfig.devMode) {

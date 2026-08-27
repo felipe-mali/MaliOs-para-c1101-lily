@@ -9,6 +9,28 @@ int screenwidth;
 int screenheight;
 int multiply = 2;
 
+namespace {
+constexpr size_t kEncoderWorkBufferSize = 600;
+constexpr size_t kEncoderInputBufferSize = 260;
+
+bool encodeFrame(const String &message)
+{
+  message.toCharArray((char *)strinbuf, kEncoderInputBufferSize);
+  qrframe = (unsigned char *)malloc(kEncoderWorkBufferSize);
+  if (!qrframe)
+    return false;
+
+  qrencode();
+  return true;
+}
+
+void releaseFrame()
+{
+  free(qrframe);
+  qrframe = 0;
+}
+} // namespace
+
 QRcode::QRcode(tft_display *tft)
 {
   this->tft = tft;
@@ -48,13 +70,13 @@ void QRcode::render(int x, int y, int color)
   }
 }
 
-void QRcode::create(String message)
+bool QRcode::create(const String &message)
 {
   // create QR code
   tft->fillScreen(TFT_WHITE);
-  message.toCharArray((char *)strinbuf, 260);
-  qrframe = (unsigned char *)malloc(600);
-  qrencode();
+  if (!encodeFrame(message))
+    return false;
+
   // print QR Code
   for (byte x = 0; x < WD; x += 2)
   {
@@ -86,6 +108,42 @@ void QRcode::create(String message)
       }
     }
   }
-  free(qrframe);
-  qrframe = 0;
+  releaseFrame();
+  return true;
+}
+
+bool QRcode::encode(const String &message, uint8_t *packed, size_t capacity, uint8_t &matrixSizeOut)
+{
+  matrixSizeOut = 0;
+  const size_t required = packedSize();
+  if (!packed || capacity < required)
+    return false;
+
+  if (!encodeFrame(message))
+    return false;
+
+  memset(packed, 0, required);
+  size_t bitIndex = 0;
+  for (uint8_t y = 0; y < WD; ++y)
+  {
+    for (uint8_t x = 0; x < WD; ++x, ++bitIndex)
+    {
+      if (QRBIT(x, y))
+        packed[bitIndex >> 3] |= (uint8_t)(0x80U >> (bitIndex & 7U));
+    }
+  }
+
+  matrixSizeOut = WD;
+  releaseFrame();
+  return true;
+}
+
+uint8_t QRcode::matrixSize()
+{
+  return WD;
+}
+
+size_t QRcode::packedSize()
+{
+  return ((size_t)WD * WD + 7U) / 8U;
 }

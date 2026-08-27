@@ -12,6 +12,7 @@
 #include "esp_task_wdt.h"
 #include "esp_wifi.h"
 #include "modules/mali/MaliCounter.h"
+#include "modules/mali/MaliQrService.h"
 #include <functional>
 #include <string>
 #include <vector>
@@ -451,6 +452,7 @@ void setup() {
         SAFE_STACK_BUFFER_SIZE / 4
     ); // Must be invoked before Serial.begin(). Default is 256 chars
     Serial.begin(115200);
+    MaliQrService::begin();
     MaliCounter::printBootDiagnostics();
 
     log_d("Total heap: %d", ESP.getHeapSize());
@@ -597,6 +599,7 @@ void loop() {
         previousMillis = millis(); // ensure that will not dim screen when get back to menu
     }
 #endif
+    MaliQrService::processPendingDisplay();
     tft.fillScreen(bruceConfig.bgColor);
 
 #if defined(ENABLE_RAM_LOGGING)
@@ -613,6 +616,7 @@ void loop() {
 #else
 
 void loop() {
+    MaliQrService::processPendingDisplay();
     tft.setLogging();
     Serial.println(
         "\n"

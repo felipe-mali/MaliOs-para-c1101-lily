@@ -31,7 +31,19 @@
           </button>
         </div>
       </div>
-      <div class="free-space">
+      <nav class="webui-navigation" aria-label="WebUI sections">
+        <button
+          class="btn-action active"
+          type="button"
+          data-webui-target="files"
+        >
+          Arquivos
+        </button>
+        <button class="btn-action" type="button" data-webui-target="qr">
+          QR Studio
+        </button>
+      </nav>
+      <div class="free-space files-view">
         <span
           class="btn-action act-browse block-space free-sd"
           data-path="/"
@@ -47,7 +59,7 @@
           LittleFS [<span>0 MB</span>]
         </span>
       </div>
-      <div class="action-content">
+      <div class="action-content files-view">
         <span class="breadcrumb">
           <button
             class="icon-action"
@@ -201,7 +213,7 @@
           </button>
         </div>
       </div>
-      <div class="content">
+      <div class="content files-view">
         <table class="table explorer">
           <thead>
             <tr>
@@ -213,6 +225,202 @@
           <tbody></tbody>
         </table>
       </div>
+      <section class="qr-studio hidden" aria-labelledby="qr-studio-title">
+        <div class="qr-studio-head">
+          <h1 id="qr-studio-title">QR Studio</h1>
+          <p>
+            Gere e visualize QR Codes localmente. Nenhum dado e enviado para
+            servicos externos.
+          </p>
+        </div>
+        <div class="qr-studio-layout">
+          <form id="qr-studio-form" class="qr-studio-form" novalidate>
+            <label for="qr-type">Tipo</label>
+            <select id="qr-type" name="type">
+              <option value="pix">PIX</option>
+              <option value="wifi">Wi-Fi</option>
+              <option value="url">URL</option>
+              <option value="text">Texto</option>
+              <option value="phone">Telefone</option>
+              <option value="email">E-mail</option>
+              <option value="vcard">Contato / vCard</option>
+            </select>
+
+            <div class="qr-fields" data-qr-fields="pix">
+              <label for="qr-pix-key">Chave PIX</label>
+              <input
+                id="qr-pix-key"
+                name="pix-key"
+                type="text"
+                maxlength="25"
+                autocomplete="off"
+                placeholder="CPF, e-mail, telefone ou chave aleatoria"
+              />
+              <label for="qr-pix-amount">Valor</label>
+              <input
+                id="qr-pix-amount"
+                name="pix-amount"
+                type="text"
+                maxlength="10"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="100.00"
+              />
+              <small>Usa o mesmo gerador PIX disponivel no MaliOS.</small>
+            </div>
+
+            <div class="qr-fields hidden" data-qr-fields="wifi">
+              <label for="qr-wifi-ssid">Nome da rede (SSID)</label>
+              <input
+                id="qr-wifi-ssid"
+                name="wifi-ssid"
+                type="text"
+                maxlength="32"
+                autocomplete="off"
+              />
+              <label for="qr-wifi-security">Seguranca</label>
+              <select id="qr-wifi-security" name="wifi-security">
+                <option value="WPA">WPA / WPA2</option>
+                <option value="nopass">Rede aberta</option>
+              </select>
+              <div class="qr-wifi-password">
+                <label for="qr-wifi-password">Senha</label>
+                <input
+                  id="qr-wifi-password"
+                  name="wifi-password"
+                  type="password"
+                  maxlength="63"
+                  autocomplete="new-password"
+                />
+              </div>
+              <small>A senha permanece apenas nesta pagina e nao e salva.</small>
+            </div>
+
+            <div class="qr-fields hidden" data-qr-fields="url">
+              <label for="qr-url">Endereco</label>
+              <input
+                id="qr-url"
+                name="url"
+                type="url"
+                maxlength="154"
+                inputmode="url"
+                autocomplete="off"
+                placeholder="https://exemplo.com"
+              />
+            </div>
+
+            <div class="qr-fields hidden" data-qr-fields="text">
+              <label for="qr-text">Texto</label>
+              <textarea
+                id="qr-text"
+                name="text"
+                maxlength="154"
+                rows="5"
+              ></textarea>
+            </div>
+
+            <div class="qr-fields hidden" data-qr-fields="phone">
+              <label for="qr-phone">Telefone</label>
+              <input
+                id="qr-phone"
+                name="phone"
+                type="tel"
+                maxlength="145"
+                inputmode="tel"
+                autocomplete="tel"
+                placeholder="+5511999999999"
+              />
+            </div>
+
+            <div class="qr-fields hidden" data-qr-fields="email">
+              <label for="qr-email-address">Endereco de e-mail</label>
+              <input
+                id="qr-email-address"
+                name="email-address"
+                type="email"
+                maxlength="140"
+                inputmode="email"
+                autocomplete="email"
+              />
+              <label for="qr-email-subject">Assunto (opcional)</label>
+              <input
+                id="qr-email-subject"
+                name="email-subject"
+                type="text"
+                maxlength="100"
+              />
+              <label for="qr-email-body">Mensagem (opcional)</label>
+              <textarea
+                id="qr-email-body"
+                name="email-body"
+                maxlength="140"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div class="qr-fields hidden" data-qr-fields="vcard">
+              <label for="qr-vcard-name">Nome</label>
+              <input
+                id="qr-vcard-name"
+                name="vcard-name"
+                type="text"
+                maxlength="100"
+                autocomplete="name"
+              />
+              <label for="qr-vcard-phone">Telefone (opcional)</label>
+              <input
+                id="qr-vcard-phone"
+                name="vcard-phone"
+                type="tel"
+                maxlength="60"
+                inputmode="tel"
+                autocomplete="tel"
+              />
+              <label for="qr-vcard-email">E-mail (opcional)</label>
+              <input
+                id="qr-vcard-email"
+                name="vcard-email"
+                type="email"
+                maxlength="100"
+                inputmode="email"
+                autocomplete="email"
+              />
+              <small>Contato vCard 3.0 simples: nome, telefone e e-mail.</small>
+            </div>
+
+            <div class="qr-byte-count" aria-live="polite">
+              Tamanho: <span id="qr-payload-size">--</span>
+            </div>
+            <div class="qr-studio-actions">
+              <button
+                id="qr-preview-button"
+                class="btn-action btn-default"
+                type="submit"
+              >
+                GERAR PREVIEW
+              </button>
+              <button
+                id="qr-show-button"
+                class="btn-action"
+                type="button"
+              >
+                EXIBIR NO MALI
+              </button>
+            </div>
+            <p
+              id="qr-status"
+              class="qr-status"
+              role="status"
+              aria-live="polite"
+            ></p>
+          </form>
+
+          <div class="qr-preview" aria-label="Preview do QR Code">
+            <canvas id="qr-preview-canvas" width="244" height="244"></canvas>
+            <p>Preview gerado pelo proprio MaliOS.</p>
+          </div>
+        </div>
+      </section>
     </div>
     <template id="t">
       <table>

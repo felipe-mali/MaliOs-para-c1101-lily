@@ -1664,6 +1664,301 @@ window.addEventListener("popstate", (event) => {
   }
 });
 
+const QR_STUDIO_MAX_BYTES = 154;
+const qrStudioForm = $("#qr-studio-form");
+const qrStudioType = $("#qr-type");
+const qrStudioStatus = $("#qr-status");
+const qrStudioSize = $("#qr-payload-size");
+const qrStudioPreviewButton = $("#qr-preview-button");
+const qrStudioShowButton = $("#qr-show-button");
+
+function qrStudioUtf8Length(value) {
+  if (window.TextEncoder) return new TextEncoder().encode(value).length;
+  return new Blob([value]).size;
+}
+
+function qrStudioSetStatus(message, type) {
+  qrStudioStatus.textContent = message || "";
+  qrStudioStatus.classList.toggle("error", type === "error");
+  qrStudioStatus.classList.toggle("success", type === "success");
+}
+
+function qrStudioSetBusy(busy) {
+  qrStudioPreviewButton.disabled = busy;
+  qrStudioShowButton.disabled = busy;
+}
+
+function qrStudioEscapeWifi(value) {
+  return value.replace(/([\\;,:"])/g, "\\$1");
+}
+
+function qrStudioEscapeVcard(value) {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/\r?\n/g, "\\n")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,");
+}
+
+function qrStudioRequire(value, label) {
+  if (!value.trim()) throw new Error(`${label} nao pode ficar vazio.`);
+  return value.trim();
+}
+
+function qrStudioValidateEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function qrStudioBuildRequest() {
+  const type = qrStudioType.value;
+  const formData = new FormData();
+
+  if (type === "pix") {
+    const key = qrStudioRequire($("#qr-pix-key").value, "A chave PIX");
+    let amount = qrStudioRequire($("#qr-pix-amount").value, "O valor");
+    amount = amount.replace(",", ".");
+
+    if (qrStudioUtf8Length(key) > 25)
+      throw new Error("A chave PIX deve ter no maximo 25 bytes.");
+    if (!/^\d+(?:\.\d{1,2})?$/.test(amount))
+      throw new Error(
+        "Informe o valor PIX usando numeros e ate duas casas decimais.",
+      );
+    if (qrStudioUtf8Length(amount) > 10)
+      throw new Error("O valor PIX deve ter no maximo 10 bytes.");
+
+    formData.append("type", "pix");
+    formData.append("key", key);
+    formData.append("amount", amount);
+    return { formData: formData, payload: null };
+  }
+
+  let payload = "";
+  if (type === "wifi") {
+    const ssid = qrStudioRequire($("#qr-wifi-ssid").value, "O SSID");
+    const security = $("#qr-wifi-security").value;
+    const password = $("#qr-wifi-password").value;
+    if (security === "WPA" && !password)
+      throw new Error("Informe a senha da rede WPA/WPA2.");
+
+    payload = `WIFI:T:${security};S:${qrStudioEscapeWifi(ssid)};`;
+    if (security === "WPA")
+      payload += `P:${qrStudioEscapeWifi(password)};`;
+    payload += ";";
+  } else if (type === "url") {
+    const url = qrStudioRequire($("#qr-url").value, "A URL");
+    if (!/^https?:\/\/[^\s]+$/i.test(url))
+      throw new Error("A URL deve iniciar com http:// ou https://.");
+    payload = url;
+  } else if (type === "text") {
+    payload = $("#qr-text").value;
+    if (!payload.trim()) throw new Error("O texto nao pode ficar vazio.");
+  } else if (type === "phone") {
+    const phone = qrStudioRequire($("#qr-phone").value, "O telefone");
+    if (!/^[+0-9().\-\s]{3,}$/.test(phone))
+      throw new Error("O telefone contem caracteres invalidos.");
+    payload = `tel:${phone}`;
+  } else if (type === "email") {
+    const address = qrStudioRequire(
+      $("#qr-email-address").value,
+      "O endereco de e-mail",
+    );
+    if (!qrStudioValidateEmail(address))
+      throw new Error("Informe um endereco de e-mail valido.");
+
+    const params = [];
+    const subject = $("#qr-email-subject").value;
+    const body = $("#qr-email-body").value;
+    if (subject) params.push(`subject=${encodeURIComponent(subject)}`);
+    if (body) params.push(`body=${encodeURIComponent(body)}`);
+    payload = `mailto:${address}${params.length ? "?" + params.join("&") : ""}`;
+  } else if (type === "vcard") {
+    const name = qrStudioRequire($("#qr-vcard-name").value, "O nome");
+    const phone = $("#qr-vcard-phone").value.trim();
+    const email = $("#qr-vcard-email").value.trim();
+    if (email && !qrStudioValidateEmail(email))
+      throw new Error("Informe um endereco de e-mail valido.");
+
+    const lines = [
+      "BEGIN:VCARD",
+      "VERSION:3.0",
+      `FN:${qrStudioEscapeVcard(name)}`,
+    ];
+    if (phone) lines.push(`TEL:${qrStudioEscapeVcard(phone)}`);
+    if (email) lines.push(`EMAIL:${qrStudioEscapeVcard(email)}`);
+    lines.push("END:VCARD");
+    payload = lines.join("\r\n");
+  } else {
+    throw new Error("Tipo de QR Code desconhecido.");
+  }
+
+  const payloadSize = qrStudioUtf8Length(payload);
+  if (payloadSize > QR_STUDIO_MAX_BYTES)
+    throw new Error(
+      `O conteudo possui ${payloadSize} bytes. O limite e ${QR_STUDIO_MAX_BYTES}.`,
+    );
+
+  formData.append("payload", payload);
+  return { formData: formData, payload: payload };
+}
+
+function qrStudioUpdateSize() {
+  const sizeContainer = $(".qr-byte-count");
+  try {
+    const request = qrStudioBuildRequest();
+    if (request.payload === null) {
+      qrStudioSize.textContent = "validado pelo MaliOS (limite 154 bytes)";
+    } else {
+      const bytes = qrStudioUtf8Length(request.payload);
+      qrStudioSize.textContent = `${bytes} / ${QR_STUDIO_MAX_BYTES} bytes`;
+    }
+    sizeContainer.classList.remove("invalid");
+  } catch (error) {
+    qrStudioSize.textContent = "--";
+    sizeContainer.classList.add("invalid");
+  }
+}
+
+async function qrStudioPost(path, formData, expectBinary) {
+  const response = await fetch((IS_DEV ? "/bruce" : "") + path, {
+    method: "POST",
+    body: formData,
+    credentials: "same-origin",
+  });
+
+  if (response.status === 401) {
+    handleAuthError();
+    throw new Error("Sessao expirada.");
+  }
+  if (!response.ok) {
+    const detail = (await response.text()).trim();
+    if (detail) throw new Error(detail);
+    if (response.status === 409)
+      throw new Error("O display esta ocupado. Tente novamente em instantes.");
+    throw new Error(`O MaliOS recusou a solicitacao (${response.status}).`);
+  }
+
+  return expectBinary ? response.arrayBuffer() : response.text();
+}
+
+function qrStudioDrawPreview(buffer) {
+  const data = new Uint8Array(buffer);
+  if (data.length < 2) throw new Error("Preview recebido esta vazio.");
+
+  const matrixSize = data[0];
+  const matrixBits = matrixSize * matrixSize;
+  const expectedBytes = 1 + Math.ceil(matrixBits / 8);
+  if (matrixSize < 21 || data.length < expectedBytes)
+    throw new Error("Preview recebido possui formato invalido.");
+
+  const quietZone = 4;
+  const totalModules = matrixSize + quietZone * 2;
+  const scale = Math.max(3, Math.floor(320 / totalModules));
+  const canvas = $("#qr-preview-canvas");
+  canvas.width = totalModules * scale;
+  canvas.height = totalModules * scale;
+  const context = canvas.getContext("2d");
+  context.imageSmoothingEnabled = false;
+  context.fillStyle = "#fff";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = "#000";
+
+  for (let row = 0; row < matrixSize; row++) {
+    for (let column = 0; column < matrixSize; column++) {
+      const bitIndex = row * matrixSize + column;
+      const byte = data[1 + (bitIndex >> 3)];
+      const isDark = (byte & (0x80 >> (bitIndex & 7))) !== 0;
+      if (isDark) {
+        context.fillRect(
+          (column + quietZone) * scale,
+          (row + quietZone) * scale,
+          scale,
+          scale,
+        );
+      }
+    }
+  }
+}
+
+function qrStudioSelectType() {
+  document.querySelectorAll("[data-qr-fields]").forEach((fields) => {
+    fields.classList.toggle(
+      "hidden",
+      fields.getAttribute("data-qr-fields") !== qrStudioType.value,
+    );
+  });
+  const isOpenWifi = $("#qr-wifi-security").value === "nopass";
+  $(".qr-wifi-password").classList.toggle("hidden", isOpenWifi);
+  if (isOpenWifi) $("#qr-wifi-password").value = "";
+  qrStudioSetStatus("");
+  qrStudioUpdateSize();
+}
+
+document.querySelectorAll("[data-webui-target]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const target = button.getAttribute("data-webui-target");
+    const showQrStudio = target === "qr";
+    document.querySelectorAll(".files-view").forEach((element) => {
+      element.classList.toggle("hidden", showQrStudio);
+    });
+    $(".qr-studio").classList.toggle("hidden", !showQrStudio);
+    document.querySelectorAll("[data-webui-target]").forEach((navButton) => {
+      navButton.classList.toggle("active", navButton === button);
+    });
+  });
+});
+
+qrStudioType.addEventListener("change", qrStudioSelectType);
+$("#qr-wifi-security").addEventListener("change", qrStudioSelectType);
+qrStudioForm.addEventListener("input", () => {
+  qrStudioSetStatus("");
+  qrStudioUpdateSize();
+});
+
+qrStudioForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  qrStudioSetStatus("");
+  try {
+    const request = qrStudioBuildRequest();
+    qrStudioSetBusy(true);
+    qrStudioSetStatus("Gerando preview no MaliOS...");
+    const preview = await qrStudioPost(
+      "/api/qr/preview",
+      request.formData,
+      true,
+    );
+    qrStudioDrawPreview(preview);
+    qrStudioSetStatus("Preview gerado com sucesso.", "success");
+  } catch (error) {
+    qrStudioSetStatus(
+      error.message || "Nao foi possivel gerar o preview.",
+      "error",
+    );
+  } finally {
+    qrStudioSetBusy(false);
+  }
+});
+
+qrStudioShowButton.addEventListener("click", async () => {
+  qrStudioSetStatus("");
+  try {
+    const request = qrStudioBuildRequest();
+    qrStudioSetBusy(true);
+    qrStudioSetStatus("Enviando QR Code para o display...");
+    await qrStudioPost("/api/qr/show", request.formData, false);
+    qrStudioSetStatus(
+      "QR Code enviado. Use Voltar ou pressione o encoder no Mali para fechar.",
+      "success",
+    );
+  } catch (error) {
+    qrStudioSetStatus(error.message || "Nao foi possivel usar o display.", "error");
+  } finally {
+    qrStudioSetBusy(false);
+  }
+});
+
+qrStudioSelectType();
+
 (async function () {
   await fetchSystemInfo();
 

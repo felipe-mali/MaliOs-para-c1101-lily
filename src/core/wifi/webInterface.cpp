@@ -1,4 +1,5 @@
 #include "webInterface.h"
+#include "MaliQrWebApi.h"
 #include "core/display.h"    // using displayRedStripe as error msg
 #include "core/mykeyboard.h" // using keyboard when calling rename
 #include "core/passwords.h"
@@ -9,6 +10,7 @@
 #include "core/utils.h"
 #include "core/wifi/wifi_common.h" // using common wifisetup
 #include "esp_task_wdt.h"
+#include "modules/mali/MaliQrService.h"
 #include "webFiles.h"
 #include <MD5Builder.h>
 #include <cstddef>
@@ -397,6 +399,7 @@ void configureWebServer() {
     mdnsRunning = startMdnsResponder();
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
     server->onNotFound(notFound);
+    registerMaliQrWebApi(*server, [](AsyncWebServerRequest *request) { return checkUserWebAuth(request); });
 
     // Index
     server->on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -774,7 +777,8 @@ void startWebUi(bool mode_ap) {
     drawWebUiScreen(mode_ap);
 #ifdef HAS_SCREEN // Headless always run in the background!
     while (!check(EscPress)) {
-        // nothing here, just to hold the screen until the server is on.
+        // Consume TFT work in this foreground UI task, never in AsyncTCP.
+        if (MaliQrService::processPendingDisplay()) drawWebUiScreen(mode_ap);
         vTaskDelay(pdMS_TO_TICKS(70));
     }
 
