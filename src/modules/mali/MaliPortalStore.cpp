@@ -1,4 +1,5 @@
 #include "MaliPortalStore.h"
+#include "maliPortalTemplate.h"
 
 #include <LittleFS.h>
 #include <freertos/FreeRTOS.h>
@@ -10,9 +11,6 @@ namespace {
 constexpr const char *kDirectory = "/MaliOS/portals";
 constexpr const char *kSelectionFile = "/MaliOS/portal_selected.txt";
 constexpr const char *kDefaultName = "mali_lab.html";
-
-const char kDefaultTemplate[] PROGMEM = R"HTML(<!-- AP="Mali Lab" -->
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mali Lab</title><style>:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:18px;background:#070607;color:#f7edf1;font:15px system-ui,sans-serif}.card{width:min(100%,430px);border:1px solid #722039;background:#100a0d;box-shadow:0 18px 50px #0008}.head{padding:18px;border-bottom:3px solid #a61f48}.head b{display:block;color:#e44d79;letter-spacing:.16em}.body{padding:18px}h1{margin:.35rem 0;font-size:27px}p{line-height:1.55;color:#d2bcc4}.notice{padding:11px;border-left:3px solid #e44d79;background:#1b0d13}label{display:block;margin:14px 0 5px;color:#e7c9d3}input,button{width:100%;padding:12px;border:1px solid #722039;background:#090708;color:#fff}button{margin-top:15px;background:#a61f48;font-weight:700;cursor:pointer}.ok{min-height:1.4em;color:#79dfa5}</style></head><body><main class="card"><header class="head"><b>MALI PORTAL</b><h1>Laboratorio local</h1></header><section class="body"><p class="notice">Pagina educativa para equipamentos proprios e ambientes autorizados. Nao informe senhas nem dados reais.</p><form id="lab"><label for="nick">Nome ou apelido de teste</label><input id="nick" maxlength="32" autocomplete="off"><label for="code">Codigo ficticio do laboratorio</label><input id="code" maxlength="24" autocomplete="off"><button type="submit">VALIDAR LOCALMENTE</button></form><p id="result" class="ok" role="status"></p></section></main><script>document.getElementById('lab').addEventListener('submit',function(e){e.preventDefault();document.getElementById('result').textContent='Teste local concluido. Nenhum dado foi enviado ou armazenado.';this.reset()})</script></body></html>)HTML";
 
 SemaphoreHandle_t storeMutex = nullptr;
 
@@ -79,10 +77,9 @@ bool ensureUnlocked(String &error) {
             error = "Nao foi possivel criar o template Mali Lab";
             return false;
         }
-        const size_t length = strlen(kDefaultTemplate);
-        const size_t written = file.write(reinterpret_cast<const uint8_t *>(kDefaultTemplate), length);
+        const size_t written = file.write(mali_lab_html, mali_lab_html_size);
         file.close();
-        if (written != length) {
+        if (written != mali_lab_html_size) {
             LittleFS.remove(defaultPath);
             error = "Falha ao criar o template Mali Lab";
             return false;

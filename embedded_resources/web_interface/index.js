@@ -465,7 +465,7 @@ async function fetchSystemInfo() {
   Dialog.loading.show("Fetching system info...");
   let req = await requestGet("/systeminfo");
   let info = JSON.parse(req);
-  $(".bruce-version").textContent = info.BRUCE_VERSION;
+  $(".malios-version").textContent = info.MALIOS_VERSION;
   $(".free-space .free-sd span").innerHTML =
     `${info.SD.used} / ${info.SD.total}`;
   $(".free-space .free-fs span").innerHTML =
@@ -2315,7 +2315,7 @@ function portalStudioRenderList() {
     const label = document.createElement("strong");
     label.textContent = template.name;
     const detail = document.createElement("small");
-    detail.textContent = `${template.size} B${template.selected ? " Â· EM USO" : ""}${template.builtIn ? " Â· PADRAO" : ""}`;
+    detail.textContent = `${template.size} B${template.selected ? " \u00b7 EM USO" : ""}${template.builtIn ? " \u00b7 PADRAO" : ""}`;
     button.append(label, detail);
     button.addEventListener("click", () => portalStudioOpen(template.name));
     container.appendChild(button);

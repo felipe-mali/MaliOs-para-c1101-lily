@@ -270,7 +270,7 @@ void boot_screen() {
     tft.drawPixel(0, 0, bruceConfig.bgColor);
     tft.drawCentreString("MaliOS", tftWidth / 2, 10, 1);
     tft.setTextSize(FP);
-    tft.drawCentreString(BRUCE_VERSION, tftWidth / 2, 25, 1);
+    tft.drawCentreString(MALIOS_VERSION, tftWidth / 2, 25, 1);
     tft.setTextSize(FM);
     tft.drawCentreString(
         "FIRMWARE DO MALI", tftWidth / 2, tftHeight + 2, 1

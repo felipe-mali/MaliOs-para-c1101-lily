@@ -12,6 +12,7 @@ _*.sh
 tmp
 ISSUES.md
 include/webFiles.h
+include/maliPortalTemplate.h
 include/current_year.h
 checksum.sha256
 /*.bin

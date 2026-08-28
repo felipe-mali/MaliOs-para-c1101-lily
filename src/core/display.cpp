@@ -12,7 +12,7 @@
 #include <memory>
 
 #ifndef MALIOS_VERSION
-#define MALIOS_VERSION BRUCE_VERSION
+#define MALIOS_VERSION "0.7"
 #endif
 
 #define MAX_MENU_SIZE (int)(tftHeight / 25)

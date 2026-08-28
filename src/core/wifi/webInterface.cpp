@@ -429,9 +429,10 @@ void serveWebUIFile(
     FS *fs = NULL;
     if (setupSdCard()) {
         if (SD.exists("/BruceWebUI/" + filename)) fs = &SD;
-    } else if (LittleFS.exists("/BruceWebUI/" + filename)) {
-        fs = &LittleFS;
     }
+    // Keep SD as the preferred custom WebUI source, but still inspect
+    // LittleFS when a mounted SD does not contain this particular file.
+    if (!fs && LittleFS.exists("/BruceWebUI/" + filename)) fs = &LittleFS;
     if (fs) {
         response = request->beginResponse(*fs, "/BruceWebUI/" + filename, contentType);
     } else {
@@ -566,10 +567,12 @@ void configureWebServer() {
             snprintf(
                 response_body,
                 sizeof(response_body),
-                "{\"%s\":\"%s\",\"SD\":{\"%s\":\"%s\",\"%s\":\"%s\",\"%s\":\"%s\"},"
+                "{\"%s\":\"%s\",\"%s\":\"%s\",\"SD\":{\"%s\":\"%s\",\"%s\":\"%s\",\"%s\":\"%s\"},"
                 "\"LittleFS\":{\"%s\":\"%s\",\"%s\":\"%s\",\"%s\":\"%s\"}}",
                 "BRUCE_VERSION",
                 BRUCE_VERSION,
+                "MALIOS_VERSION",
+                MALIOS_VERSION,
                 "free",
                 humanReadableSize(SDTotalBytes - SDUsedBytes).c_str(),
                 "used",

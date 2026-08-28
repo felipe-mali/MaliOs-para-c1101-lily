@@ -16,9 +16,9 @@ struct TemplateInfo {
     bool builtIn = false;
 };
 
-// Templates are intentionally isolated from the general file manager under
-// LittleFS:/MaliOS/portals. All public methods validate the basename before
-// touching the filesystem.
+// Templates live in a dedicated folder that is also visible in the WebUI file
+// manager at LittleFS:/MaliOS/portals. All public methods validate the basename
+// before touching the filesystem.
 bool begin(String &error);
 bool list(std::vector<TemplateInfo> &items, String &error);
 bool read(const String &name, String &content, String &error);
