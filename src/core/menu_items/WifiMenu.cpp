@@ -1,3 +1,4 @@
+#include "mali_tools/counter/counter_main.h"
 #include "WifiMenu.h"
 #include "core/display.h"
 #include "core/settings.h"
@@ -61,6 +62,7 @@ void WifiMenu::optionsMenu() {
     if (WiFi.getMode() & WIFI_MODE_STA && WiFi.isConnected()) {
         options.push_back({"Info do AP", displayAPInfo});
     }
+    options.push_back({"Wi-Fi Counter", [](){ CounterSuite::run(CounterSuite::WIFI); }});
     options.push_back({"WebUI", loopOptionsWebUi});
     options.push_back({"Mali Portal", []() {
                            String name;

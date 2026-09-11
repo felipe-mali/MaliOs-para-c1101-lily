@@ -1,3 +1,4 @@
+#include "mali_tools/counter/counter_main.h"
 #include "MaliCounterMenu.h"
 
 #include "core/utils.h"
@@ -6,7 +7,7 @@
 
 void MaliCounterMenu::optionsMenu() {
     std::vector<Option> counterOptions = {
-        {"Painel / Full Scan", MaliCounter::run},
+        {"Counter Suite", CounterSuite::open},
         {"Sobre a contagem", []() {
              displayInfo("Atividade passiva; eventos de radio nao equivalem a dispositivos.", true);
          }},

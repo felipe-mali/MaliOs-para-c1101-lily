@@ -40,7 +40,8 @@ uint32_t ledStateStartedAt = 0;
 uint32_t ledStateRevision = 1;
 
 bool isTemporaryLedState(MaliLedState state) {
-    return state == MaliLedState::SUCCESS || state == MaliLedState::ERROR;
+    return state == MaliLedState::SUCCESS || state == MaliLedState::ERROR ||
+           state == MaliLedState::COUNTER_SIGNAL || state == MaliLedState::COUNTER_STRONG;
 }
 
 CRGB scaleLedColor(const CRGB &color, uint8_t percent) {
@@ -107,7 +108,7 @@ void updateLedEffects() {
 
     uint32_t duration = state == MaliLedState::SUCCESS ? SUCCESS_DURATION_MS
                          : state == MaliLedState::ERROR ? ERROR_DURATION_MS
-                                                       : 0;
+                                                       : (state == MaliLedState::COUNTER_SIGNAL || state == MaliLedState::COUNTER_STRONG) ? 300 : 0;
     if (duration > 0 && now - startedAt >= duration) {
         currentLedState = restoreLedState;
         state = currentLedState;
@@ -124,6 +125,7 @@ void updateLedEffects() {
     else if (state == MaliLedState::NFC_SCAN || state == MaliLedState::RF_SCAN)
         frame ^= elapsed / STATUS_UPDATE_MS;
     else if (state == MaliLedState::SUCCESS) frame ^= elapsed / 220;
+    else if (state == MaliLedState::COUNTER_SIGNAL || state == MaliLedState::COUNTER_STRONG) frame ^= elapsed / 25;
     else if (state == MaliLedState::ERROR) frame ^= elapsed / 100;
 
     static uint32_t lastFrame = UINT32_MAX;
@@ -151,6 +153,13 @@ void updateLedEffects() {
             if ((elapsed / 100) % 2 == 0)
                 fill_solid(leds, LED_COUNT, scaleLedColor(MALI_ERROR_RED, 65));
             break;
+        case MaliLedState::COUNTER_SIGNAL:
+        case MaliLedState::COUNTER_STRONG: {
+            uint8_t maximum = state == MaliLedState::COUNTER_STRONG ? 85 : 45;
+            uint8_t brightness = maximum * (300 - min(uint32_t(300), elapsed)) / 300;
+            fill_solid(leds, LED_COUNT, scaleLedColor(MALI_SCAN_PURPLE, brightness));
+            break;
+        }
         case MaliLedState::NFC_SCAN:
             fill_solid(leds, LED_COUNT, scaleLedColor(MALI_SCAN_PURPLE, pulseBrightness(elapsed, NFC_PULSE_MS)));
             break;

@@ -9,7 +9,7 @@
   </head>
 
   <body>
-    <div class="container">
+    <div class="container mali-shell">
       <div class="header">
         <div class="title" onclick="Dialog.show('info')">
           <span class="mali-brand">MALI OS</span>
@@ -32,45 +32,51 @@
           </button>
         </div>
       </div>
-      <nav class="webui-navigation" aria-label="WebUI sections">
-        <button
-          class="btn-action active"
-          type="button"
-          data-webui-target="home"
-        >
-          Dashboard
-        </button>
-        <button
-          class="btn-action"
-          type="button"
-          data-webui-target="files"
-        >
-          Arquivos
-        </button>
-        <button class="btn-action" type="button" data-webui-target="qr">
-          QR Studio
-        </button>
-        <button class="btn-action" type="button" data-webui-target="wifi">
-          Wi-Fi
-        </button>
-        <button class="btn-action" type="button" data-webui-target="portal">
-          Portal Studio
-        </button>
-        <button class="btn-action" type="button" data-webui-target="scripts">
-          Scripts
-        </button>
-        <button class="btn-action" type="button" data-webui-target="system">
-          Sistema
-        </button>
+      <nav class="webui-navigation mali-sidebar" aria-label="WebUI sections">
+        <a class="mali-sidebar-brand" href="#home" data-open-view="home"><svg class="mali-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M9 31V9L20 24L31 9V31M12 31V21M28 31V21"/></svg><span>MALI OS<small>Predatory Firmware</small></span></a>
+        <span class="mali-nav-label">DEVICE CONSOLE</span>
+        <button class="btn-action active" data-webui-target="home">Dashboard</button>
+        <button class="btn-action" data-webui-target="wifi">Network</button>
+        <button class="btn-action" data-webui-target="radio">Radio</button>
+        <button class="btn-action" data-webui-target="tools">Tools</button>
+        <button class="btn-action" data-webui-target="counter">Counter</button>
+        <button class="btn-action" data-webui-target="files">Files</button>
+        <button class="btn-action" data-webui-target="system">System</button>
+        <span class="mali-nav-label">QUICK ACCESS</span>
+        <button class="btn-action" data-webui-target="keygauge">Key Gauge</button>
+        <button class="btn-action" data-webui-target="qr">QR Studio</button>
+        <button class="btn-action" data-webui-target="portal">Portal Studio</button>
+        <button class="btn-action" data-webui-target="scripts">Scripts</button>
+        <span class="mali-sidebar-foot">LOCAL INTERFACE <span class="mali-status">READY</span></span>
       </nav>
+      <section class="webui-view tools-view hidden" aria-labelledby="tools-title">
+        <div class="mali-hero"><div><span class="mali-kicker">MALI / TOOLS</span><h1 id="tools-title">Built for the device.</h1><p>Ferramentas locais, acesso direto e o mesmo estado do T-Embed.</p></div></div>
+        <div class="mali-card-grid">
+          <button class="mali-card" data-open-view="keygauge"><strong>Key Gauge</strong><span>Profile viewer / editor</span></button>
+          <button class="mali-card" data-open-view="qr"><strong>QR Studio</strong><span>PIX / Wi-Fi / contato</span></button>
+          <button class="mali-card" data-open-view="scripts"><strong>Scripts</strong><span>Arquivos e automação local</span></button>
+          <button class="mali-card" onclick="openNavigator()"><strong>Pixel Paint / D20</strong><span>Abrir o navegador do dispositivo</span></button>
+        </div>
+      </section>
+      <section class="webui-view radio-view hidden" aria-labelledby="radio-title">
+        <div class="mali-hero"><div><span class="mali-kicker">MALI / RADIO</span><h1 id="radio-title">Observe. Measure.</h1><p>As tecnologias disponíveis acompanham a configuração do dispositivo.</p></div></div>
+        <div class="mali-card-grid">
+          <button class="mali-card" data-open-view="counter"><strong>Counter</strong><span>BLE / RF / IR / NFC — diagnóstico e laboratório</span></button>
+          <button class="mali-card" onclick="openNavigator()"><strong>Device navigator</strong><span>Controle das ferramentas existentes no T-Embed</span></button>
+        </div>
+      </section>
       <section class="webui-view home-view mali-home" aria-labelledby="mali-home-title">
         <div class="mali-hero">
           <div>
-            <span class="mali-kicker">CONTROLE LOCAL · OFFLINE</span>
-            <h1 id="mali-home-title">MALI OS</h1>
+            <span class="mali-kicker">MALI / DEVICE CONSOLE</span>
+            <h1 id="mali-home-title">Turn the system.</h1>
             <p>Ferramentas do T-Embed, arquivos e diagnostico em uma interface local.</p>
           </div>
           <span class="mali-online-dot">WEBUI ATIVO</span>
+        </div>
+        <div class="mali-rotary-deck mali-panel">
+          <div class="mali-gear" aria-hidden="true"><svg viewBox="0 0 140 140"><circle class="mali-orbit" cx="70" cy="70" r="59"/><circle class="mali-orbit-inner" cx="70" cy="70" r="47"/><path class="mali-axis" d="M47 94V46L70 78L93 46V94M53 94V73M87 94V73"/><circle class="mali-position" cx="70" cy="11" r="4"/></svg></div>
+          <div><span class="mali-kicker">ROTARY ACCESS / 01—04</span><h2>One turn away.</h2><p>Selecione um módulo. O dispositivo continua no centro.</p><div class="mali-selector" role="group" aria-label="Atalhos do dispositivo"><button data-open-view="wifi" class="btn-action">Network</button><button data-open-view="tools" class="btn-action">Tools</button><button data-open-view="counter" class="btn-action">Counter</button><button data-open-view="system" class="btn-action">System</button></div></div>
         </div>
         <div class="dashboard-summary" aria-live="polite">
           <div><span>MODELO</span><strong id="dashboard-model">--</strong></div>
@@ -80,6 +86,8 @@
         </div>
         <p id="dashboard-status" class="mali-inline-status" role="status"></p>
         <div class="mali-card-grid">
+          <button class="mali-card" data-open-view="counter"><strong>COUNTER</strong><span>Testes de Resiliência</span></button>
+          <button class="mali-card" type="button" data-open-view="keygauge"><strong>Mali Tools / KEY GAUGE</strong><span>Editor de perfis geometricos</span></button>
           <button class="mali-card" type="button" data-open-view="files">
             <strong>Arquivos</strong><span>SD e LittleFS</span>
           </button>
@@ -100,6 +108,62 @@
           </button>
         </div>
       </section>
+<section class="webui-view counter-view hidden" aria-labelledby="counter-title">
+ <div class="mali-hero"><div><span class="mali-kicker">MALI TOOLS</span><h1 id="counter-title">COUNTER</h1><p>Testes de Resiliência · LAB / AUTHORIZED TARGETS ONLY</p></div><strong id="ct-state">IDLE</strong></div>
+ <div class="ct-layout">
+  <div class="ct-config">
+   <label for="ct-category">TECHNOLOGY</label><select id="ct-category"></select>
+   <button class="btn-action" id="ct-scan">SCAN</button>
+   <label for="ct-targets">SELECT (ate 32 alvos; validade 2 minutos)</label><select id="ct-targets" size="4"></select>
+   <p id="ct-target-info" class="kg-hint"></p>
+   <label for="ct-mode">MODE</label><select id="ct-mode"></select>
+   <label><input id="ct-simulation" type="checkbox" checked /> SIMULATION — sem operações externas</label>
+   <p id="ct-mode-note" class="kg-hint"></p>
+   <label for="ct-target">TARGET / IPv4 HOST</label><input id="ct-target" maxlength="64" placeholder="Selecione um alvo ou informe IPv4 para ping" />
+   <label for="ct-password">Wi-Fi password (RAM only)</label><input id="ct-password" type="password" maxlength="64" autocomplete="off" />
+   <label for="ct-frequency">RF CENTER (MHz)</label><input id="ct-frequency" type="number" value="433.92" step="0.01" />
+   <label for="ct-duration">DURATION</label><select id="ct-duration"><option value="5">5 sec</option><option value="10">10 sec</option><option value="30" selected>30 sec</option><option value="60">60 sec</option><option value="0">Unlimited</option><option value="custom">Custom</option></select>
+   <input id="ct-custom-duration" type="number" min="1" max="3600" value="30" aria-label="Custom duration in seconds" hidden />
+   <label for="ct-intensity">INTENSITY</label><select id="ct-intensity"><option value="2000">LOW</option><option value="1000" selected>MEDIUM</option><option value="500">HIGH</option><option value="custom">CUSTOM</option></select>
+   <label for="ct-interval">Actual interval / polling (ms)</label><input id="ct-interval" type="number" min="100" max="60000" value="1000" />
+   <label><input id="ct-authorized" type="checkbox" /> LAB / AUTHORIZED TARGETS ONLY</label>
+   <button class="btn-action" id="ct-start">START</button>
+  </div>
+  <div class="ct-live">
+   <div class="ct-stop-bar"><strong id="ct-live-mode">Ready</strong><button class="btn-action" id="ct-stop">STOP TEST</button></div>
+   <p id="ct-live-target">TARGET: —</p><div id="ct-metrics" class="ct-metrics"></div>
+   <canvas id="ct-chart" width="800" height="220" aria-label="Historico curto: RSSI, tempo ou eventos"></canvas>
+   <p id="ct-message" role="status" aria-live="polite"></p>
+   <div class="kg-toolbar"><button class="btn-action" id="ct-again">RUN AGAIN</button><button class="btn-action" id="ct-save">SAVE RESULT</button></div>
+   <h2>SCAN / CHANNELS</h2><div id="ct-channels"></div>
+   <h2>HISTORY</h2><button class="btn-action" id="ct-history-refresh">Atualizar</button><div id="ct-history"></div>
+   <label for="ct-limit">History limit (1–50)</label><input id="ct-limit" type="number" min="1" max="50" value="20" /><button class="btn-action" id="ct-settings">APPLY SETTINGS</button>
+  </div>
+ </div>
+</section>
+
+<section class="webui-view keygauge-view hidden" aria-labelledby="kg-title">
+  <div class="mali-hero"><div><span class="mali-kicker">MALI TOOLS</span><h1 id="kg-title">KEY GAUGE</h1><p>Perfil geometrico manual · REFERENCE ONLY</p></div><strong id="kg-state">NOVO · NAO SALVO</strong></div>
+  <div class="kg-layout">
+    <div class="kg-main">
+      <div class="kg-toolbar"><button class="btn-action" id="kg-new">NEW</button><button class="btn-action" id="kg-duplicate">DUPLICATE</button><button class="btn-action" id="kg-save">SAVE</button><button class="btn-action" id="kg-show">SHOW ON DEVICE</button></div>
+      <div class="kg-drawing"><canvas id="kg-canvas" width="960" height="430" aria-label="Perfil: arraste os pontos verticalmente. Controles equivalentes abaixo."></canvas></div>
+      <p id="kg-active">P1 · LEVEL 0</p><p class="kg-hint">Arraste um marcador para ajustar o nivel. THICKNESS altera a base; PROFILE WIDTH altera o comprimento visual.</p>
+      <div id="kg-levels" class="kg-levels" aria-label="Niveis dos pontos"></div>
+    </div>
+    <aside class="kg-controls" aria-label="Configuracao do perfil">
+      <label for="kg-name">PROFILE NAME</label><input id="kg-name" maxlength="31" pattern="[A-Za-z0-9_-]+" autocomplete="off" value="PROFILE_001" />
+      <label for="kg-points">POINTS</label><select id="kg-points"><option>4</option><option>5</option><option selected>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select>
+      <label for="kg-thickness">THICKNESS: <output id="kg-thickness-value">5</output></label><input id="kg-thickness" type="range" min="1" max="10" value="5" />
+      <label for="kg-width">PROFILE WIDTH: <output id="kg-width-value">90</output>%</label><input id="kg-width" type="range" min="50" max="100" value="90" />
+      <h2>PROFILES</h2><p class="kg-hint">Mesmo armazenamento do T-Embed.</p>
+      <label for="kg-list">Perfis salvos</label><select id="kg-list" size="6" aria-label="Perfis salvos"></select>
+      <div class="kg-toolbar"><button class="btn-action" id="kg-load">LOAD</button><button class="btn-action" id="kg-delete">DELETE</button><button class="btn-action" id="kg-refresh">Atualizar</button></div>
+    </aside>
+  </div>
+  <p id="kg-status" role="status" aria-live="polite">Ajustes ficam na memoria do navegador ate SAVE.</p>
+</section>
+
       <div class="webui-view free-space files-view hidden">
         <span
           class="btn-action act-browse block-space free-sd"

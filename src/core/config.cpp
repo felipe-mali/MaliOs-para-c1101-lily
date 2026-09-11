@@ -140,6 +140,10 @@ void BruceConfig::fromFile(bool checkFS) {
         count++;
         log_e("Fail");
     }
+    // Migrate the former stock Mali palette only; preserve custom user themes.
+    if(priColor==0x600C && secColor==0xBD95 && bgColor==0){
+        priColor=MaliUI::ACCENT;secColor=MaliUI::TEXT_SECONDARY;bgColor=MaliUI::BACKGROUND;
+    }
 
     if (!setting["themeFile"].isNull()) {
         themePath = setting["themeFile"].as<String>();

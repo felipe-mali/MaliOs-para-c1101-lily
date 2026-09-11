@@ -52,6 +52,7 @@ public:
     void hideAppsMenu();
 
 private:
+    void openCategory(int category);
     int _currentIndex = 0;
     int _totalItems = 0;
     std::vector<MenuItemInterface *> _menuItems;

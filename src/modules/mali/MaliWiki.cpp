@@ -77,7 +77,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
     WIKI_ENTRY(
         WIFI,
         "WebUI",
-        "Inicia a interface web original do Bruce na rede atual ou em modo AP.",
+        "Inicia a interface web do MaliOS na rede atual ou em modo AP.",
         "Gerencia arquivos do SD e LittleFS e recursos mantidos pela interface original.",
         "Abrir o IP mostrado ou bruce.local em um navegador da mesma rede.",
         "Wi-Fi ESP32-S3, LittleFS e microSD quando presente.",

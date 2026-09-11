@@ -11,6 +11,8 @@ enum class MaliLedState : uint8_t {
     ERROR,
     NFC_SCAN,
     RF_SCAN,
+    COUNTER_SIGNAL,
+    COUNTER_STRONG,
 };
 
 #ifdef HAS_RGB_LED

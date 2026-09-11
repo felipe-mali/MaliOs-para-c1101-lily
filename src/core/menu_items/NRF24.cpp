@@ -1,3 +1,4 @@
+#include "mali_tools/counter/counter_main.h"
 #include "NRF24.h"
 #include "core/display.h"
 #include "core/utils.h"
@@ -9,6 +10,7 @@
 
 void NRF24Menu::optionsMenu() {
     options.clear();
+    if(CounterSuite::nrfAvailable()) options.push_back({"2.4G Counter", [](){ CounterSuite::run(CounterSuite::NRF); }});
     options.push_back({"Informacoes", nrf_info});
     options.push_back({"Espectro", nrf_spectrum});
     #if !defined(LITE_VERSION)

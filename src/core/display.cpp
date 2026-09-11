@@ -1,3 +1,5 @@
+#include "core/ui/MaliUI.h"
+#include "mali_tools/counter/CounterLab.h"
 #include "display.h"
 #include "core/led_control.h"
 #include "core/wifi/webInterface.h" // for server
@@ -174,56 +176,21 @@ std::vector<String> wrapText(const String &text, int maxCharsPerLine) {
 ** Description:   Display Red Stripe with information (supports multi-line text wrapping)
 ***************************************************************************************/
 void displayRedStripe(const String &text, uint16_t fgcolor, uint16_t bgcolor) {
-    // detect if not running in interactive mode -> show nothing onscreen and return immediately
-    // if (server || isSleeping || isScreenOff) return; // webui is running
-
-    int size;
-    if (fgcolor == bgcolor && fgcolor == TFT_WHITE) fgcolor = TFT_BLACK;
-
-    // Calculate max chars per line based on font size
-    int maxCharsFM = (tftWidth - 20) / (LW * FM);
-    int maxCharsFP = (tftWidth - 20) / (LW * FP);
-
-    // Determine if we need to wrap the text
-    std::vector<String> wrappedLines;
-    int boxHeight = 26; // Default height for single line
-
-    if (text.length() * LW * FM < (tftWidth - 2 * FM * LW)) {
-        // Text fits with FM font
-        size = FM;
-        wrappedLines = wrapText(text, maxCharsFM);
-    } else {
-        // Text needs FP font or larger
-        size = FP;
-        wrappedLines = wrapText(text, maxCharsFP);
-    }
-
-    // Adjust box height based on number of lines
-    if (wrappedLines.size() > 1) { boxHeight = 13 + (wrappedLines.size() * (size == FM ? 8 : 10)); }
-
-    tft.drawPixel(0, 0, 0);
-    tft.fillRoundRect(10, tftHeight / 2 - boxHeight / 2, tftWidth - 20, boxHeight, 7, bgcolor);
-    tft.setTextColor(fgcolor, bgcolor);
-    tft.setTextSize(size);
-
-    // Draw each line centered
-    int lineHeight = size == FM ? 8 : 10;
-    int startY = tftHeight / 2 - (wrappedLines.size() * lineHeight) / 2;
-    for (size_t i = 0; i < wrappedLines.size(); i++) {
-        tft.drawCentreString(wrappedLines[i], tftWidth / 2, startY + i * lineHeight);
-    }
+    (void)fgcolor;
+    uint16_t tone=bgcolor==TFT_RED?MaliUI::ERROR:bgcolor==TFT_YELLOW?MaliUI::WARNING:bgcolor==TFT_DARKGREEN?MaliUI::SUCCESS:MaliUI::ACCENT;
+    MaliUI::drawToast(text,tone);
 }
 
 void drawButton(
     int32_t x, int32_t y, int32_t w, int32_t h, uint32_t color, const char *text, bool inverted = false
 ) {
     if (inverted) {
-        tft.fillRoundRect(x, y, w, h, 5, color);
+        tft.fillRoundRect(x, y, w, h, MaliUI::MALI_RADIUS_MEDIUM, MaliUI::SURFACE_ALT);
     } else {
-        tft.fillRoundRect(x, y, w, h, 5, TFT_BLACK);
-        tft.drawRoundRect(x, y, w, h, 5, color);
+        tft.fillRoundRect(x, y, w, h, MaliUI::MALI_RADIUS_MEDIUM, MaliUI::SURFACE);
+        tft.drawRoundRect(x, y, w, h, MaliUI::MALI_RADIUS_MEDIUM, color);
     }
-    tft.setTextColor(inverted ? TFT_BLACK : color);
+    tft.setTextColor(inverted ? MaliUI::TEXT_PRIMARY : color);
     tft.drawString(text, x + w / 2, y + h);
 }
 
@@ -234,6 +201,8 @@ int8_t displayMessage(
 #ifdef HAS_SCREEN
     uint8_t oldTextDatum = tft.getTextDatum();
 #endif
+
+    MaliUI::drawCard(6,30,tftWidth-12,max(30,tftHeight-60));
 
     tft.setTextColor(color);
     tft.setTextSize(FM);
@@ -550,6 +519,12 @@ int loopOptions(
         index = firstEnabled;
     }
 
+    const bool gear = menuType == MENU_TYPE_MAIN || menuType == MENU_TYPE_GEAR;
+    bool gearBuffered = gear && MaliUI::beginGear();
+    MaliUI::GearMotion motion;
+    MaliUI::HoldButton selectButton;
+    check(SelPress);
+    uint32_t gearFrameAt = 0;
     Opt_Coord coord;
     bool redraw = true;
     bool exit = false;
@@ -574,6 +549,11 @@ int loopOptions(
     while (1) {
         // Check for shutdown before drawing menu to avoid drawing a black bar on the screen
         if (exit) break;
+        if (gear && CounterLab::hasPending()) MaliUI::endGear();
+        if (CounterLab::serviceDisplay()) {
+            if (gear) gearBuffered = MaliUI::beginGear();
+            drawMainBorder(); firstRender = true; redraw = true; menuOpenTs = millis();
+        }
         MaliWifiWebApi::service();
         if (MaliQrService::processPendingDisplay()) {
             // The QR page clears the screen when it closes. Rebuild the active
@@ -595,7 +575,12 @@ int loopOptions(
             }
         }
 
+        bool wasMoving=motion.active;
+        motion.tick(millis());
+        if(gearBuffered && wasMoving&&!motion.active)redraw=true;
+        if (gearBuffered && motion.active && millis()-gearFrameAt>=25) redraw=true;
         if (redraw) {
+            gearFrameAt=millis();
             menuOptionType = menuType; // updates menutype to the remote controller
             menuOptionLabel = subText;
             // update the hovered
@@ -603,11 +588,14 @@ int loopOptions(
             options[index].hovered = true;
 
             bool renderedByLambda = false;
-            if (options[index].hover)
+            if (!gear && options[index].hover)
                 renderedByLambda = options[index].hover(options[index].hoverPointer, true);
 
             if (!renderedByLambda) {
-                if (menuType == MENU_TYPE_SUBMENU) drawSubmenu(index, options, subText);
+                if (gear) {
+                    if(firstRender) MaliUI::drawHeader(menuType==MENU_TYPE_MAIN?"OS":subText);
+                    MaliUI::drawGearMenu(options,index,motion,subText);
+                } else if (menuType == MENU_TYPE_SUBMENU) drawSubmenu(index, options, subText);
                 else
                     coord = drawOptions(
                         index,
@@ -651,6 +639,10 @@ int loopOptions(
 #ifdef HAS_ENCODER
         int32_t rotarySteps = drainRotarySteps();
         if (rotarySteps != 0) {
+            if (gear) motion.move(rotarySteps>0?-1:1,millis());
+            int enabledCount=0;for(const auto &item:options)if(item.enabled)++enabledCount;
+            if(enabledCount)rotarySteps%=enabledCount;
+            redraw=true;
             check(PrevPress);
             check(NextPress);
             check(UpPress);
@@ -680,6 +672,7 @@ int loopOptions(
 #endif
         {
             if (PrevPress || check(UpPress)) {
+                if(gear)motion.move(-1,millis());
                 devModeCounter = 0;
 #ifdef HAS_KEYBOARD
                 check(PrevPress);
@@ -722,6 +715,7 @@ int loopOptions(
             }
             /* DW Btn to next item */
             if (check(NextPress) || check(DownPress)) {
+                if(gear)motion.move(1,millis());
                 int nextEnabled = findNextEnabled(index, +1);
                 if (nextEnabled >= 0) {
                     if (!bruceConfig.devMode && nextEnabled <= index) devModeCounter++;
@@ -737,9 +731,22 @@ int loopOptions(
         */
         // Prevent immediate selection if the SEL button was already being held when the menu opened.
         // Allow a short grace period for the user to release the button first.
-        static const unsigned long MENU_SELECT_IGNORE_MS = 600; // ms to ignore SEL after menu opens
+        static const unsigned long MENU_SELECT_IGNORE_MS = 600; // fallback for non-encoder inputs
 
-        if (forceMenuOption >= 0 || (millis() - menuOpenTs > MENU_SELECT_IGNORE_MS && check(SelPress))) {
+        bool selectNow=false;
+        bool selectionReady=millis()-menuOpenTs>MENU_SELECT_IGNORE_MS;
+#if defined(HAS_ENCODER) && defined(SEL_BTN)
+        bool physicalDown=digitalRead(SEL_BTN)==BTN_ACT;
+        bool wasDown=selectButton.down,wasArmed=selectButton.armed;
+        auto buttonEvent=selectButton.update(physicalDown,millis());
+        if(buttonEvent==MaliUI::ButtonEvent::Back){index=-1;break;}
+        bool virtualSelect=check(SelPress);
+        selectNow=buttonEvent==MaliUI::ButtonEvent::Select || (!physicalDown&&!wasDown&&wasArmed&&virtualSelect);
+        selectionReady=true; // release-to-arm replaces the old 600ms dead period
+#else
+        selectNow=check(SelPress);
+#endif
+        if (forceMenuOption >= 0 || (selectionReady && selectNow)) {
             uint16_t chosen = index;
             if (forceMenuOption >= 0) {
                 chosen = forceMenuOption;
@@ -748,6 +755,7 @@ int loopOptions(
             }
             if (chosen >= options.size() || !options[chosen].enabled) continue;
             Serial.println("Selected: " + String(options[chosen].label));
+            if(gear)MaliUI::endGear();
             options[chosen].operation();
             break;
         }
@@ -756,6 +764,7 @@ int loopOptions(
         if (interpreter_state > 0 && !interpreter) { break; }
     }
 
+    if(gear)MaliUI::endGear();
     RotaryNetSteps = 0; // reset rotary steps to avoid unexpected jumps in the next menu
     return index;
 }
@@ -766,13 +775,9 @@ int loopOptions(
 ** Dependencia: prog_handler =>>    0 - Flash, 1 - LittleFS
 ***************************************************************************************/
 void progressHandler(int progress, size_t total, const String &message) {
-    int barWidth = map(progress, 0, total, 0, tftWidth - 40);
-    if (barWidth < 3) {
-        tft.fillRect(6, 27, tftWidth - 12, tftHeight - 33, bruceConfig.bgColor);
-        tft.drawRect(18, tftHeight - 47, tftWidth - 36, 17, bruceConfig.priColor);
-        displayRedStripe(message, TFT_WHITE, bruceConfig.priColor);
-    }
-    tft.fillRect(20, tftHeight - 45, barWidth, 13, bruceConfig.priColor);
+    if(total==0)return;
+    MaliUI::drawToast(message);
+    MaliUI::drawProgress(16,tftHeight-12,tftWidth-32,progress,total);
 }
 
 /***************************************************************************************
@@ -783,94 +788,19 @@ Opt_Coord drawOptions(
     int index, std::vector<Option> &options, uint16_t fgcolor, uint16_t selcolor, uint16_t bgcolor,
     bool firstRender
 ) {
-    static int last_index = 0;
-
+    (void)fgcolor;(void)selcolor;(void)bgcolor;(void)firstRender;
     Opt_Coord coord;
-    int menuSize = options.size();
-    if (options.size() > MAX_MENU_SIZE) { menuSize = MAX_MENU_SIZE; }
-
-    // Uncomment to update the statusBar (causes flickering)
-    // drawStatusBar();
-
-    int32_t optionsTopY = tftHeight / 2 - menuSize * (FM * 8 + 4) / 2 - 5;
-    tft.drawPixel(0, 0, bruceConfig.bgColor);
-    if (firstRender) {
-        tft.fillRoundRect(
-            tftWidth * 0.10, optionsTopY, tftWidth * 0.8, (FM * 8 + 4) * menuSize + 10, 5, bgcolor
-        );
-        tft.drawRoundRect(
-            tftWidth * 0.10,
-            tftHeight / 2 - menuSize * (FM * 8 + 4) / 2 - 5,
-            tftWidth * 0.8,
-            (FM * 8 + 4) * menuSize + 10,
-            5,
-            fgcolor
-        );
+    const int row=24,top=32,visible=max(1,(tftHeight-52)/row);
+    int start=max(0,min(index-visible/2,int(options.size())-visible));
+    tft.fillRect(0,26,tftWidth,tftHeight-42,MaliUI::BACKGROUND);
+    for(int i=start;i<int(options.size())&&i<start+visible;++i){
+        int y=top+(i-start)*row;
+        MaliUI::drawMenuItem(options[i].label,8,y,tftWidth-16,row-2,i==index,options[i].enabled);
+        if(options[i].selected)tft.fillCircle(tftWidth-16,y+10,2,MaliUI::SUCCESS);
+        if(i==index){coord.x=20;coord.y=y+(row-10)/2;coord.size=max(1,(tftWidth-40)/6);coord.fgcolor=MaliUI::SURFACE_ALT;coord.bgcolor=MaliUI::TEXT_PRIMARY;}
     }
-    tft.setTextColor(fgcolor, bgcolor);
-    tft.setTextSize(FM);
-    tft.setCursor(tftWidth * 0.10 + 5, tftHeight / 2 - menuSize * (FM * 8 + 4) / 2);
-
-    int i = 0;
-    int init = 0;
-    int cont = 1;
-
-    if (index >= MAX_MENU_SIZE) init = index - MAX_MENU_SIZE + 1;
-    // check if cycling from last item to first
-    if (abs(index - last_index) >= menuSize) {
-        if (index > last_index) last_index = init; // from first to last
-        else last_index = menuSize - 1;            // from last to first
-    }
-
-    cont = 1;
-    for (i = 0; i < options.size(); i++) {
-        if (i >= init) {
-            int16_t cursorY = tft.getCursorY();
-            // Erase previously highlited element,
-            if (i == last_index) {
-                tft.fillRoundRect(
-                    tftWidth * 0.10 + 2, cursorY + 2, tftWidth * 0.8 - 4, FM * LH + 2, 3, bruceConfig.bgColor
-                );
-            }
-            // Draw selection highlight bar
-            if (i == index) {
-                tft.fillRoundRect(
-                    tftWidth * 0.10 + 2, cursorY + 2, tftWidth * 0.8 - 4, FM * LH + 2, 3, bruceConfig.priColor
-                );
-            }
-
-            if (options[i].selected) tft.setTextColor(selcolor, bgcolor); // if selected, change Text color
-            else tft.setTextColor(fgcolor, bgcolor);
-            if (!options[i].enabled) tft.setTextColor(TFT_DARKGREY, bgcolor);
-
-            String text = "";
-            if (i == index) {
-                text += ">";
-                coord.x = tftWidth * 0.10 + 5 + FM * LW;
-                coord.y = tft.getCursorY() + 4;
-                coord.size = (tftWidth * 0.8 - 10) / (LW * FM) - 1;
-                coord.fgcolor = fgcolor;
-                coord.bgcolor = bgcolor;
-            } else text += " ";
-            text += String(options[i].label) + "              ";
-            tft.setCursor(tftWidth * 0.10 + 5, tft.getCursorY() + 4);
-
-            // Draw text with appropriate colors for selection
-            if (i == index) { tft.setTextColor(bgcolor, bruceConfig.priColor); }
-            tft.println(text.substring(0, (tftWidth * 0.8 - 10) / (LW * FM) - 1));
-
-            // Reset text color for next item
-            tft.setTextColor(fgcolor, bgcolor);
-
-            cont++;
-        }
-        if (cont > MAX_MENU_SIZE) break;
-    }
-    // update history
-    last_index = index;
-#if defined(HAS_TOUCH)
-    TouchFooter();
-#endif
+    MaliUI::drawFooter();
+    tft.setTextSize(1);
     return coord;
 }
 
@@ -879,146 +809,21 @@ Opt_Coord drawOptions(
 ** Description:   Função para desenhar e mostrar as opçoes de contexto
 ***************************************************************************************/
 void drawSubmenu(int index, std::vector<Option> &options, const char *title) {
-    drawStatusBar();
-    int menuSize = options.size();
-    tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-    tft.setTextSize(FP);
-    tft.drawPixel(0, 0, 0);
-    tft.fillRect(6, 30, tftWidth - 12, 8 * FP, bruceConfig.bgColor);
-    tft.drawString(title, 12, 30);
-
-    // middle of the drawing area
-    int middle = 25 /*status*/ + (tftHeight - 30 /*status + bottom margin*/) / 2;
-    // drawCentreString uses TC_DATUM, so we need to adjust the Y position
-    // 42 ensures that title isnt touched( 30 + 8 (LH) + 4(Margin))
-    int middle_up = middle - (tftHeight - 42) / 3 - FM * LH / 2 + 4;
-    int middle_down = middle + (tftHeight - 42) / 3 - FM * LH / 2;
-
-    tft.setTextSize(FM);
-#if defined(HAS_TOUCH)
-    tft.drawCentreString("/\\", tftWidth / 2, middle_up - (FM * LH + 6), 1);
-#endif
-    // Previous item
-    int firstIndex = index - 1 >= 0 ? index - 1 : menuSize - 1;
-    const char *firstOption = options[firstIndex].label.c_str();
-    tft.setTextColor(options[firstIndex].enabled ? bruceConfig.secColor : TFT_DARKGREY);
-    tft.fillRect(6, middle_up, tftWidth - 12, 8 * FM, bruceConfig.bgColor);
-    tft.drawCentreString(firstOption, tftWidth / 2, middle_up, SMOOTH_FONT);
-
-    // Selected item
-    int selectedTextSize = options[index].label.length() <= tftWidth / (LW * FG) - 1 ? FG : FM;
-    tft.setTextSize(selectedTextSize);
-    tft.setTextColor(options[index].enabled ? bruceConfig.priColor : TFT_DARKGREY);
-    tft.fillRect(6, middle - FG * LH / 2 - 1, tftWidth - 12, FG * LH + 5, bruceConfig.bgColor);
-    tft.drawCentreString(options[index].label, tftWidth / 2, middle - selectedTextSize * LH / 2, SMOOTH_FONT);
-    tft.drawFastHLine(
-        tftWidth / 2 - strlen(options[index].label.c_str()) * selectedTextSize * LW / 2,
-        middle + selectedTextSize * LH / 2 + 1,
-        strlen(options[index].label.c_str()) * selectedTextSize * LW,
-        bruceConfig.priColor
-    );
-    // Next Item
-    int thirdIndex = index + 1 < menuSize ? index + 1 : 0;
-    const char *thirdOption = options[thirdIndex].label.c_str();
-    tft.setTextSize(FM);
-    tft.setTextColor(options[thirdIndex].enabled ? bruceConfig.secColor : TFT_DARKGREY);
-    tft.fillRect(6, middle_down, tftWidth - 12, 8 * FM, bruceConfig.bgColor);
-    tft.drawCentreString(thirdOption, tftWidth / 2, middle_down, SMOOTH_FONT);
-
-    tft.fillRect(tftWidth - 5, 0, 5, tftHeight, bruceConfig.bgColor);
-    tft.fillRect(tftWidth - 5, index * tftHeight / menuSize, 5, tftHeight / menuSize, bruceConfig.priColor);
-
-#if defined(HAS_TOUCH)
-    tft.drawCentreString("\\/", tftWidth / 2, middle_down + (FM * LH + 6), 1);
-    tft.setTextColor(getColorVariation(bruceConfig.priColor), bruceConfig.bgColor);
-    tft.drawString("[ x ]", 7, 7, 1);
-    TouchFooter();
-#endif
+    MaliUI::drawHeader(title);
+    const int top=32,bottom=tftHeight-20,row=26,visible=max(1,(bottom-top)/row);
+    const int start=max(0,min(index-visible/2,int(options.size())-visible));
+    tft.fillRect(0,26,tftWidth,tftHeight-42,MaliUI::BACKGROUND);
+    for(int i=start;i<int(options.size())&&i<start+visible;++i)
+        MaliUI::drawMenuItem(options[i].label,8,top+(i-start)*row,tftWidth-20,row-3,i==index,options[i].enabled);
+    if(options.size()>size_t(visible)){
+        int height=max(5,(bottom-top)*visible/int(options.size()));
+        tft.fillRoundRect(tftWidth-6,top+(bottom-top-height)*index/max(1,int(options.size())-1),2,height,1,MaliUI::ACCENT_DIM);
+    }
+    MaliUI::drawFooter();
 }
 
 void drawStatusBar() {
-    uint8_t bat = getBattery();
-    if (bat > 0) drawBatteryStatus(bat);
-
-    if (bruceConfig.theme.border) {
-        tft.drawRoundRect(5, 5, tftWidth - 10, tftHeight - 10, 5, bruceConfig.priColor);
-        tft.drawLine(5, 25, tftWidth - 6, 25, bruceConfig.priColor);
-    }
-
-    if (clock_set) {
-        setTftDisplay(12, 12, bruceConfig.priColor, 1, bruceConfig.bgColor);
-        tft.fillRect(12, 12, 60, LH, bruceConfig.bgColor);
-#if defined(HAS_RTC)
-        updateTimeStr(_rtc.getTimeStruct());
-#else
-        updateTimeStr(rtc.getTimeStruct());
-#endif
-        tft.print(timeStr);
-    } else {
-        setTftDisplay(12, 12, bruceConfig.priColor, 1, bruceConfig.bgColor);
-        tft.print("MaliOS " + String(MALIOS_VERSION));
-    }
-
-    int iconCount = 0;
-    bool showSD = sdcardMounted;
-    bool showGPS = gpsConnected;
-    bool showWifi = (WiFi.getMode() != 0);
-    bool showWeb = isWebUIActive;
-    bool showBLE = BLEConnected;
-    bool showWG = isConnectedWireguard;
-    if (showSD) iconCount++;
-    if (showGPS) iconCount++;
-    if (showWifi) iconCount++;
-    if (showWeb) iconCount++;
-    if (showBLE) iconCount++;
-    if (showWG) iconCount++;
-
-    if (iconCount > 0) {
-        const int IW = 16;
-        const int IH = 16;
-        const int GAP = 6;
-        int totalW = iconCount * IW + (iconCount - 1) * GAP;
-        int sx = (tftWidth - totalW) / 2;
-        int iy = 7;
-        int idx = 0;
-
-        if (showSD) {
-            int x = sx + idx * (IW + GAP);
-            tft.fillRect(x, iy, IW, IH, bruceConfig.bgColor);
-            drawSdSmall(x, iy);
-            idx++;
-        }
-        if (showGPS) {
-            int x = sx + idx * (IW + GAP);
-            tft.fillRect(x, iy, IW, IH, bruceConfig.bgColor);
-            drawGpsSmall(x, iy);
-            idx++;
-        }
-        if (showWifi) {
-            int x = sx + idx * (IW + GAP);
-            tft.fillRect(x, iy, IW, IH, bruceConfig.bgColor);
-            drawWifiSmall(x, iy);
-            idx++;
-        }
-        if (showWeb) {
-            int x = sx + idx * (IW + GAP);
-            tft.fillRect(x, iy, IW, IH, bruceConfig.bgColor);
-            drawWebUISmall(x, iy);
-            idx++;
-        }
-        if (showBLE) {
-            int x = sx + idx * (IW + GAP);
-            tft.fillRect(x, iy, IW, IH, bruceConfig.bgColor);
-            drawBLESmall(x, iy);
-            idx++;
-        }
-        if (showWG) {
-            int x = sx + idx * (IW + GAP);
-            tft.fillRect(x, iy, IW, IH, bruceConfig.bgColor);
-            drawWireguardStatus(x, iy);
-            idx++;
-        }
-    }
+    MaliUI::drawHeader();
 }
 
 void drawMainBorder(bool clear) {
@@ -1045,8 +850,7 @@ void drawMainBorderWithTitle(const String &title, bool clear) {
 
 void printTitle(const String &title) {
     String t = title;
-    t.toUpperCase();
-    tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
 
     // Scale down title font if it doesn't fit the screen width
     int titleSize = FM;

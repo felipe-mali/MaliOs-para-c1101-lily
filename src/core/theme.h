@@ -1,10 +1,11 @@
 #ifndef __THEME_H
 #define __THEME_H
 #include "sd_functions.h"
+#include "ui/MaliTheme.h"
 #include <ArduinoJson.h>
 
-#define DEFAULT_PRICOLOR 0x600C
-#define DEFAULT_SECCOLOR 0xBD95
+#define DEFAULT_PRICOLOR MaliUI::ACCENT
+#define DEFAULT_SECCOLOR MaliUI::TEXT_SECONDARY
 
 struct themeFiles {
     String wifi = "";
@@ -65,7 +66,7 @@ public:
     // Theme colors in RGB565 format
     uint16_t priColor = DEFAULT_PRICOLOR;
     uint16_t secColor = DEFAULT_SECCOLOR;
-    uint16_t bgColor = 0x0000;
+    uint16_t bgColor = MaliUI::BACKGROUND;
 
     // UI Color
     void _setUiColor(uint16_t primary, uint16_t *secondary = nullptr, uint16_t *background = nullptr);

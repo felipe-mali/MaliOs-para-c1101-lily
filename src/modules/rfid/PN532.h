@@ -39,11 +39,14 @@ public:
     // Life Cycle
     /////////////////////////////////////////////////////////////////////////////////////
     bool begin();
+    bool begin(bool quiet);
 
     /////////////////////////////////////////////////////////////////////////////////////
     // Operations
     /////////////////////////////////////////////////////////////////////////////////////
     int read(int cardBaudRate = PN532_MIFARE_ISO14443A);
+    // UID-only polling, bounded response parsing; no authentication or block reads.
+    int readUidOnly(uint16_t timeoutMs = 50);
     int clone();
     int erase();
     int write(int cardBaudRate = PN532_MIFARE_ISO14443A);

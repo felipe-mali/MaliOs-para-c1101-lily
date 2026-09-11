@@ -1,3 +1,4 @@
+#include "mali_tools/counter/counter_main.h"
 #include "RFIDMenu.h"
 #include "core/display.h"
 #include "core/settings.h"
@@ -16,6 +17,7 @@
 #endif
 void RFIDMenu::optionsMenu() {
     options = {
+        {"NFC Counter", [](){ CounterSuite::run(CounterSuite::NFC); }},
 #if !defined(REMOVE_RFID_HW_INTERFACE)  // Remove Hardware interface menu due to lack of external GPIO
         {"Ler tag",     [=]() { TagOMatic(); }                     },
 #ifndef LITE_VERSION

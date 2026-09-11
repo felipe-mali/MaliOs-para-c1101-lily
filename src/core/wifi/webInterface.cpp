@@ -1,5 +1,10 @@
+#include "core/ui/MaliUI.h"
 #include "webInterface.h"
 #include "MaliQrWebApi.h"
+#include "KeyGaugeWebApi.h"
+#include "CounterWebApi.h"
+#include "mali_tools/counter/CounterLab.h"
+#include "mali_tools/key_gauge/KeyGauge.h"
 #include "MaliPortalWebApi.h"
 #include "MaliSystemWebApi.h"
 #include "MaliWifiWebApi.h"
@@ -352,26 +357,28 @@ void notFound(AsyncWebServerRequest *request) { request->send(404, "text/plain",
 **  Draw information on screen of WebUI.
 **********************************************************************/
 void drawWebUiScreen(bool mode_ap) {
-    drawMainBorderWithTitle("WebUI", true);
+    tft.fillScreen(MaliUI::BACKGROUND);
+    MaliUI::drawHeader("WEBUI");
+    MaliUI::drawCard(8,32,tftWidth-16,tftHeight-56);
 
     String txt;
     if (!mode_ap) txt = WiFi.localIP().toString();
     else txt = WiFi.softAPIP().toString();
 
     int padX = 14;
-    int currentY = 55;
+    int currentY = 40;
 
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     tft.setTextSize(FP);
 
     if (mode_ap) {
         tft.setCursor(padX, currentY);
-        tft.print("Net: BruceNet/brucenet");
+        tft.print("Net: " + WiFi.softAPSSID());
         currentY += LH * FP + 6;
     }
 
     tft.setCursor(padX, currentY);
-    if (mdnsRunning) tft.print("Url: http://bruce.local");
+    tft.print("http://" + txt);
     currentY += LH * FP + 6;
 
     tft.setCursor(padX, currentY);
@@ -387,7 +394,7 @@ void drawWebUiScreen(bool mode_ap) {
 
     tft.setTextColor(TFT_RED, bruceConfig.bgColor);
     tft.setTextSize(FP);
-    tft.drawCentreString("pressione Esc para parar", tftWidth / 2, tftHeight - 2 * LH * FP - 5, 1);
+    MaliUI::drawFooter("BACK: WebUI options");
 
 #if defined(HAS_TOUCH)
     TouchFooter();
@@ -486,6 +493,10 @@ void configureWebServer() {
     MaliWifiWebApi::registerRoutes(
         *server, [](AsyncWebServerRequest *request) { return checkUserWebAuth(request); }
     );
+
+    registerKeyGaugeWebApi(*server, [](AsyncWebServerRequest *request) { return checkUserWebAuth(request); });
+
+    registerCounterWebApi(*server, [](AsyncWebServerRequest *request) { return checkUserWebAuth(request); });
 
     // Index
     server->on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -901,9 +912,11 @@ void startWebUi(bool mode_ap) {
     drawWebUiScreen(mode_ap);
 #ifdef HAS_SCREEN // Headless always run in the background!
     while (!check(EscPress)) {
+        if (CounterLab::serviceDisplay()) drawWebUiScreen(mode_ap);
         MaliWifiWebApi::service();
         // Consume TFT work in this foreground UI task, never in AsyncTCP.
         if (MaliQrService::processPendingDisplay()) drawWebUiScreen(mode_ap);
+        KeyGauge::processWebPreview();
         vTaskDelay(pdMS_TO_TICKS(70));
     }
 

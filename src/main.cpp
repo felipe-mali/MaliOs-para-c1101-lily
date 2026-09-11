@@ -1,3 +1,4 @@
+#include "core/ui/MaliUI.h"
 #include "core/main_menu.h"
 #include <globals.h>
 
@@ -265,16 +266,7 @@ void begin_tft() {
  **  Draw boot screen
  *********************************************************************/
 void boot_screen() {
-    tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-    tft.setTextSize(FM);
-    tft.drawPixel(0, 0, bruceConfig.bgColor);
-    tft.drawCentreString("MaliOS", tftWidth / 2, 10, 1);
-    tft.setTextSize(FP);
-    tft.drawCentreString(MALIOS_VERSION, tftWidth / 2, 25, 1);
-    tft.setTextSize(FM);
-    tft.drawCentreString(
-        "FIRMWARE DO MALI", tftWidth / 2, tftHeight + 2, 1
-    ); // will draw outside the screen on non touch devices
+    MaliUI::drawBoot(0);
 }
 
 /*********************************************************************
@@ -295,6 +287,17 @@ void boot_screen_anim() {
     else if (boot_img == 0 && LittleFS.exists("/boot.gif")) boot_img = 4;
     if (bruceConfig.theme.boot_img) boot_img = 5; // override others
 
+    if(!boot_img){
+        uint32_t start=millis(),frame=0;bool ready=false;
+        while(millis()-start<1100){
+            uint32_t elapsed=millis()-start;
+            if(check(AnyKeyPress))break;
+            if(elapsed-frame>=25){frame=elapsed;bool showVersion=elapsed>=800;
+                MaliUI::drawBoot(min(uint32_t(100),elapsed/8),showVersion&&!ready);ready=showVersion;}
+            vTaskDelay(pdMS_TO_TICKS(5));
+        }
+        tft.fillScreen(MaliUI::BACKGROUND);return;
+    }
     tft.drawPixel(0, 0, 0);       // Forces back communication with TFT, to avoid ghosting
                                   // Start image loop
     while (millis() < i + 7000) { // boot image lasts for 5 secs
@@ -329,33 +332,7 @@ void boot_screen_anim() {
             }
             drawn = true;
         }
-#if !defined(LITE_VERSION)
-        if (!boot_img && (millis() - i > 2200) && (millis() - i) < 2700)
-            tft.drawRect(2 * tftWidth / 3, tftHeight / 2, 2, 2, bruceConfig.priColor);
-        if (!boot_img && (millis() - i > 2700) && (millis() - i) < 2900)
-            tft.fillRect(0, 45, tftWidth, tftHeight - 45, bruceConfig.bgColor);
-        if (!boot_img && (millis() - i > 2900) && (millis() - i) < 3400)
-            tft.drawXBitmap(
-                2 * tftWidth / 3 - 30,
-                5 + tftHeight / 2,
-                bruce_small_bits,
-                bruce_small_width,
-                bruce_small_height,
-                bruceConfig.bgColor,
-                bruceConfig.priColor
-            );
-        if (!boot_img && (millis() - i > 3400) && (millis() - i) < 3600) tft.fillScreen(bruceConfig.bgColor);
-        if (!boot_img && (millis() - i > 3600))
-            tft.drawXBitmap(
-                (tftWidth - 238) / 2,
-                (tftHeight - 133) / 2,
-                bits,
-                bits_width,
-                bits_height,
-                bruceConfig.bgColor,
-                bruceConfig.priColor
-            );
-#endif
+
         if (check(AnyKeyPress)) // If any key or M5 key is pressed, it'll jump the boot screen
         {
             tft.fillScreen(bruceConfig.bgColor);

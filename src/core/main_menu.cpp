@@ -1,3 +1,5 @@
+#include "ui/MaliUI.h"
+#include "mali_tools/counter/CounterLab.h"
 #include "main_menu.h"
 #include "display.h"
 #include "led_control.h"
@@ -111,35 +113,16 @@ void MainMenu::begin(void) {
 
     if (migrateDisabledMenuNames(_menuItems)) bruceConfig.saveFile();
 
-    std::vector<String> l = bruceConfig.disabledMenus;
-    for (int i = 0; i < _totalItems; i++) {
-        String stableName = _menuItems[i]->getName();
-        String displayName = _menuItems[i]->getDisplayName();
-        if (find(l.begin(), l.end(), stableName) == l.end()) { // If menu item is not disabled
-            options.push_back(
-                {// selected lambda
-                 displayName,
-                 [this, i]() { _menuItems[i]->optionsMenu(); },
-                 false,                                  // selected = false
-                 [](void *menuItem, bool shouldRender) { // render lambda
-                     if (!shouldRender) return false;
-                     drawMainBorder(false);
-
-                     MenuItemInterface *obj = static_cast<MenuItemInterface *>(menuItem);
-                     float scale = float((float)tftWidth / (float)240);
-                     if (bruceConfigPins.rotation & 0b01) scale = float((float)tftHeight / (float)135);
-                     obj->draw(scale);
-#if defined(HAS_TOUCH)
-                     TouchFooter();
-#endif
-                     return true;
-                 },
-                 _menuItems[i]
-                }
-            );
-        }
-    }
-    _currentIndex = loopOptions(options, MENU_TYPE_MAIN, "Menu Principal", _currentIndex);
+    std::vector<Option> rootOptions = {
+        {"NETWORK", [this](){openCategory(0);}},
+        {"RADIO", [this](){openCategory(1);}},
+        {"TOOLS", [this](){openCategory(2);}},
+        {"COUNTER", CounterLab::open},
+        {"FILES", [this](){fileMenu.optionsMenu();}},
+        {"SYSTEM", [this](){openCategory(5);}},
+    };
+    rootOptions[4].enabled=std::find(bruceConfig.disabledMenus.begin(),bruceConfig.disabledMenus.end(),fileMenu.getName())==bruceConfig.disabledMenus.end();
+    _currentIndex = loopOptions(rootOptions,MENU_TYPE_MAIN,"OS",_currentIndex);
 };
 
 /*********************************************************************
@@ -171,4 +154,25 @@ RESTART: // using gotos to avoid stackoverflow after many choices
     index = loopOptions(options, index);
     bruceConfig.saveFile();
     if (!returnToMenu) goto RESTART;
+}
+
+void MainMenu::openCategory(int category) {
+    auto enabled=[](const String &name){return std::find(bruceConfig.disabledMenus.begin(),bruceConfig.disabledMenus.end(),name)==bruceConfig.disabledMenus.end();};
+    bool done=false;int cursor=0;
+    while(!done&&!returnToMenu){
+        std::vector<Option> list;
+        if(category==2 && enabled(maliToolsMenu.getName()))list.push_back({"Mali Tools",[this](){maliToolsMenu.optionsMenu();}});
+        for(auto *item:_menuItems){
+            String name=item->getName();bool belongs=false;
+            if(category==0)belongs=name=="WiFi"||name=="BLE"||name=="Ethernet";
+            if(category==1)belongs=name=="RF"||name=="NRF24"||name=="LoRa"||name=="FM"||name=="IR"||name=="RFID"||name=="GPS";
+            if(category==2)belongs=name=="Others"||name=="JS Interpreter";
+            if(category==5)belongs=name=="Config"||name=="Clock";
+            if(belongs&&enabled(name))list.push_back({item->getDisplayName(),[item](){item->optionsMenu();}});
+        }
+        if(category==0)list.push_back({"Connections",[this](){connectMenu.optionsMenu();}});
+        list.push_back({"Back",[&](){done=true;}});
+        cursor=loopOptions(list,MENU_TYPE_GEAR,category==0?"NETWORK":category==1?"RADIO":category==2?"TOOLS":"SYSTEM",cursor);
+        if(cursor<0)break;
+    }
 }

@@ -1,3 +1,4 @@
+#include "mali_tools/counter/counter_main.h"
 #include "RFMenu.h"
 #include "core/display.h"
 #include "core/settings.h"
@@ -15,6 +16,7 @@
 
 void RFMenu::optionsMenu() {
     options = {
+        {"RF Counter", CounterSuite::rfMenu},
         {"Procurar/copiar", [=]() { RFScan(); }       },
 #if !defined(LITE_VERSION)
         {"Gravar RAW",      rf_raw_record             }, // Pablo-Ortiz-Lopez

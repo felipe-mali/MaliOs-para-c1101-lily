@@ -1,3 +1,4 @@
+#include "mali_tools/counter/counter_main.h"
 #include "IRMenu.h"
 #include "core/display.h"
 #include "core/settings.h"
@@ -14,6 +15,7 @@ void IRMenu::optionsMenu() {
     M5.Power.setExtOutput(true); // ENABLE 5V OUTPUT
 #endif
     options = {
+        {"IR Counter", [](){ CounterSuite::run(CounterSuite::IR); }},
         {"TV-B-Gone", StartTvBGone              },
         {"IR personalizado", otherIRcodes              },
         {"Ler IR",            [=]() { IrRead(); }       },

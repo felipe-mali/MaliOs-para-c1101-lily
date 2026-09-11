@@ -1,3 +1,8 @@
+#include "modules/others/pixel_paint_app.h"
+#include "modules/others/dice_app.h"
+#include "mali_tools/counter/counter_main.h"
+#include "mali_tools/counter/CounterLab.h"
+#include "mali_tools/key_gauge/KeyGauge.h"
 #include "MaliToolsMenu.h"
 
 #include "core/main_menu.h"
@@ -10,6 +15,12 @@ void MaliToolsMenu::optionsMenu() {
     returnToMenu = false;
     while (!returnToMenu) {
         std::vector<Option> maliOptions = {
+            {"PIXEL PAINT", pixel_paint_app},
+            {"D20", dice_app},
+            {"COUNTER", CounterLab::open},
+            {"UTILITIES", [](){mainMenu.othersMenu.optionsMenu();}},
+            {"Counter Suite", CounterSuite::open},
+            {"KEY GAUGE", KeyGauge::open},
             {"Info. do Sistema", MaliSystemInfo::showSystemInfo   },
             {"Status do Hardware", MaliSystemInfo::showHardwareStatus},
             {"Energia", MaliSystemInfo::showEnergy               },
@@ -20,7 +31,7 @@ void MaliToolsMenu::optionsMenu() {
             {"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::MALI_TOOLS); }},
         };
 
-        int selected = loopOptions(maliOptions, MENU_TYPE_SUBMENU, "Mali Tools");
+        int selected = loopOptions(maliOptions, MENU_TYPE_GEAR, "TOOLS");
         if (selected < 0) break;
     }
 }

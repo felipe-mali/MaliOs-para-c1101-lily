@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <div class="dialog-background">
+    <div class="dialog-background mali-login">
         <form action="/login" method="POST">
             <div class="dialog login">
                 <div class="dialog-head">
@@ -19,10 +19,10 @@
                 <div class="dialog-body">
                     <div id="notice" style="display: none;font-weight: bold;padding-bottom: 5px;"></div>
                     <label for="username" class="oinput-label">Usuario</label>
-                    <input type="text" name="username" id="username" class="oinput-text-submit"
+                    <input type="text" name="username" id="username" autocomplete="username" class="oinput-text-submit"
                         style="margin-bottom: 10px">
                     <label for="password" class="oinput-label">Senha</label>
-                    <input type="password" name="password" class="oinput-text-submit">
+                    <input type="password" id="password" name="password" autocomplete="current-password" class="oinput-text-submit">
                 </div>
                 <div class="dialog-footer">
                     <input type="submit" class="btn-action" value="ENTRAR">

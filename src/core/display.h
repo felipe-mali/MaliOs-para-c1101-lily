@@ -14,6 +14,7 @@
 #define MENU_TYPE_MAIN 0
 #define MENU_TYPE_SUBMENU 1
 #define MENU_TYPE_REGULAR 2
+#define MENU_TYPE_GEAR 3
 
 void panelSleep(bool on);
 void turnOffDisplay();
@@ -27,6 +28,7 @@ struct Opt_Coord {
     uint16_t bgcolor = bruceConfig.bgColor;
 };
 void displayScrollingText(const String &text, Opt_Coord &coord, bool highlight = false);
+std::vector<String> wrapText(const String &text, int maxCharsPerLine);
 
 #if !defined(LITE_VERSION)
 

@@ -7,6 +7,7 @@
  */
 
 #include "PN532.h"
+#include "pn532_uid.h"
 #include "apdu.h"
 #include "core/bus_HAL.h"
 #include "core/display.h"
@@ -333,7 +334,9 @@ PN532::PN532(CONNECTION_TYPE connection_type) {
         );
 }
 
-bool PN532::begin() {
+bool PN532::begin() { return begin(false); }
+
+bool PN532::begin(bool quiet) {
     TwoWire *Wire = nullptr;
 #ifdef M5STICK
     if (_connection_type == CONNECTION_TYPE::I2C_SPI) {
@@ -362,7 +365,7 @@ bool PN532::begin() {
         // Adafruit_PN532 always talks to the global `Wire` - can't work if
         // bus_HAL remapped i2c_bus to Wire1 to avoid colliding with sys_i2c.
         PN532_DBG("[PN532] begin: FAILED - I2C bus conflicts with system I2C bus\n");
-        displayError("Barramento I2C conflita com o I2C do sistema", true);
+        if (!quiet) displayError("Barramento I2C conflita com o I2C do sistema", true);
         return false;
     }
 
@@ -384,6 +387,28 @@ bool PN532::begin() {
     );
 
     return i2c_check || versiondata;
+}
+
+int PN532::readUidOnly(uint16_t timeoutMs) {
+    uint8_t command[] = {PN532_COMMAND_INLISTPASSIVETARGET, 1, PN532_MIFARE_ISO14443A};
+    if (!nfc.sendCommandCheckAck(command, sizeof(command), timeoutMs ? timeoutMs : 50)) return TAG_NOT_PRESENT;
+    uint8_t frame[26] = {};
+    nfc.readdata(frame, sizeof(frame));
+    // Normal PN532 response: TFI, response code, target count, target number,
+    // ATQA[2], SAK, UID length, UID[4/7/10], optional ATS.
+    uint8_t length = pn532UidLength(frame, sizeof(frame));
+    if (!length) return TAG_NOT_PRESENT;
+    uid.size = length;
+    memcpy(uid.uidByte, frame + 13, length);
+    uid.sak = frame[11];
+    uid.atqaByte[0] = frame[9]; uid.atqaByte[1] = frame[10];
+    printableUID.uid = "";
+    for (uint8_t i = 0; i < length; ++i) {
+        char hex[4]; snprintf(hex, sizeof(hex), "%02X ", uid.uidByte[i]);
+        printableUID.uid += hex;
+    }
+    printableUID.picc_type = nfc.PICC_GetTypeName(uid.sak);
+    return SUCCESS;
 }
 
 int PN532::read(int cardBaudRate) {

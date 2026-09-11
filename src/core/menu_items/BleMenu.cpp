@@ -1,3 +1,4 @@
+#include "mali_tools/counter/counter_main.h"
 #include "BleMenu.h"
 #include "core/display.h"
 #include "core/utils.h"
@@ -15,6 +16,7 @@
 
 void BleMenu::optionsMenu() {
     options.clear();
+    options.push_back({"BLE Counter", [](){ CounterSuite::run(CounterSuite::BLE); }});
 #if !defined(LITE_VERSION)
     if (BLEConnected) {
         options.push_back({"Desconectar", [=]() {

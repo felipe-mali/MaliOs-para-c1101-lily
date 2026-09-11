@@ -234,9 +234,7 @@ extern volatile int32_t RotaryNetSteps;
 
 #ifdef HAS_ENCODER
 static inline int32_t drainRotarySteps() {
-    int32_t steps = RotaryNetSteps;
-    RotaryNetSteps -= steps;
-    return steps;
+    return __atomic_exchange_n(&RotaryNetSteps, int32_t(0), __ATOMIC_RELAXED);
 }
 #endif
 

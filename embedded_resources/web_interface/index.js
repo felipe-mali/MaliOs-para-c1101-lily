@@ -2097,21 +2097,236 @@ function qrStudioSelectType() {
   qrStudioUpdateSize();
 }
 
+// KEY GAUGE: no network/flash writes from drawing, pointer or slider events.
+const KeyGaugeWeb = (() => {
+  const el = id => document.getElementById(`kg-${id}`);
+  const fresh = name => ({name, points:6, thickness:5, profileWidth:90, levels:[0,0,0,0,0,0]});
+  let profile = fresh('PROFILE_001'), savedName = '', dirty = false, active = 0, names = [], ready = false, busy = false;
+  let pointer = null, geometry = null;
+  const canvas = el('canvas'), ctx = canvas.getContext('2d');
+  const clone = p => ({...p, levels:[...p.levels]});
+  const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+  function valid(p) {
+    return p && typeof p.name === 'string' && /^[A-Za-z0-9_-]{1,31}$/.test(p.name) &&
+      Number.isInteger(p.points) && p.points >= 4 && p.points <= 10 &&
+      Number.isInteger(p.thickness) && p.thickness >= 1 && p.thickness <= 10 &&
+      Number.isInteger(p.profileWidth) && p.profileWidth >= 50 && p.profileWidth <= 100 &&
+      Array.isArray(p.levels) && p.levels.length === p.points && p.levels.every(v => Number.isInteger(v) && v >= 0 && v <= 9);
+  }
+  function status(message, error = false) { el('status').textContent = message; el('status').dataset.error = error; }
+  function state() {
+    el('state').textContent = dirty ? 'ALTERADO · NAO SALVO' : savedName ? 'SALVO' : 'NOVO · NAO SALVO';
+    el('active').textContent = `P${active + 1} · LEVEL ${profile.levels[active]}`;
+    el('thickness-value').textContent = profile.thickness;
+    el('width-value').textContent = profile.profileWidth;
+    el('levels').querySelectorAll('.kg-level').forEach((node,i) => {
+      node.classList.toggle('active', i === active);
+      node.querySelector('output').textContent = profile.levels[i];
+      node.querySelector('input').value = profile.levels[i];
+    });
+  }
+  function draw() {
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width) return;
+    const w = rect.width, h = rect.height, dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(w*dpr); canvas.height = Math.round(h*dpr); ctx.setTransform(dpr,0,0,dpr,0,0);
+    const style = getComputedStyle(el('canvas').closest('.keygauge-view'));
+    const color = key => style.getPropertyValue(key).trim();
+    const top = 32, height = h - 68, depth = height/2;
+    const base = top + depth + 2 + (height-depth-2)*(profile.thickness-1)/9;
+    const span = (w-24)*profile.profileWidth/100, left = (w-span)/2;
+    const start = left+span/9, end = left+span-span/20;
+    const points = profile.levels.map((v,i) => ({x:start+(end-start)*i/(profile.points-1),y:top+depth*v/9}));
+    geometry = {points, top, depth};
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = color('--color'); ctx.globalAlpha=.32;
+    ctx.beginPath();ctx.moveTo(start,base);points.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(end,base);ctx.closePath();ctx.fill();ctx.globalAlpha=1;
+    ctx.strokeStyle=color('--sec-color');ctx.lineWidth=1;
+    ctx.strokeRect(left,top,start-left,base-top);
+    ctx.beginPath();ctx.moveTo(start,base);ctx.lineTo(end,base);ctx.stroke();
+    points.forEach((p,i)=>{ctx.strokeStyle=color(i===active?'--kg-selected':'--border');ctx.beginPath();ctx.moveTo(p.x,top-10);ctx.lineTo(p.x,base);ctx.stroke();});
+    ctx.strokeStyle=color('--text');ctx.lineWidth=2;ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke();
+    points.forEach((p,i)=>{
+      ctx.fillStyle=color(i===active?'--kg-selected':'--text');ctx.beginPath();ctx.arc(p.x,p.y,i===active?8:5,0,Math.PI*2);ctx.fill();
+      if(i===active){ctx.lineWidth=2;ctx.strokeStyle=color('--kg-selected');ctx.beginPath();ctx.arc(p.x,p.y,12,0,Math.PI*2);ctx.stroke();}
+      ctx.font='12px monospace';ctx.textAlign='center';ctx.fillText(`P${i+1}`,p.x,h-12);
+    });
+    state();
+  }
+  function render() {
+    active = Math.min(active, profile.points-1);
+    el('name').value=profile.name;el('points').value=profile.points;el('thickness').value=profile.thickness;el('width').value=profile.profileWidth;
+    el('levels').replaceChildren();
+    profile.levels.forEach((v,i)=>{
+      const box=document.createElement('div');box.className='kg-level';
+      const label=document.createElement('label');label.htmlFor=`kg-level-${i}`;label.append(`P${i+1}: `);
+      const value=document.createElement('output');value.textContent=v;label.append(value);
+      const input=document.createElement('input');input.id=`kg-level-${i}`;input.type='range';input.min=0;input.max=9;input.value=v;input.setAttribute('aria-label',`P${i+1} level`);
+      input.addEventListener('input',()=>{if(busy)return;active=i;profile.levels[i]=+input.value;changed();});
+      input.addEventListener('focus',()=>{active=i;draw();});box.append(label,input);el('levels').append(box);
+    });
+    state();draw();
+  }
+  function changed(){dirty=true;state();draw();}
+  async function request(path, method='GET', data) {
+    const controller = new AbortController(), timeout = setTimeout(()=>controller.abort(),15000);
+    try {
+      const response = await fetch(`/api/keygauge/${path}`, {method, cache:'no-store', credentials:'same-origin', signal:controller.signal,
+        ...(data?{headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(data)}:{})});
+      let result;try{result=await response.json();}catch{throw new Error(response.status===401?'Sessao expirada. Entre novamente.':'Resposta invalida do dispositivo.');}
+      if(!response.ok)throw new Error(result.error||`Erro HTTP ${response.status}`);
+      return result;
+    } catch(error) { if(error.name==='AbortError')throw new Error('Tempo esgotado. Atualize a lista para verificar o resultado antes de repetir SAVE.');throw error; }
+    finally {clearTimeout(timeout);}
+  }
+  function nextName(){for(let i=1;i<=9999;i++){const n=`PROFILE_${String(i).padStart(3,'0')}`;if(!names.includes(n)&&n!==profile.name)return n;}throw new Error('Limite de nomes atingido.');}
+  async function refresh() {
+    const result=await request('profiles');
+    if(!Array.isArray(result.items)||!result.items.every(n=>typeof n==='string'&&/^[A-Za-z0-9_-]{1,31}$/.test(n)))throw new Error('Lista de perfis invalida.');
+    names=result.items;const selected=el('list').value;el('list').replaceChildren();
+    names.forEach(name=>{const option=document.createElement('option');option.value=name;option.textContent=name;el('list').append(option);});
+    if(names.includes(selected))el('list').value=selected;
+    else if(names.includes(savedName))el('list').value=savedName;
+    if(!ready&&!dirty&&!savedName&&typeof result.nextName==='string'&&valid(fresh(result.nextName))){profile=fresh(result.nextName);render();}
+    ready=true;
+  }
+  async function run(action){if(busy)return;busy=true;endDrag();document.querySelectorAll('.keygauge-view button, .keygauge-view input, .keygauge-view select').forEach(n=>n.disabled=true);
+    try{await action();}catch(error){status(error.message,true);}finally{busy=false;document.querySelectorAll('.keygauge-view button, .keygauge-view input, .keygauge-view select').forEach(n=>n.disabled=false);}}
+  function discard(){return !dirty||window.confirm('Descartar os ajustes ainda nao salvos?');}
+  el('new').onclick=()=>run(async()=>{if(!discard())return;await refresh();profile=fresh(nextName());savedName='';dirty=false;active=0;render();status('Novo perfil em memoria. Use SAVE para gravar.');});
+  el('duplicate').onclick=()=>run(async()=>{await refresh();profile={...clone(profile),name:nextName()};savedName='';dirty=true;render();status('Copia em memoria. O original foi preservado.');});
+  el('refresh').onclick=()=>run(async()=>{await refresh();status('Lista atualizada. Ajustes em memoria preservados.');});
+  el('load').onclick=()=>run(async()=>{const name=el('list').value;if(!name)throw new Error('Selecione um perfil.');if(!discard())return;
+    const result=await request(`profile?name=${encodeURIComponent(name)}`);if(!valid(result))throw new Error('Perfil recebido invalido.');
+    profile=clone(result);savedName=result.name;dirty=false;active=0;render();status(`Carregado: ${savedName}`);});
+  el('save').onclick=()=>run(async()=>{if(!valid(profile))throw new Error('Use nome de 1 a 31 letras, numeros, _ ou -. Verifique os limites.');
+    const replacing=savedName===profile.name;
+    if(replacing&&!window.confirm(`Salvar alteracoes em ${savedName}?`))return;
+    const sent=clone(profile);const result=await request('profile','POST',{profile:JSON.stringify(sent),replace:replacing?'1':'0'});
+    if(!valid(result))throw new Error('Resposta de SAVE invalida; atualize a lista para conferir.');
+    savedName=sent.name;dirty=false;state();status(`Salvo: ${savedName}`);await refresh();el('list').value=savedName;});
+  el('delete').onclick=()=>run(async()=>{const name=el('list').value;if(!name)throw new Error('Selecione um perfil salvo.');
+    if(!window.confirm(`Excluir ${name}?${name===savedName&&dirty?' Os ajustes deste perfil tambem serao descartados.':''}`))return;
+    await request(`profile?name=${encodeURIComponent(name)}`,'DELETE');names=names.filter(n=>n!==name);
+    if(savedName===name){profile=fresh(nextName());savedName='';dirty=false;active=0;render();}
+    status(`Excluido: ${name}`);await refresh();});
+  el('show').onclick=()=>run(async()=>{if(!valid(profile))throw new Error('Confira o nome e os valores do perfil.');const result=await request('preview','POST',{profile:JSON.stringify(profile)});status(result.message||'Enviado em RAM; nao salvo.');});
+  el('name').oninput=()=>{profile.name=el('name').value;changed();};
+  el('points').onchange=()=>{profile.points=+el('points').value;profile.levels=Array.from({length:profile.points},(_,i)=>profile.levels[i]??0);dirty=true;render();};
+  el('thickness').oninput=()=>{profile.thickness=+el('thickness').value;changed();};
+  el('width').oninput=()=>{profile.profileWidth=+el('width').value;changed();};
+  function drag(event){if(pointer!==event.pointerId||!geometry||busy)return;event.preventDefault();const rect=canvas.getBoundingClientRect();
+    profile.levels[active]=clamp(Math.round((event.clientY-rect.top-geometry.top)*9/geometry.depth),0,9);changed();}
+  function endDrag(){if(pointer!==null){const id=pointer;pointer=null;if(canvas.hasPointerCapture(id))canvas.releasePointerCapture(id);}}
+  canvas.addEventListener('pointerdown',event=>{if(busy||pointer!==null||!geometry||event.isPrimary===false||event.button!==0)return;
+    const rect=canvas.getBoundingClientRect(), x=event.clientX-rect.left, y=event.clientY-rect.top;
+    // Nearest column stays usable at 10 points on narrow touch screens.
+    let closest=0;geometry.points.forEach((p,i)=>{if(Math.abs(p.x-x)<Math.abs(geometry.points[closest].x-x))closest=i;});
+    if(Math.abs(geometry.points[closest].x-x)>28||Math.abs(geometry.points[closest].y-y)>32)return;
+    active=closest;pointer=event.pointerId;canvas.setPointerCapture(pointer);event.preventDefault();draw();});
+  canvas.addEventListener('pointermove',drag);canvas.addEventListener('pointerup',event=>{if(pointer===event.pointerId){drag(event);endDrag();}});
+  canvas.addEventListener('pointercancel',endDrag);canvas.addEventListener('lostpointercapture',()=>{pointer=null;});window.addEventListener('blur',endDrag);
+  window.addEventListener('beforeunload',event=>{if(dirty){event.preventDefault();event.returnValue='';}});
+  new ResizeObserver(draw).observe(canvas);render();
+  return {open:()=>{draw();run(refresh);}};
+})();
+
+// COUNTER shares a single firmware state; all reads use the existing HTTP server.
+const CounterWeb = (() => {
+ const el=id=>document.getElementById(`ct-${id}`);
+ let capabilities=[],state=null,polling=false,visible=false,lastConfig=null,targets=[],scanSequence=-1;
+ const message=(text,error=false)=>{el('message').textContent=text;el('message').dataset.error=error;};
+ async function api(path,method='GET',data){
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),5000);
+  try{const response=await fetch(`/api/counter/${path}`,{method,credentials:'same-origin',cache:'no-store',signal:controller.signal,...(data?{headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(data)}:{})});
+   let result;try{result=await response.json();}catch{throw new Error('Resposta invalida / verifique a sessao WebUI.');}
+   if(!response.ok||result.error)throw new Error(result.error||`HTTP ${response.status}`);return result;
+  }finally{clearTimeout(timer);}
+ }
+ const current=()=>capabilities.find(c=>c.id===+el('category').value);
+ const mode=()=>current()?.modes.find(m=>m.id===+el('mode').value);
+ function limits(){const m=mode();if(!m)return;
+  if(m.simulationOnly)el('simulation').checked=true;
+  el('simulation').disabled=m.simulationOnly;
+  el('mode-note').textContent=m.simulationOnly?'SIMULATION ONLY: requer adaptador de laboratorio configurado e cancelavel.':'Leitura passiva ou conexao iniciada pelo proprio T-Embed.';
+  const min=m.minInterval;el('interval').min=min;
+  if(el('intensity').value!=='custom')el('interval').value=Math.min(60000,min*(+el('intensity').value/500));
+  else el('interval').value=Math.max(min,+el('interval').value);
+  el('scan').disabled=![0,1].includes(+el('category').value);
+  for(const id of ['password','frequency']){const field=el(id),show=id==='password'?current().id===0:current().id===2;field.hidden=!show;document.querySelector(`label[for="ct-${id}"]`).hidden=!show;}
+ }
+ function categories(){el('mode').replaceChildren();(current()?.modes||[]).forEach(m=>el('mode').add(new Option(m.name+(m.simulationOnly?' [SIM]':''),m.id)));limits();}
+ function config(){const c={category:+el('category').value,mode:+el('mode').value,simulation:el('simulation').checked,authorized:el('authorized').checked,
+  target:el('target').value.trim(),password:el('password').value,duration:el('duration').value==='custom'?+el('custom-duration').value:+el('duration').value,
+  interval:+el('interval').value,frequency:+el('frequency').value};
+  if(!current()||!Number.isInteger(c.duration)||c.duration<0||c.duration>3600||!Number.isInteger(c.interval)||c.interval<mode().minInterval||c.interval>60000)throw new Error('Confira duracao e intervalo real do modo.');
+  return c;
+ }
+ async function loadTargets(){const data=await api('targets');if(!Array.isArray(data.items))throw new Error('Lista de alvos invalida.');targets=data.items;el('targets').replaceChildren();
+  targets.forEach((t,i)=>el('targets').add(new Option(`${t.name||t.address} · ${t.rssi} dBm · ${t.address}`,i)));
+  if(data.category===0){el('channels').replaceChildren();for(let ch=1;ch<=14;ch++){const list=targets.filter(t=>t.channel===ch),p=document.createElement('p');p.textContent=`CH ${ch} · NETWORK COUNT ${list.length} · AVG RSSI ${list.length?Math.round(list.reduce((n,t)=>n+t.rssi,0)/list.length)+' dBm':'—'} · ACTIVITY: visibilidade passiva`;el('channels').append(p);}}
+ }
+ function chart(s){const canvas=el('chart'),ctx=canvas.getContext('2d'),g=Array.isArray(s.graph)?s.graph.filter(Number.isFinite):[];
+  if(Array.isArray(s.bars)&&s.bars.length){ctx.clearRect(0,0,800,220);ctx.fillStyle='#aa9da3';ctx.font='14px monospace';ctx.fillText(s.category===0?'CH 1..14 / AP visibility':'CC1101 center +/-0.2 MHz',12,18);ctx.fillStyle='#bd81ed';const step=776/s.bars.length;s.bars.forEach((v,i)=>ctx.fillRect(12+i*step,205-170*v/100,Math.max(1,step-2),170*v/100));return;}
+  ctx.clearRect(0,0,800,220);ctx.fillStyle='#aa9da3';ctx.font='14px monospace';ctx.fillText(s.rssiSamples?'RSSI dBm':'Time / sample (ms)',12,18);if(g.length<2)return;
+  const lo=Math.min(...g),hi=Math.max(...g);ctx.fillText(`${lo} .. ${hi}`,12,40);ctx.strokeStyle='#bd81ed';ctx.lineWidth=2;ctx.beginPath();g.forEach((v,i)=>{const x=12+776*i/59,y=205-(v-lo)*150/Math.max(1,hi-lo);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+ }
+ function render(s){state=s;el('state').textContent=s.pending?'QUEUED':s.state;el('live-mode').textContent=`${s.simulation?'SIMULATION · ':''}${s.modeName||'COUNTER'}`;el('live-target').textContent=`TARGET: ${s.target||'local / receiver'}`;
+  const metrics={TIME:`${((s.elapsed||0)/1000).toFixed(1)}s`,EVENTS:s.events,SUCCESS:s.success,FAIL:s.failures,TX:s.tx,RX:s.rx,RETRIES:s.retries,RATE:`${Number(s.rate||0).toFixed(1)}/s`,ATTEMPTS:s.attempts,'AVG TIME':`${Number(s.avgTime||0).toFixed(1)}ms`,MIN:`${s.minTime||0}ms`,MAX:`${s.maxTime||0}ms`};
+  if(s.hasTx===false)delete metrics.TX;
+  if(s.hasOutcomes===false){delete metrics.SUCCESS;delete metrics.FAIL;delete metrics.ATTEMPTS;delete metrics.RETRIES;}
+  if(s.hasTiming===false){delete metrics['AVG TIME'];delete metrics.MIN;delete metrics.MAX;}
+  if(s.category===0&&(s.mode===3||s.mode===4)){metrics.SENT=s.tx;metrics.RECEIVED=s.rx;metrics.LOST=s.failures;metrics['LOSS %']=`${s.tx?(100*s.failures/s.tx).toFixed(1):'0'}%`;}
+  if(s.hasOutcomes!==false)metrics['SUCCESS %']=`${Number(s.successRate||0).toFixed(1)}%`;
+  if(s.rssiSamples){metrics.RSSI=`${s.rssi}dBm`;metrics['RSSI AVG']=`${Number(s.rssiAvg).toFixed(1)}dBm`;metrics['RSSI MIN']=s.rssiMin;metrics['RSSI MAX']=s.rssiMax;metrics.SAMPLES=s.rssiSamples;}
+  if(Array.isArray(s.channels)){el('channels').replaceChildren();s.channels.forEach(ch=>{const p=document.createElement('p');p.textContent=`CH ${ch.channel} | NETWORK COUNT ${ch.count} | AVG RSSI ${ch.count?ch.rssi+' dBm':'--'} | ACTIVITY: AP visibility (max 32)`;el('channels').append(p);});}
+  el('metrics').replaceChildren();Object.entries(metrics).forEach(([name,value])=>{const box=document.createElement('div'),label=document.createElement('span'),number=document.createElement('strong');label.textContent=name;number.textContent=value??'—';box.dataset.metric=name;box.append(label,number);el('metrics').append(box);});chart(s);
+  const running=s.pending||['RUNNING','SCANNING','STOPPING'].includes(s.state);el('start').disabled=running;el('again').disabled=running||!lastConfig;el('save').disabled=!['COMPLETE','STOPPED'].includes(s.state);
+  message(s.message||'Ready',s.state==='ERROR');
+ }
+ async function poll(){if(polling||!visible)return;polling=true;
+  try{const s=await api('status');render(s);if(s.state==='CONFIGURING'&&!s.pending&&s.sequence!==scanSequence){scanSequence=s.sequence;await loadTargets();}}
+  catch(e){message(`Conexao interrompida: ${e.message}. Use BACK/encoder no dispositivo para STOP.`,true);}finally{polling=false;}
+ }
+ async function start(scan=false,again=false){try{const c=again?{...lastConfig,password:el('password').value}:config();if(scan){c.mode=0;c.duration=10;c.interval=Math.max(c.interval,current().modes[0].minInterval);}
+  if(!c.simulation&&!scan&&!c.authorized)throw new Error('Confirme LAB / AUTHORIZED TARGETS ONLY.');
+  el('start').disabled=true;const result=await api(scan?'scan':'start','POST',{config:JSON.stringify(c)});if(!scan){lastConfig={...c,password:''};}el('password').value='';message(result.message);await poll();
+ }catch(e){message(e.message,true);el('start').disabled=false;}}
+ async function history(){try{const data=await api('history');el('history').replaceChildren();for(const h of data.items||[]){const p=document.createElement('p');p.textContent=`${h.simulation?'SIMULATION · ':''}${h.modeName} · ${h.state} · ${(h.elapsed/1000).toFixed(1)}s · ${h.events} events · OK ${h.success} / FAIL ${h.failures}`;el('history').append(p);}}catch(e){message(e.message,true);}}
+ el('category').onchange=()=>{targets=[];el('targets').replaceChildren();el('target').value='';categories();};el('mode').onchange=limits;el('intensity').onchange=limits;
+ el('targets').onchange=()=>{const t=targets[+el('targets').value];if(!t)return;el('target').value=t.address;el('target-info').textContent=`${t.address} · RSSI ${t.rssi} · CH ${t.channel??"—"} · ${t.securityOrService||''} · ADV ${t.advType} · ${t.connectable?'connectable':'not connectable'}`;};
+ el('duration').onchange=()=>{el('custom-duration').hidden=el('duration').value!=='custom';};
+ el('start').onclick=()=>start();el('scan').onclick=()=>start(true);el('again').onclick=()=>start(false,true);
+ // STOP has its own request path and never waits for a status/START request.
+ el('stop').onclick=async()=>{message('STOP solicitado...');try{await api('stop','POST');await poll();}catch(e){message(`STOP sem confirmacao: ${e.message}. Use BACK/encoder no dispositivo.`,true);}};
+ el('save').onclick=async()=>{try{const r=await api('save','POST');message(r.message);await history();}catch(e){message(e.message,true);}};
+ el('history-refresh').onclick=history;el('settings').onclick=async()=>{try{const r=await api('settings','POST',{historyLimit:el('limit').value});message(r.message);}catch(e){message(e.message,true);}};
+ setInterval(()=>{visible=!document.querySelector('.counter-view').classList.contains('hidden');if(visible)poll();},1000);
+ return {open:async()=>{visible=true;try{if(!capabilities.length){const data=await api('capabilities');capabilities=data.categories;el('category').replaceChildren();capabilities.forEach(c=>el('category').add(new Option(c.name,c.id)));el('limit').value=data.historyLimit;categories();}await poll();await history();}catch(e){message(e.message,true);}}};
+})();
+
 let wifiStatusCache = null;
 
 function showWebuiView(target) {
-  const validTargets = ["home", "files", "qr", "wifi", "portal", "scripts", "system"];
+  const validTargets = ["home", "files", "qr", "wifi", "portal", "scripts", "system", "keygauge", "counter", "radio", "tools"];
   if (!validTargets.includes(target)) target = "home";
   document.querySelectorAll(".webui-view").forEach((element) => {
     element.classList.toggle("hidden", !element.classList.contains(`${target}-view`));
   });
   document.querySelectorAll("[data-webui-target]").forEach((button) => {
+    button.setAttribute("aria-current",button.getAttribute("data-webui-target")===target?"page":"false");
     button.classList.toggle(
       "active",
       button.getAttribute("data-webui-target") === target,
     );
   });
-  if (target === "qr") {
+  const gear=document.querySelector(".mali-gear");
+  if(gear){const order=["home","wifi","radio","tools","counter","files","system","keygauge","qr","portal","scripts"];gear.style.setProperty("--gear-angle",`${Math.max(0,order.indexOf(target))*30}deg`);}
+  if (target === "counter") {
+    CounterWeb.open();
+  } else if (target === "keygauge") {
+    KeyGaugeWeb.open();
+  } else if (target === "qr") {
     qrStudioLoadFavorites();
     qrStudioLoadHistory();
   } else if (target === "wifi") {
@@ -2712,3 +2927,26 @@ showWebuiView(window.location.hash.replace("#", "") || "home");
     }, 100); // Small delay to ensure the file list is loaded first
   }
 })();
+
+// Small monochrome symbols, matching the firmware primitive icon library.
+const maliIconPaths={
+ home:'M5 18V5L12 14L19 5V18M7 18V12M17 18V12',
+ wifi:'M3 8L12 3L21 8M6 11L12 7L18 11M9 14L12 12L15 14M12 18v1',
+ radio:'M12 11v10M7 21h10M12 8a3 3 0 1 0 0 6a3 3 0 1 0 0-6M12 2a9 9 0 1 0 0 18a9 9 0 1 0 0-18',
+ tools:'M5 19L19 5M5 17L17 5M17 3a3 3 0 1 0 0 6a3 3 0 1 0 0-6',
+ counter:'M3 19v-5h3v5zM8 19V9h3v10zM13 19v-7h3v7zM18 19V4h3v15z',
+ files:'M3 7V4h7l3 3h8v13H3z',
+ system:'M12 7a5 5 0 1 0 0 10a5 5 0 1 0 0-10M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2',
+ keygauge:'M3 18V9h3l3 4l3-7l3 4l3-5l3 3v10z',
+ qr:'M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h3v3h3v3h-6z',
+ portal:'M5 21V3h14v18M10 21V7h5v14M13 14h1',
+ scripts:'M8 6L2 12l6 6M16 6l6 6l-6 6M14 3l-4 18'
+};
+document.querySelectorAll('.mali-sidebar [data-webui-target]').forEach(button=>{
+ const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'),path=document.createElementNS(svg.namespaceURI,'path');
+ svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');svg.classList.add('mali-nav-icon');path.setAttribute('d',maliIconPaths[button.dataset.webuiTarget]||maliIconPaths.system);svg.append(path);button.prepend(svg);
+});
+document.querySelectorAll('.mali-selector [data-open-view]').forEach((button,index)=>{
+ const preview=()=>document.querySelector('.mali-gear')?.style.setProperty('--gear-angle',`${index*90}deg`);
+ button.addEventListener('pointerenter',preview);button.addEventListener('focus',preview);
+});
