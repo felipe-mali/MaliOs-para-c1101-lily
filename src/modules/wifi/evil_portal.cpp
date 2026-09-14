@@ -1,3 +1,4 @@
+#include "core/ui/MaliUI.h"
 #include "evil_portal.h"
 #include "core/config.h"
 #include "core/display.h"
@@ -488,7 +489,7 @@ void EvilPortal::printDeauthStatus() {
     if (!_deauth || isDeauthHeld) {
         printFootnote("Deauth INATIVO");
     } else {
-        tft.setTextColor(TFT_RED);
+        tft.setTextColor(MaliUI::ERROR);
         printFootnote("Deauth ATIVO");
         tft.setTextColor(bruceConfig.priColor);
     }

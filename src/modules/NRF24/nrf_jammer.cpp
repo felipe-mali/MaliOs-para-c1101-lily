@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "nrf_jammer.h"
 #include "core/display.h"
 #include "core/mykeyboard.h"
@@ -73,16 +74,16 @@ void nrf_jammer() {
     };
 
     jamMode modes[] = {
-        {"Test        ", Test_channels,      sizeof(Test_channels) / sizeof(Test_channels[0])          },
+        {MaliText::test_ce2b05, Test_channels,      sizeof(Test_channels) / sizeof(Test_channels[0])          },
         {"WiFi        ", wifi_channels,      sizeof(wifi_channels) / sizeof(wifi_channels[0])          },
         {"BLEch       ", ble_channels,       sizeof(ble_channels) / sizeof(ble_channels[0])            },
         {"BLE Adv Pri ", ble_adv_priority,   sizeof(ble_adv_priority) / sizeof(ble_adv_priority[0])    },
         {"Bluetooth   ", bluetooth_channels, sizeof(bluetooth_channels) / sizeof(bluetooth_channels[0])},
         {"USB         ", usb_channels,       sizeof(usb_channels) / sizeof(usb_channels[0])            },
-        {"Video Stream", video_channels,     sizeof(video_channels) / sizeof(video_channels[0])        },
+        {MaliText::video_stream_174abf, video_channels,     sizeof(video_channels) / sizeof(video_channels[0])        },
         {"RC          ", rc_channels,        sizeof(rc_channels) / sizeof(rc_channels[0])              },
         {"Zigbee      ", zigbee_channels,    sizeof(zigbee_channels) / sizeof(zigbee_channels[0])      },
-        {"Full        ", full_channels,      sizeof(full_channels) / sizeof(full_channels[0])          }
+        {MaliText::full_3e02bb, full_channels,      sizeof(full_channels) / sizeof(full_channels[0])          }
     };
 
     if (nrf_start(mode)) {

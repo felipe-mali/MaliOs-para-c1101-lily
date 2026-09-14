@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "counter_events.h"
 #include "core/display.h"
 #include "core/led_control.h"
@@ -51,7 +52,7 @@ void flushLog() {
 }
 void logMenu() {
     std::vector<Option> menu = {
-        {"View Log",
+        {MaliText::view_log_a4409c,
          []() {
              std::vector<Option> rows;
              for (uint32_t i = total - used; i < total; ++i) {
@@ -59,9 +60,9 @@ void logMenu() {
                  rows.push_back({line.c_str(), [line]() { displayInfo(line, true); }});
              }
              if (rows.empty()) rows.push_back({"Sem eventos", []() {}});
-             loopOptions(rows, MENU_TYPE_SUBMENU, "Event Log (uptime)");
+             loopOptions(rows, MENU_TYPE_SUBMENU, MaliText::event_log_uptime_dbbd46);
          }                    },
-        {"Clear Log",
+        {MaliText::clear_log_3fc9c3,
          []() {
              if (sdcardMounted && SD.exists("/MaliCounter/events.log") &&
                  !SD.remove("/MaliCounter/events.log")) {
@@ -70,7 +71,7 @@ void logMenu() {
              }
              total = persisted = used = 0;
          }                    },
-        {"Export Log",
+        {MaliText::export_log_084456,
          []() {
              if (!setupSdCard()) {
                  displayError("SD indisponivel", true);
@@ -91,6 +92,6 @@ void logMenu() {
          }                    },
         {"Voltar",     []() {}}
     };
-    loopOptions(menu, MENU_TYPE_SUBMENU, "Counter Log");
+    loopOptions(menu, MENU_TYPE_SUBMENU, MaliText::counter_log_2520f7);
 }
 } // namespace CounterSuite

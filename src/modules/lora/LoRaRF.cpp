@@ -1,3 +1,5 @@
+#include "core/ui/MaliUI.h"
+#include "core/ui/PtBr.h"
 #if !defined(LITE_VERSION)
 #include "LoRaRF.h"
 #include "WString.h"
@@ -211,7 +213,7 @@ void render() {
     tft.setTextColor(0x6DFC);
     if (!intlora) { tft.drawString("Falha ao iniciar LoRa", 10, 13); }
     Serial.println(String(displayName));
-    tft.drawString("USRN: " + String(displayName), 10, 25);
+    tft.drawString(MaliText::usrn_a7a5af + String(displayName), 10, 25);
 
     int yPos = yStart;
     int endLine = scrollOffset + maxMessages;
@@ -246,7 +248,7 @@ void sendmsg() {
     if (!intlora) {
         tft.setTextColor(bruceConfig.priColor);
 
-        tft.setTextColor(TFT_RED);
+        tft.setTextColor(MaliUI::ERROR);
         tft.setTextSize(2);
         tft.setCursor(10, tftHeight / 2 - 10);
         tft.print("LoRa nao iniciado!");
@@ -256,7 +258,7 @@ void sendmsg() {
         update = true;
         return;
     }
-    msg = keyboard(msg, 256, "Message:");
+    msg = keyboard(msg, 256, MaliText::message_9e0295);
     if (msg == "\x1B") return;
     msg = String(displayName) + ": " + msg;
     if (msg == "") return;

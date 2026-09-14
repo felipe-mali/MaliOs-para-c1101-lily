@@ -1,3 +1,5 @@
+#include "core/ui/MaliUI.h"
+#include "core/ui/PtBr.h"
 // Borrowed from https://github.com/justcallmekoko/ESP32Marauder/
 // Learned from https://github.com/risinek/esp32-wifi-penetration-tool/
 // Arduino IDE needs to be tweeked to work, follow the instructions:
@@ -373,9 +375,9 @@ ScanNets:
         if (millis() - lastTime > 2000) {
             drawMainBorderWithTitle("Flood de deauth");
             tft.setCursor(10, tftHeight - 25);
-            tft.print("Frames:               ");
+            tft.print(MaliText::frames_008f07);
             tft.setCursor(10, tftHeight - 25);
-            tft.println("Frames: " + String(count / 2) + "/s   ");
+            tft.println(MaliText::frames_364f97 + String(count / 2) + "/s   ");
             tft.setCursor(10, tftHeight - 45);
             tft.println("Canal " + String(channel) + "    ");
             count = 0;
@@ -563,39 +565,39 @@ void capture_handshake(const String &tssid, const String &mac, uint8_t channel) 
             padprintln("Seguranca: " + encryptionTypeStr);
 
             if (phase == CAPTURED) {
-                tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+                tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
                 padprintln("Status: CAPTURADO!");
             } else if (hasBeacons) {
-                tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+                tft.setTextColor(MaliUI::WARNING, bruceConfig.bgColor);
                 padprintln("Status: " + String(phase == MONITORING ? "Monitorando..." : "Buscando..."));
             } else {
-                tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+                tft.setTextColor(MaliUI::WARNING, bruceConfig.bgColor);
                 padprintln("Status: Aguardando...");
             }
 
             if (tftHeight > 135) {
-                tft.setTextColor(hsTracker.msg1 ? TFT_GREEN : TFT_RED, bruceConfig.bgColor);
+                tft.setTextColor(hsTracker.msg1 ? MaliUI::SUCCESS : MaliUI::ERROR, bruceConfig.bgColor);
                 padprintln("        EAPOL MSG 1: " + String(hsTracker.msg1 ? "Capturada" : "Nenhuma"));
-                tft.setTextColor(hsTracker.msg2 ? TFT_GREEN : TFT_RED, bruceConfig.bgColor);
+                tft.setTextColor(hsTracker.msg2 ? MaliUI::SUCCESS : MaliUI::ERROR, bruceConfig.bgColor);
                 padprintln("        EAPOL MSG 2: " + String(hsTracker.msg2 ? "Capturada" : "Nenhuma"));
-                tft.setTextColor(hsTracker.msg3 ? TFT_GREEN : TFT_RED, bruceConfig.bgColor);
+                tft.setTextColor(hsTracker.msg3 ? MaliUI::SUCCESS : MaliUI::ERROR, bruceConfig.bgColor);
                 padprintln("        EAPOL MSG 3: " + String(hsTracker.msg3 ? "Capturada" : "Nenhuma"));
-                tft.setTextColor(hsTracker.msg4 ? TFT_GREEN : TFT_RED, bruceConfig.bgColor);
+                tft.setTextColor(hsTracker.msg4 ? MaliUI::SUCCESS : MaliUI::ERROR, bruceConfig.bgColor);
                 padprintln("        EAPOL MSG 4: " + String(hsTracker.msg4 ? "Capturada" : "Nenhuma"));
                 tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
             } else {
                 tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
                 padprint("EAPOL MSG:");
-                tft.setTextColor(hsTracker.msg1 ? TFT_GREEN : TFT_RED, bruceConfig.bgColor);
+                tft.setTextColor(hsTracker.msg1 ? MaliUI::SUCCESS : MaliUI::ERROR, bruceConfig.bgColor);
                 tft.print(" 1");
-                tft.setTextColor(hsTracker.msg2 ? TFT_GREEN : TFT_RED, bruceConfig.bgColor);
+                tft.setTextColor(hsTracker.msg2 ? MaliUI::SUCCESS : MaliUI::ERROR, bruceConfig.bgColor);
                 tft.print(" 2");
-                tft.setTextColor(hsTracker.msg3 ? TFT_GREEN : TFT_RED, bruceConfig.bgColor);
+                tft.setTextColor(hsTracker.msg3 ? MaliUI::SUCCESS : MaliUI::ERROR, bruceConfig.bgColor);
                 tft.print(" 3");
-                tft.setTextColor(hsTracker.msg4 ? TFT_GREEN : TFT_RED, bruceConfig.bgColor);
+                tft.setTextColor(hsTracker.msg4 ? MaliUI::SUCCESS : MaliUI::ERROR, bruceConfig.bgColor);
                 tft.print(" 4");
                 if (hsTracker.msg1 && hsTracker.msg2 && hsTracker.msg3 && hsTracker.msg4) {
-                    tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
                     tft.println(" > Todas capturadas");
                 } else tft.println("");
             }
@@ -610,7 +612,7 @@ void capture_handshake(const String &tssid, const String &mac, uint8_t channel) 
             if (phase != CAPTURED) {
                 padprintln("Pressione " + String(BTN_ALIAS) + " p/ deauth");
             } else {
-                tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+                tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
                 padprintln("Handshake salvo!        ");
                 tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
             }

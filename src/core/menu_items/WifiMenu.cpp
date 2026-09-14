@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "mali_tools/counter/counter_main.h"
 #include "WifiMenu.h"
 #include "core/display.h"
@@ -54,7 +55,7 @@ void WifiMenu::optionsMenu() {
             {"Conectar ao Wi-Fi", lambdaHelper(wifiConnectMenu, WIFI_STA)},
             {"Iniciar AP Wi-Fi", [=]() {
                  wifiConnectMenu(WIFI_AP);
-                 displayInfo("pwd: " + bruceConfig.wifiAp.pwd, true);
+                 displayInfo(MaliText::pwd_a62786 + bruceConfig.wifiAp.pwd, true);
              }},
         };
     }
@@ -116,7 +117,7 @@ void WifiMenu::optionsMenu() {
     addOptionToMainMenu();
     options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::WIFI); }});
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "WiFi");
+    loopOptions(options, MENU_TYPE_GEAR, "WiFi");
 
     options.clear();
 }
@@ -144,7 +145,7 @@ void WifiMenu::configMenu() {
                                evilOptions.push_back({"Permitir /ssid", setEvilAllowSetSsid});
                                evilOptions.push_back({"Mostrar endpoints", setEvilAllowEndpointDisplay});
                                evilOptions.push_back({"Voltar", [this]() { configMenu(); }});
-                               loopOptions(evilOptions, MENU_TYPE_SUBMENU, "Config. Evil Wi-Fi");
+                               loopOptions(evilOptions, MENU_TYPE_GEAR, "Config. Evil Wi-Fi");
                            }});
 
     {
@@ -161,7 +162,7 @@ void WifiMenu::configMenu() {
         wifiOptions.push_back(opt);
     }
     wifiOptions.push_back({"Voltar", [this]() { optionsMenu(); }});
-    loopOptions(wifiOptions, MENU_TYPE_SUBMENU, "Config. Wi-Fi");
+    loopOptions(wifiOptions, MENU_TYPE_GEAR, "Config. Wi-Fi");
 }
 
 void WifiMenu::drawIcon(float scale) {

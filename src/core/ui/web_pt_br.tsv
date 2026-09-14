@@ -1,0 +1,191 @@
+# Textos Web. IDs, rotas, comandos e estados de API permanecem estaveis.
+Serial Cmd	Comando serial
+Navigator	Navegador
+Settings	Configurações
+Log Out	Sair
+WebUI sections	Seções da WebUI
+Predatory Firmware	Firmware Predador
+DEVICE CONSOLE	CONSOLE DO DISPOSITIVO
+Dashboard	Painel
+Network	Rede
+Radio	Rádio
+Tools	Ferramentas
+Files	Arquivos
+System	Sistema
+QUICK ACCESS	ACESSO RÁPIDO
+LOCAL INTERFACE	INTERFACE LOCAL
+READY	PRONTO
+MALI / TOOLS	MALI / FERRAMENTAS
+Built for the device.	Feito para o dispositivo.
+Profile viewer / editor	Visualizador e editor de perfis
+MALI / RADIO	MALI / RÁDIO
+Observe. Measure.	Observe. Meça.
+Device navigator	Navegador do dispositivo
+MALI / DEVICE CONSOLE	MALI / CONSOLE DO DISPOSITIVO
+Turn the system.	Gire o sistema.
+ROTARY ACCESS / 01—04	ACESSO ROTATIVO / 01—04
+One turn away.	Ao alcance de um giro.
+MALI TOOLS	FERRAMENTAS MALI
+Mali Tools / KEY GAUGE	Ferramentas Mali / KEY GAUGE
+Action	Ação
+Size	Tamanho
+Name	Nome
+Create new file	Criar arquivo
+Create new folder	Criar pasta
+Refresh folder	Atualizar pasta
+Upload files to current folder	Enviar arquivos para a pasta atual
+Upload folder to current folder	Enviar pasta para a pasta atual
+Uploading	Enviando
+Download	Baixar
+Run this file	Executar este arquivo
+Edit:	Editar:
+Run	Executar
+Save	Salvar
+Delete	Excluir
+Rename	Renomear
+Close	Fechar
+Back	Voltar
+Next Page	Próxima página
+Previous Page	Página anterior
+Left	Esquerda
+Right	Direita
+Up	Cima
+Down	Baixo
+Long Press	Pressão longa
+Select/OK	Selecionar/OK
+Reload Screen = R	Atualizar tela = R
+Page Up = Page Up	Página anterior = Page Up
+Page Down = Page Down	Próxima página = Page Down
+Back = Backspace	Voltar = Backspace
+Long Press = M	Pressão longa = M
+Close Navigator = Escape	Fechar navegador = Escape
+Navigating = Arrow Keys	Navegar = teclas de seta
+Navigator Shortcut	Atalho do navegador
+Device Navigator	Navegador do dispositivo
+Reload After Navigate	Atualizar após navegar
+Auto Reload: 1s	Atualização: 1s
+Auto Reload: 2s	Atualização: 2s
+Auto Reload: 5s	Atualização: 5s
+Auto Reload: 10s	Atualização: 10s
+Shortcut	Atalho
+Change WebUI Credentials	Alterar credenciais da WebUI
+Username	Usuário
+Password	Senha
+Reboot	Reiniciar
+Info	Informações
+Local Bruce WebUI	WebUI local MaliOS
+Custom WebUI	WebUI personalizada
+Custom	Personalizado
+or	ou
+by	por
+You can help develop the WebUI interface using	Você pode contribuir com a WebUI usando
+You can use a keyboard for navigating instead of the on-screen buttons	Você pode navegar com um teclado ou com os botões na tela
+Firmware for offensive pranks, pentest studies and analysis - for educational purposes only. Do not use in environments where you are not allowed. All responsibilities for irresponsible usage of this firmware rest on your fin, sharky.	Firmware para estudos, testes de segurança e análise em ambientes autorizados. A base Bruce e seus autores permanecem creditados; o uso responsável é dever de quem opera o dispositivo.
+Sincerely, Bruce.	MaliOS — baseado no Bruce Firmware.
+⚠️ WiFi features will stop the WebUI after configuration	⚠️ As funções Wi-Fi encerram a WebUI após a configuração
+Use o File Manager para enviar, editar e executar arquivos suportados pelo interpretador herdado do Bruce.	Use o gerenciador de arquivos para enviar, editar e executar os arquivos suportados pelo interpretador.
+Gerencie JavaScript pelo File Manager	Gerencie JavaScript pelos Arquivos
+Somente leitura. O Dashboard nao inicializa radios nem altera o modo USB.	Somente leitura. O painel não inicializa rádios nem altera o modo USB.
+NEW	NOVO
+DUPLICATE	DUPLICAR
+SAVE	SALVAR
+LOAD	CARREGAR
+DELETE	EXCLUIR
+POINTS	PONTOS
+PROFILE NAME	NOME DO PERFIL
+PROFILES	PERFIS
+THICKNESS:	ESPESSURA:
+PROFILE WIDTH:	LARGURA DO PERFIL:
+SHOW ON DEVICE	EXIBIR NO DISPOSITIVO
+P1 · LEVEL 0	P1 · NÍVEL 0
+Perfil geometrico manual · REFERENCE ONLY	Perfil geométrico manual · APENAS REFERÊNCIA
+Arraste um marcador para ajustar o nivel. THICKNESS altera a base; PROFILE WIDTH altera o comprimento visual.	Arraste um marcador para ajustar o nível. ESPESSURA altera a base; LARGURA DO PERFIL altera o comprimento visual.
+Ajustes ficam na memoria do navegador ate SAVE.	Os ajustes ficam na memória do navegador até SALVAR.
+TECHNOLOGY	TECNOLOGIA
+MODE	MODO
+DURATION	DURAÇÃO
+INTENSITY	INTENSIDADE
+LOW	BAIXA
+MEDIUM	MÉDIA
+HIGH	ALTA
+CUSTOM	PERSONALIZADO
+START	INICIAR
+STOP TEST	PARAR TESTE
+RUN AGAIN	REPETIR
+SAVE RESULT	SALVAR RESULTADO
+HISTORY	HISTÓRICO
+SCAN	ESCANEAR
+SCAN / CHANNELS	BUSCA / CANAIS
+SELECT (ate 32 alvos; validade 2 minutos)	SELECIONAR (até 32 alvos; validade de 2 minutos)
+TARGET / IPv4 HOST	ALVO / HOST IPv4
+TARGET: —	ALVO: —
+Wi-Fi password (RAM only)	Senha Wi-Fi (somente RAM)
+RF CENTER (MHz)	CENTRO RF (MHz)
+Actual interval / polling (ms)	Intervalo real entre consultas (ms)
+Custom duration in seconds	Duração personalizada em segundos
+History limit (1–50)	Limite do histórico (1–50)
+APPLY SETTINGS	APLICAR CONFIGURAÇÕES
+Unlimited	Sem limite
+IDLE	INATIVO
+LAB / AUTHORIZED TARGETS ONLY	LAB / SOMENTE ALVOS AUTORIZADOS
+Testes de Resiliência · LAB / AUTHORIZED TARGETS ONLY	Testes de Resiliência · LAB / SOMENTE ALVOS AUTORIZADOS
+SIMULATION — sem operações externas	SIMULAÇÃO — sem operações externas
+Ready	Pronto
+5 sec	5 s
+10 sec	10 s
+30 sec	30 s
+60 sec	60 s
+Loading...	Carregando...
+Loading	Carregando
+Rename Folder: 	Renomear pasta: 
+Rename File: 	Renomear arquivo: 
+New Folder Name:	Novo nome da pasta:
+New File Name:	Novo nome do arquivo:
+Create Folder	Criar pasta
+Create File	Criar arquivo
+Folder Name:	Nome da pasta:
+File Name:	Nome do arquivo:
+Serial Command	Comando serial
+Command:	Comando:
+Invalid dialog name: 	Diálogo inválido: 
+Session expired or unauthorized. Would you like to go to the login page?	Sessão expirada ou acesso não autorizado. Deseja abrir a página de acesso?
+Unauthorized access (401)	Acesso não autorizado (401)
+Request failed with status ${req.status}	A solicitação falhou com status ${req.status}
+Network error	Erro de rede
+Are you sure you want to DELETE ${file}?\n\nTHIS ACTION CANNOT BE UNDONE!	Deseja EXCLUIR ${file}?\n\nESTA AÇÃO NÃO PODE SER DESFEITA!
+Are you sure you want to REBOOT the device?	Deseja REINICIAR o dispositivo?
+You have unsaved changes. Do you want to discard them?	Há alterações não salvas. Deseja descartá-las?
+Creating File...	Criando arquivo...
+Creating Folder...	Criando pasta...
+Running Serial Command...	Executando comando serial...
+Running command...	Executando comando...
+Saving WiFi Credentials...	Salvando credenciais Wi-Fi...
+Saving...	Salvando...
+Credentials saved successfully!	Credenciais salvas com sucesso!
+Failed to reload screen: 	Falha ao atualizar a tela: 
+Failed to run command: 	Falha ao executar comando: 
+Tempo esgotado. Atualize a lista para verificar o resultado antes de repetir SAVE.	Tempo esgotado. Atualize a lista para verificar o resultado antes de repetir SALVAR.
+Novo perfil em memoria. Use SAVE para gravar.	Novo perfil em memória. Use SALVAR para gravar.
+Resposta de SAVE invalida; atualize a lista para conferir.	Resposta ao salvar inválida; atualize a lista para conferir.
+SIMULATION ONLY: requer adaptador de laboratorio configurado e cancelavel.	SOMENTE SIMULAÇÃO: requer adaptador de laboratório configurado e cancelável.
+CH 1..14 / AP visibility	Canais 1..14 / visibilidade dos APs
+CC1101 center +/-0.2 MHz	Centro CC1101 +/-0,2 MHz
+Time / sample (ms)	Tempo / amostra (ms)
+Confirme LAB / AUTHORIZED TARGETS ONLY.	Confirme LAB / SOMENTE ALVOS AUTORIZADOS.
+local / receiver	local / receptor
+connectable	conectável
+not connectable	não conectável
+STOP solicitado...	Parada solicitada...
+
+Fetching system info...	Consultando o sistema...
+Fetching content...	Carregando conteudo...
+Filename cannot be empty.	O nome do arquivo nao pode ficar vazio.
+No action specified.	Nenhuma acao informada.
+Username and password cannot be empty.	Usuario e senha nao podem ficar vazios.
+Rebooting...	Reiniciando...
+Failed to reload screen:	Falha ao atualizar a tela:
+Invalid header at offset	Cabecalho invalido na posicao
+Failed to restore file editor:	Falha ao restaurar o editor de arquivos:
+Failed to restore file editor from URL:	Falha ao restaurar o editor pela URL:
+Failed to open file for editing:	Falha ao abrir arquivo para edicao:
+Dialog.showOneInput: Invalid dialog name	Dialog.showOneInput: Nome de dialogo invalido

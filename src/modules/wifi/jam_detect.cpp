@@ -1,3 +1,4 @@
+#include "core/ui/MaliUI.h"
 #if !defined(LITE_VERSION)
 #include "jam_detect.h"
 
@@ -123,7 +124,7 @@ jd_draw(const uint16_t *dps, const uint16_t *peak, uint32_t thr, uint8_t curCh, 
         uint32_t pkX = (uint32_t)(barX + 1) + (uint32_t)(barW - 2) * peak[ch] / scale;
         if (peak[ch] > 0 && pkX > (uint32_t)(barX + 1)) tft.drawFastVLine((int)pkX, ry + 1, bh - 2, TFT_YELLOW);
 
-        tft.setTextColor(over ? TFT_RED : bruceConfig.priColor, bruceConfig.bgColor);
+        tft.setTextColor(over ? MaliUI::ERROR : bruceConfig.priColor, bruceConfig.bgColor);
         tft.drawString(String(dps[ch]), barX + barW + 4, ry, 1);
     }
 

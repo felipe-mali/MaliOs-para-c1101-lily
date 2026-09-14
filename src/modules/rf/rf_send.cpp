@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "rf_send.h"
 #include "core/led_control.h"
 #include "core/type_convertion.h"
@@ -31,7 +32,7 @@ void sendCustomRF() {
         {"Recentes", [&]() { selected_code = selectRecentRfMenu(); }},
         {"LittleFS", [&]() { filesystem = &LittleFS; }              },
     };
-    if (setupSdCard()) options.insert(options.begin(), {"SD Card", [&]() { filesystem = &SD; }});
+    if (setupSdCard()) options.insert(options.begin(), {MaliText::sd_card_14cdf0, [&]() { filesystem = &SD; }});
 
     loopOptions(options);
 
@@ -321,7 +322,7 @@ bool txSubFile(RfCodes &selected_code, bool hideDefaultUI) {
             sent++;
             if (!hideDefaultUI) {
                 if (check(EscPress)) break;
-                displayTextLine("Sent " + String(sent) + "/" + String(total));
+                displayTextLine(MaliText::sent_060fbc + String(sent) + "/" + String(total));
             }
         }
 
@@ -338,7 +339,7 @@ bool txSubFile(RfCodes &selected_code, bool hideDefaultUI) {
     }
 
     Serial.printf("\nSent %d of %d signals\n", sent, total);
-    if (!hideDefaultUI) { displayTextLine("Sent " + String(sent) + "/" + String(total), false); }
+    if (!hideDefaultUI) { displayTextLine(MaliText::sent_060fbc + String(sent) + "/" + String(total), false); }
 
     // Reset vectors
     bitList.clear();

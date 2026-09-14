@@ -1,3 +1,5 @@
+#include "core/ui/PtBr.h"
+#include "core/ui/MaliUI.h"
 /**
  * @file netcut.cpp
  * @brief NetCut ARP Module for Bruce Firmware
@@ -589,30 +591,30 @@ static void _activeLoop() {
 
             // Troll timing info
             if (trollN > 0) {
-                tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+                tft.setTextColor(MaliUI::WARNING, bruceConfig.bgColor);
                 tft.drawString(
-                    "Troll: " + String(s_trollOfflineMs / 1000) + "s OFF / " +
-                        String(s_trollOnlineMs / 1000) + "s ON",
+                    "Troll: " + String(s_trollOfflineMs / 1000) + MaliText::s_off_0be826 +
+                        String(s_trollOnlineMs / 1000) + MaliText::s_on_cf6e10,
                     10,
                     tftHeight - 6 * _lh,
                     1
                 );
             }
 
-            tft.setTextColor(TFT_RED, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::ERROR, bruceConfig.bgColor);
             tft.drawString(
                 "CORTE:" + String(cutN) + " Disp:" + String(s_deviceCount), 10, tftHeight - 5 * _lh, 1
             );
             tft.setTextColor(TFT_MAGENTA, bruceConfig.bgColor);
             tft.drawString(
-                "TRL:" + String(trollOff) + "off/" + String(trollOn) + "on", 10, tftHeight - 4 * _lh, 1
+                "TRL:" + String(trollOff) + MaliText::off_08f5cb + String(trollOn) + MaliText::on_db3d40, 10, tftHeight - 4 * _lh, 1
             );
 
             // Draw SNIPER count
-            for (int i = 0; i < s_deviceCount; i++) tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+            for (int i = 0; i < s_deviceCount; i++) tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
             tft.drawString("Pacotes:" + String(packetCount), 10, tftHeight - 3 * _lh, 1);
 
-            tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::TEXT_SECONDARY, bruceConfig.bgColor);
             tft.drawString("Esc=Parar", 10, tftHeight - 2 * _lh, 1);
         }
 

@@ -24,6 +24,7 @@ enum class Category : uint8_t {
     USB_HID,
     MALI_TOOLS,
     MALI_COUNTER,
+    MALI_KEYS,
 };
 
 void open(Category category);

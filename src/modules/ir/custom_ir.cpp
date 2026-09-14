@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "custom_ir.h"
 #include "TV-B-Gone.h" // for checkIrTxPin()
 #include "core/display.h"
@@ -195,7 +196,7 @@ bool txIrFile(FS *fs, const String &filepath, bool hideDefaultUI) {
         if (check(SelPress)) // Pause TV-B-Gone
         {
             while (check(SelPress)) { vTaskDelay(pdMS_TO_TICKS(1)); }
-            if (!hideDefaultUI) { displayTextLine("Paused"); }
+            if (!hideDefaultUI) { displayTextLine(MaliText::paused_c7dfb6); }
 
             while (!check(SelPress)) { // If Presses Select again, continues
                 if (check(EscPress)) {
@@ -227,11 +228,11 @@ void otherIRcodes() {
     returnToMenu = true; // make sure menu is redrawn when quitting in any point
 
     options = {
-        {"Recent",   selectRecentIrMenu       },
+        {MaliText::recent_76eec7,   selectRecentIrMenu       },
         {"LittleFS", [&]() { fs = &LittleFS; }},
         {"Menu",     yield                    },
     };
-    if (setupSdCard()) options.insert(options.begin(), {"SD Card", [&]() { fs = &SD; }});
+    if (setupSdCard()) options.insert(options.begin(), {MaliText::sd_card_14cdf0, [&]() { fs = &SD; }});
 
     loopOptions(options);
 
@@ -258,8 +259,8 @@ void otherIRcodes() {
         bool exit = false;
         bool mode_cmd = true;
         options = {
-            {"Choose cmd", [&]() { mode_cmd = true; } },
-            {"Spam all",   [&]() { mode_cmd = false; }},
+            {MaliText::choose_cmd_ce787e, [&]() { mode_cmd = true; } },
+            {MaliText::spam_all_c850a8,   [&]() { mode_cmd = false; }},
             {"Menu",       [&]() { exit = true; }     },
         };
 

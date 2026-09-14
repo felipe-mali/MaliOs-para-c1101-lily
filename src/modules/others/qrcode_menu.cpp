@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "qrcode_menu.h"
 #include "../lib/TFT_eSPI_QRcode/src/qrcode.h"
 #include "core/config.h"
@@ -50,12 +51,12 @@ void qrcode_display(const String &qrcodeUrl) {
 }
 
 void display_custom_qrcode() {
-    String message = keyboard("", 100, "QRCode text:");
+    String message = keyboard("", 100, MaliText::qrcode_text_2908ef);
     return qrcode_display(message);
 }
 
 void pix_qrcode() {
-    String key = keyboard("", 25, "PIX Key:");
+    String key = keyboard("", 25, MaliText::pix_key_006d81);
     if (key == "\x1B") return;
     String amount = num_keyboard("1000.00", 10, "Int amount:");
     if (amount == "\x1B") return;
@@ -91,9 +92,9 @@ void qrcode_menu() {
 
 void custom_qrcode_menu() {
     options = {
-        {"Display",      display_custom_qrcode  },
-        {"Save&Display", save_and_display_qrcode},
-        {"Remove",       remove_custom_qrcode   },
+        {MaliText::display_574ff9,      display_custom_qrcode  },
+        {MaliText::save_display_66f37d, save_and_display_qrcode},
+        {MaliText::remove_e96390,       remove_custom_qrcode   },
         {"Voltar",       qrcode_menu            }
     };
     loopOptions(options);
@@ -101,7 +102,7 @@ void custom_qrcode_menu() {
 
 void save_and_display_qrcode() {
 
-    String name = keyboard("", 100, "QRCode name:");
+    String name = keyboard("", 100, MaliText::qrcode_name_51d855);
     if (name == "\x1B") return;
     if (name.isEmpty()) {
         displayError("Nome nao pode ficar vazio!");
@@ -119,7 +120,7 @@ void save_and_display_qrcode() {
         return;
     }
 
-    String text = keyboard("", 100, "QRCode text:");
+    String text = keyboard("", 100, MaliText::qrcode_text_2908ef);
     if (text == "\x1B") return;
 
     bruceConfig.addQrCodeEntry(name, text);

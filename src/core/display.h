@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #ifndef __DISPLAY_H__
 #define __DISPLAY_H__
 
@@ -193,7 +194,7 @@ Opt_Coord listFiles(int index, std::vector<FileList> fileList);
 
 void drawWireguardStatus(int x, int y);
 
-void progressHandler(int progress, size_t total, const String &message = "Running, Wait");
+void progressHandler(int progress, size_t total, const String &message = MaliText::running_wait_7e1d29);
 
 bool __attribute__((weak)) isCharging();
 

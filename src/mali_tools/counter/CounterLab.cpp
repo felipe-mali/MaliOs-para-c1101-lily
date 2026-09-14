@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "core/ui/MaliUI.h"
 #include "CounterLab.h"
 #include "counter_metrics.h"
@@ -19,12 +20,12 @@
 namespace CounterLab {
 namespace {
 const char *modes[COUNT][10] = {
-    {"SCAN NETWORKS", "CONNECTION TEST", "RECONNECT TEST", "PACKET LOSS TEST", "LATENCY TEST", "THROUGHPUT SAMPLE", "SIGNAL STABILITY", "CHANNEL MONITOR", "SIMULATION MODE"},
-    {"BLE SCANNER", "SIGNAL MONITOR", "ADVERTISEMENT MONITOR", "CONNECTION TEST", "RECONNECT TEST", "SERVICE ENUMERATION", "NOTIFICATION TEST", "SIMULATION MODE"},
-    {"SPECTRUM MONITOR", "ACTIVITY COUNTER", "SIGNAL STRENGTH", "EVENT LOGGER", "SIMULATION"},
-    {"IR MONITOR", "CAPTURE STATISTICS", "REPEAT TEST", "TIMING ANALYSIS", "SIMULATION"},
-    {"SCAN", "READ STABILITY", "REPEATED READ TEST", "TIMING", "ERROR RATE", "SIMULATION"},
-    {"TIMER / HEAP TEST", "SIMULATION"}
+    {MaliText::scan_networks_740a60, MaliText::connection_test_e818f1, MaliText::reconnect_test_8b08fd, MaliText::packet_loss_test_7a63f5, MaliText::latency_test_6fb10a, MaliText::throughput_sample_855837, MaliText::signal_stability_5e71f0, MaliText::channel_monitor_138512, MaliText::simulation_mode_8f424c},
+    {MaliText::ble_scanner_78208a, MaliText::signal_monitor_60b4af, MaliText::advertisement_monitor_811acb, MaliText::connection_test_e818f1, MaliText::reconnect_test_8b08fd, MaliText::service_enumeration_79c6ca, MaliText::notification_test_971514, MaliText::simulation_mode_8f424c},
+    {MaliText::spectrum_monitor_7ca617, MaliText::activity_counter_c569cb, MaliText::signal_strength_6c899c, MaliText::event_logger_b79f5c, MaliText::simulation_e07d33},
+    {MaliText::ir_monitor_d1da40, MaliText::capture_statistics_9fa8ed, MaliText::repeat_test_adfc21, MaliText::timing_analysis_b38f17, MaliText::simulation_e07d33},
+    {MaliText::scan_c5a199, MaliText::read_stability_309f08, MaliText::repeated_read_test_b5ce16, MaliText::timing_59f71f, MaliText::error_rate_ae16f9, MaliText::simulation_e07d33},
+    {MaliText::timer_heap_test_686a32, MaliText::simulation_e07d33}
 };
 const uint8_t counts[] = {9,8,5,5,6,2};
 portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
@@ -83,28 +84,32 @@ void textLine(int y, const String &text, uint16_t color = TFT_LIGHTGREY) {
     tft.setTextColor(color, MaliUI::SURFACE);
     tft.drawString(text.substring(0, max(1, (tftWidth-24)/6)), 12, y, 1);
 }
+const char *stateLabel(State state) {
+    static const char *labels[] = {"INATIVO", "ESCANEANDO", "CONFIGURANDO", "EXECUTANDO", "PARANDO", "CONCLUIDO", "PARADO", "ERRO"};
+    return state <= ERROR ? labels[state] : "ERRO";
+}
 void draw(const Status &s, bool first) {
     const bool portrait=tftHeight>240;
     const bool outcomes=s.config.simulation||connecting(s.config)||pinging(s.config)||s.config.category==NFC||s.config.category==IR||s.config.category==SYSTEM;
     if(first){tft.fillScreen(MaliUI::BACKGROUND);MaliUI::drawHeader(categoryName(s.config.category));MaliUI::drawCard(4,28,tftWidth-8,tftHeight-46);}
     tft.setTextDatum(0);tft.setTextSize(1);
-    textLine(33,String("TARGET: ")+(s.config.target[0]?s.config.target:"local / receiver"));
+    textLine(33,String(MaliText::target_149d99)+(s.config.target[0]?s.config.target:MaliText::local_receiver_42b638));
     textLine(46,modeName(s.config.category,s.config.mode));
-    textLine(59,String(s.config.simulation?"SIM / ":"LAB / ")+stateName(s.state)+"  "+String(s.elapsed/1000)+"s",MaliUI::ACCENT);
+    textLine(59,String(s.config.simulation?"SIM / ":"LAB / ")+stateLabel(s.state)+"  "+String(s.elapsed/1000)+"s",MaliUI::ACCENT);
     auto metric=[&](const char *label,const String &value,int x,int y,int width,uint16_t color){
         tft.fillRect(x,y,width,34,MaliUI::SURFACE);tft.setTextSize(1);tft.setTextColor(MaliUI::TEXT_SECONDARY,MaliUI::SURFACE);tft.drawString(label,x,y,1);
         tft.setTextSize(value.length()*12U<unsigned(width)?2:1);tft.setTextColor(color,MaliUI::SURFACE);tft.drawString(value,x,y+13,1);tft.setTextSize(1);
     };
     int step=(tftWidth-28)/3;
     if(portrait){
-        metric("EVENTS",String(s.metrics.events),12,80,tftWidth-24,MaliUI::TEXT_PRIMARY);
-        metric(outcomes?"SUCCESS":"RX",String(outcomes?s.metrics.success:s.metrics.rx),12,120,tftWidth-24,outcomes?MaliUI::SUCCESS:MaliUI::ACCENT);
-        metric(outcomes?"FAIL":"RSSI dBm",String(outcomes?int32_t(s.metrics.failures):s.metrics.rssi),12,160,tftWidth-24,outcomes?MaliUI::ERROR:MaliUI::ACCENT);
-        textLine(201,"RATE: "+String(s.elapsed?1000.0*s.metrics.events/s.elapsed:0,1)+"/s");
+        metric(MaliText::events_c5f548,String(s.metrics.events),12,80,tftWidth-24,MaliUI::TEXT_PRIMARY);
+        metric(outcomes?MaliText::success_805c3d:"RX",String(outcomes?s.metrics.success:s.metrics.rx),12,120,tftWidth-24,outcomes?MaliUI::SUCCESS:MaliUI::ACCENT);
+        metric(outcomes?MaliText::fail_fd6a5e:"RSSI dBm",String(outcomes?int32_t(s.metrics.failures):s.metrics.rssi),12,160,tftWidth-24,outcomes?MaliUI::ERROR:MaliUI::ACCENT);
+        textLine(201,MaliText::rate_f42d70+String(s.elapsed?1000.0*s.metrics.events/s.elapsed:0,1)+"/s");
     }else{
-        metric("EVENTS",String(s.metrics.events),12,77,step,MaliUI::TEXT_PRIMARY);
-        metric(outcomes?"SUCCESS":"RX",String(outcomes?s.metrics.success:s.metrics.rx),12+step,77,step,outcomes?MaliUI::SUCCESS:MaliUI::ACCENT);
-        metric(outcomes?"FAIL":"RSSI dBm",String(outcomes?int32_t(s.metrics.failures):s.metrics.rssi),12+2*step,77,step,outcomes?MaliUI::ERROR:MaliUI::ACCENT);
+        metric(MaliText::events_c5f548,String(s.metrics.events),12,77,step,MaliUI::TEXT_PRIMARY);
+        metric(outcomes?MaliText::success_805c3d:"RX",String(outcomes?s.metrics.success:s.metrics.rx),12+step,77,step,outcomes?MaliUI::SUCCESS:MaliUI::ACCENT);
+        metric(outcomes?MaliText::fail_fd6a5e:"RSSI dBm",String(outcomes?int32_t(s.metrics.failures):s.metrics.rssi),12+2*step,77,step,outcomes?MaliUI::ERROR:MaliUI::ACCENT);
     }
     int top=portrait?218:130,bottom=tftHeight-35,height=max(3,bottom-top);
     tft.fillRect(12,top,tftWidth-24,height+1,MaliUI::SURFACE);
@@ -116,7 +121,7 @@ void draw(const Status &s, bool first) {
         for(int i=1;i<s.graphCount;++i)tft.drawLine(12+(tftWidth-24)*(i-1)/59,bottom-(s.graph[i-1]-low)*height/max(1,high-low),12+(tftWidth-24)*i/59,bottom-(s.graph[i]-low)*height/max(1,high-low),MaliUI::ACCENT);
     }
     textLine(portrait?tftHeight-30:115,s.message,s.state==ERROR?MaliUI::ERROR:MaliUI::TEXT_SECONDARY);
-    MaliUI::drawFooter("HOLD / CLICK / BACK: STOP");
+    MaliUI::drawFooter(MaliText::hold_click_back_stop_f362b5);
 }
 
 void encode(JsonDocument &doc, const Status &s) {
@@ -155,24 +160,24 @@ void execute(Config c, bool scanOnly) {
     auto fail=[&](const char *message){ s.state=ERROR;strlcpy(s.message,message,sizeof(s.message)); };
     const bool conn=connecting(c), pingMode=pinging(c);
     publish(s);draw(s,true);
-    if (c.simulation) strlcpy(s.message,"SIMULATION: no external operations",sizeof(s.message));
+    if (c.simulation) strlcpy(s.message,MaliText::simulation_no_external_operations_0a851e,sizeof(s.message));
     else if (conn && c.category==WIFI) {
-        if(WiFi.getMode()!=WIFI_MODE_NULL) fail("Wi-Fi in use: local test requires Wi-Fi OFF");
-        else if(!radioHasMemForWifi() || !WiFi.mode(WIFI_STA)) fail("Wi-Fi unavailable / memory");
+        if(WiFi.getMode()!=WIFI_MODE_NULL) fail(MaliText::wi_fi_in_use_local_test_requires_wi_fi_off_d38a70);
+        else if(!radioHasMemForWifi() || !WiFi.mode(WIFI_STA)) fail(MaliText::wi_fi_unavailable_memory_82bc8d);
         else { wifiOwned=true;WiFi.persistent(false);WiFi.setAutoReconnect(false); }
     } else if (conn && c.category==BLE) {
 #if SOC_BLE_SUPPORTED
-        if(NimBLEDevice::isInitialized() || radioLargestDmaBlock()<RADIO_BLE_MIN_DMA_BLOCK) fail("BLE in use / low memory");
-        else if(!NimBLEDevice::init("")) fail("BLE init failed");
+        if(NimBLEDevice::isInitialized() || radioLargestDmaBlock()<RADIO_BLE_MIN_DMA_BLOCK) fail(MaliText::ble_in_use_low_memory_efbd6f);
+        else if(!NimBLEDevice::init("")) fail(MaliText::ble_init_failed_500bda);
         else {
             bleOwned=true;client=NimBLEDevice::createClient();
-            if(!client)fail("BLE client unavailable");
+            if(!client)fail(MaliText::ble_client_unavailable_28e667);
             else { client->setConnectTimeout(3000);client->setConnectRetries(0);client->setSelfDelete(false,false); }
         }
 #endif
     } else if(pingMode) {
         ip_addr_t address;
-        if(WiFi.status()!=WL_CONNECTED || !ipaddr_aton(c.target,&address)) fail("Connect Wi-Fi and set a unicast IPv4 host");
+        if(WiFi.status()!=WL_CONNECTED || !ipaddr_aton(c.target,&address)) fail(MaliText::connect_wi_fi_and_set_a_unicast_ipv4_host_679f7f);
         else {
             esp_ping_config_t config=ESP_PING_DEFAULT_CONFIG(); config.target_addr=address;config.count=ESP_PING_COUNT_INFINITE;
             config.interval_ms=c.interval;config.timeout_ms=500;config.data_size=32;
@@ -180,7 +185,7 @@ void execute(Config c, bool scanOnly) {
             esp_ping_callbacks_t callbacks={}; callbacks.cb_args=reinterpret_cast<void*>(uintptr_t(generation));
             callbacks.on_ping_success=[](esp_ping_handle_t h,void *a){pingResult(h,a,true);};
             callbacks.on_ping_timeout=[](esp_ping_handle_t h,void *a){pingResult(h,a,false);};
-            if(esp_ping_new_session(&config,&callbacks,&ping)!=ESP_OK || esp_ping_start(ping)!=ESP_OK)fail("Ping could not start");
+            if(esp_ping_new_session(&config,&callbacks,&ping)!=ESP_OK || esp_ping_start(ping)!=ESP_OK)fail(MaliText::ping_could_not_start_a233b4);
         }
     } else if(c.category!=SYSTEM) {
         switch(c.category){
@@ -191,7 +196,7 @@ void execute(Config c, bool scanOnly) {
             case NFC:monitor=CounterSuite::makeNfc();break;
             default:break;
         }
-        if(monitor){monitor->target=c.target;monitor->sampleInterval=c.interval;if(!monitor->begin())fail("Hardware unavailable / already in use");}
+        if(monitor){monitor->target=c.target;monitor->sampleInterval=c.interval;if(!monitor->begin())fail(MaliText::hardware_unavailable_already_in_use_729284);}
     }
     if(scanOnly || (c.category==WIFI && c.mode==7)){
         targetBuffer.reset(new CounterSuite::Target[32]);
@@ -258,7 +263,7 @@ void execute(Config c, bool scanOnly) {
             }
         }else if(c.category==SYSTEM && now-sampleAt>=c.interval){
             uint32_t jitter=sampleAt?abs(int32_t(now-sampleAt-c.interval)):0;sampleAt=now;++s.attempts;
-            timedResult(s,ESP.getFreeHeap()>16384,jitter);snprintf(s.message,sizeof(s.message),"Heap:%u min:%u / timer jitter ms",unsigned(ESP.getFreeHeap()),unsigned(ESP.getMinFreeHeap()));
+            timedResult(s,ESP.getFreeHeap()>16384,jitter);snprintf(s.message,sizeof(s.message),MaliText::heap_u_min_u_timer_jitter_ms_c2c0cf,unsigned(ESP.getFreeHeap()),unsigned(ESP.getMinFreeHeap()));
         }
         if(s.metrics.samples!=lastSamples && s.metrics.rssi!=-127){lastSamples=s.metrics.samples;++s.rssiSamples;
             s.rssiMin=min(s.rssiMin,s.metrics.rssi);s.rssiMax=max(s.rssiMax,s.metrics.rssi);s.rssiSum+=s.metrics.rssi;sample(s,s.metrics.rssi);
@@ -276,15 +281,15 @@ void execute(Config c, bool scanOnly) {
 #endif
     memset(c.password,0,sizeof(c.password));memset(s.config.password,0,sizeof(s.config.password));
     if(cancelled)s.state=STOPPED;
-    if(scanOnly && s.state==COMPLETE){s.state=CONFIGURING;strlcpy(s.message,"Scan complete: select a target",sizeof(s.message));}
-    else if(s.state==COMPLETE)strlcpy(s.message,"TEST COMPLETE / result in RAM",sizeof(s.message));
-    else if(s.state==STOPPED)strlcpy(s.message,"STOPPED / resources released",sizeof(s.message));
+    if(scanOnly && s.state==COMPLETE){s.state=CONFIGURING;strlcpy(s.message,MaliText::scan_complete_select_a_target_b0991c,sizeof(s.message));}
+    else if(s.state==COMPLETE)strlcpy(s.message,MaliText::test_complete_result_in_ram_65a2c2,sizeof(s.message));
+    else if(s.state==STOPPED)strlcpy(s.message,MaliText::stopped_resources_released_9b2ef2,sizeof(s.message));
     publish(s);draw(s,true);
     portENTER_CRITICAL(&mux);busy=false;stopping=false;portEXIT_CRITICAL(&mux);
 }
 }
-const char *categoryName(Category c){static const char *names[]={"Wi-Fi","Bluetooth / BLE","RF","Infrared","NFC","System Test"};return c<COUNT?names[c]:"Unknown";}
-const char *modeName(Category c,uint8_t m){return c<COUNT&&m<counts[c]?modes[c][m]:"Unknown";}
+const char *categoryName(Category c){static const char *names[]={"Wi-Fi","Bluetooth / BLE","RF",MaliText::infrared_2ec516,"NFC",MaliText::system_test_9e95fa};return c<COUNT?names[c]:MaliText::unknown_bc7819;}
+const char *modeName(Category c,uint8_t m){return c<COUNT&&m<counts[c]?modes[c][m]:MaliText::unknown_bc7819;}
 uint8_t modeCount(Category c){return c<COUNT?counts[c]:0;}
 const char *stateName(State s){static const char *names[]={"IDLE","SCANNING","CONFIGURING","RUNNING","STOPPING","COMPLETE","STOPPED","ERROR"};return s<=ERROR?names[s]:"ERROR";}
 bool available(Category c){
@@ -323,14 +328,14 @@ void targetsJson(JsonDocument &doc){
 }
 bool request(const Config &config,bool scan,String &error){
     Config c=config;
-    if(c.category>=COUNT || !available(c.category) || c.mode>=modeCount(c.category) || c.duration>3600 || c.interval<minimumInterval(c) || c.interval>60000){error="Invalid category/mode; duration 0..3600 s, interval within mode limits";return false;}
-    if(!c.simulation && simulationOnly(c.category,c.mode)){error="This mode requires SIMULATION (no bounded/cancellable lab adapter)";return false;}
-    if(!c.simulation && !scan && (connecting(c)||pinging(c)||c.category==NFC) && !c.authorized){error="Confirm LAB / AUTHORIZED TARGETS ONLY";return false;}
-    if(c.category==RF&&(!isfinite(c.frequency)||!CounterSuite::validRfFrequency(c.frequency-.2f)||!CounterSuite::validRfFrequency(c.frequency+.2f))){error="Unsupported CC1101 frequency";return false;}
-    if(scan && c.category!=WIFI&&c.category!=BLE){error="Scan selection is available for Wi-Fi/BLE; use receiver test for other protocols";return false;}
+    if(c.category>=COUNT || !available(c.category) || c.mode>=modeCount(c.category) || c.duration>3600 || c.interval<minimumInterval(c) || c.interval>60000){error=MaliText::invalid_category_mode_duration_0_3600_s_inte_57b2f8;return false;}
+    if(!c.simulation && simulationOnly(c.category,c.mode)){error=MaliText::this_mode_requires_simulation_no_bounded_can_eccfad;return false;}
+    if(!c.simulation && !scan && (connecting(c)||pinging(c)||c.category==NFC) && !c.authorized){error=MaliText::confirm_lab_authorized_targets_only_d09fdb;return false;}
+    if(c.category==RF&&(!isfinite(c.frequency)||!CounterSuite::validRfFrequency(c.frequency-.2f)||!CounterSuite::validRfFrequency(c.frequency+.2f))){error=MaliText::unsupported_cc1101_frequency_f490f0;return false;}
+    if(scan && c.category!=WIFI&&c.category!=BLE){error=MaliText::scan_selection_is_available_for_wi_fi_ble_us_92c5a9;return false;}
     if(!c.simulation && pinging(c)){
         IPAddress ip;
-        if(!ip.fromString(c.target)||ip[0]==0||ip[0]==127||ip[0]>=224||ip[3]==0||ip[3]==255){error="Set an explicit unicast IPv4 host";return false;}
+        if(!ip.fromString(c.target)||ip[0]==0||ip[0]==127||ip[0]>=224||ip[3]==0||ip[3]==255){error=MaliText::set_an_explicit_unicast_ipv4_host_a18e56;return false;}
     }
     portENTER_CRITICAL(&mux);
     bool occupied=busy||queued||inEngine;
@@ -340,13 +345,13 @@ bool request(const Config &config,bool scan,String &error){
         if(!foundSimulated && foundCategory==c.category && millis()-foundAt<120000)for(int i=0;i<foundCount;++i)if(!strcmp(c.target,found[i].address)){c.selected=found[i];selected=true;}
     }else selected=true;
     portEXIT_CRITICAL(&mux);
-    if(occupied || !ready){error="Busy: return device to a menu/WebUI screen before START";return false;}
-    if(!selected){error="SCAN and SELECT a recent target first";return false;}
-    if(!c.simulation && connecting(c) && c.category==BLE&&!c.selected.connectable){error="Selected BLE advertisement is not connectable";return false;}
-    if(!c.simulation && connecting(c) && c.category==WIFI && (!c.selected.name[0] || (strcmp(c.selected.detail,"OPEN") && strlen(c.password)<8))){error="Set the selected SSID and its Wi-Fi password (8..64 bytes)";return false;}
-    if(!c.simulation && connecting(c)&&c.category==WIFI&&WiFi.getMode()!=WIFI_MODE_NULL){error="Connection test needs Wi-Fi OFF; use device menu or SIMULATION while WebUI is active";return false;}
+    if(occupied || !ready){error=MaliText::busy_return_device_to_a_menu_webui_screen_be_260297;return false;}
+    if(!selected){error=MaliText::scan_and_select_a_recent_target_first_c2f356;return false;}
+    if(!c.simulation && connecting(c) && c.category==BLE&&!c.selected.connectable){error=MaliText::selected_ble_advertisement_is_not_connectabl_d4106d;return false;}
+    if(!c.simulation && connecting(c) && c.category==WIFI && (!c.selected.name[0] || (strcmp(c.selected.detail,"OPEN") && strlen(c.password)<8))){error=MaliText::set_the_selected_ssid_and_its_wi_fi_password_4cab31;return false;}
+    if(!c.simulation && connecting(c)&&c.category==WIFI&&WiFi.getMode()!=WIFI_MODE_NULL){error=MaliText::connection_test_needs_wi_fi_off_use_device_m_70b2c6;return false;}
     portENTER_CRITICAL(&mux);
-    if(busy||queued){portEXIT_CRITICAL(&mux);error="A test is already pending";return false;}
+    if(busy||queued){portEXIT_CRITICAL(&mux);error=MaliText::a_test_is_already_pending_209e76;return false;}
     pending=c;queued=true;queuedScan=scan;published=Status();published.config=c;memset(published.config.password,0,sizeof(published.config.password));published.state=CONFIGURING;stopping=false;
     portEXIT_CRITICAL(&mux);return true;
 }
@@ -363,23 +368,23 @@ bool serviceDisplay(){
 }
 void configureHistory(uint8_t limit){if(limit>=1&&limit<=50)historyLimit=limit;}
 bool saveResult(String &error){
-    Status s=snapshot();if(s.state!=COMPLETE&&s.state!=STOPPED){error="Finish or stop a test first";return false;}
-    HistoryLock lock;if(!lock.held){error="History busy";return false;}
+    Status s=snapshot();if(s.state!=COMPLETE&&s.state!=STOPPED){error=MaliText::finish_or_stop_a_test_first_04ff92;return false;}
+    HistoryLock lock;if(!lock.held){error=MaliText::history_busy_84d9d0;return false;}
     FS &fs=sdcardMounted?static_cast<FS&>(SD):static_cast<FS&>(LittleFS);
-    if((!fs.exists("/MaliTools")&&!fs.mkdir("/MaliTools"))||(!fs.exists("/MaliTools/Counter")&&!fs.mkdir("/MaliTools/Counter"))){error="Storage unavailable";return false;}
+    if((!fs.exists("/MaliTools")&&!fs.mkdir("/MaliTools"))||(!fs.exists("/MaliTools/Counter")&&!fs.mkdir("/MaliTools/Counter"))){error=MaliText::storage_unavailable_c629ac;return false;}
     char path[64];snprintf(path,sizeof(path),"/MaliTools/Counter/result_%02u.json",unsigned(s.sequence%historyLimit));
     String temp=String(path)+".tmp";JsonDocument doc;encode(doc,s);doc.remove("graph");doc.remove("bars");doc.remove("channels");
-    File f=fs.open(temp,FILE_WRITE);if(!f){error="Cannot open result";return false;}
+    File f=fs.open(temp,FILE_WRITE);if(!f){error=MaliText::cannot_open_result_4471ca;return false;}
     size_t size=measureJson(doc),written=serializeJson(doc,f);f.flush();bool ok=written==size&&!f.getWriteError();f.close();
-    if(!ok){fs.remove(temp);error="Result write failed";return false;}
-    if(fs.exists(path)&&!fs.remove(path)){fs.remove(temp);error="Cannot replace history slot";return false;}
-    if(!fs.rename(temp,path)){error="Result commit failed";return false;}
+    if(!ok){fs.remove(temp);error=MaliText::result_write_failed_eee14a;return false;}
+    if(fs.exists(path)&&!fs.remove(path)){fs.remove(temp);error=MaliText::cannot_replace_history_slot_55aa8d;return false;}
+    if(!fs.rename(temp,path)){error=MaliText::result_commit_failed_0d5359;return false;}
     // Shrinking the setting also bounds older slots on the next explicit save.
     for(int i=historyLimit;i<50;++i){char old[64];snprintf(old,sizeof(old),"/MaliTools/Counter/result_%02d.json",i);if(fs.exists(old))fs.remove(old);}
     return true;
 }
 void historyJson(JsonDocument &doc){
-    HistoryLock lock;auto list=doc["items"].to<JsonArray>();if(!lock.held){doc["error"]="History busy";return;}
+    HistoryLock lock;auto list=doc["items"].to<JsonArray>();if(!lock.held){doc["error"]=MaliText::history_busy_84d9d0;return;}
     FS &fs=sdcardMounted?static_cast<FS&>(SD):static_cast<FS&>(LittleFS);
     for(int i=0;i<50;++i){char path[64];snprintf(path,sizeof(path),"/MaliTools/Counter/result_%02d.json",i);File f=fs.open(path,FILE_READ);if(!f||f.size()>2048)continue;JsonDocument entry;if(!deserializeJson(entry,f))list.add(entry.as<JsonVariant>());}
 }
@@ -392,34 +397,34 @@ void localRun(Config c,bool scan=false){
     String error;if(!request(c,scan,error)){displayError(error,true);return;}serviceDisplay();
     if(scan)return;
     bool again=false;std::vector<Option> results={
-        {"RESULTS",[](){Status s=snapshot();JsonDocument doc;encode(doc,s);std::vector<Option> rows;for(const char *key:{"state","modeName","target","elapsed","events","attempts","success","failures","successRate","avgTime","minTime","maxTime"}){String line=String(key)+": "+doc[key].as<String>();rows.push_back({line,[line](){displayInfo(line,true);}});}rows.push_back({"BACK",[](){}});loopOptions(rows,MENU_TYPE_SUBMENU,"RESULTS / time in ms");}},
-        {"RUN AGAIN",[&](){again=true;}},{"SAVE RESULT",[](){String error;if(!saveResult(error))displayError(error,true);else displayInfo("Result saved",true);}},{"BACK",[](){}}
+        {MaliText::results_3f16f1,[](){Status s=snapshot();JsonDocument doc;encode(doc,s);std::vector<Option> rows;for(const char *key:{"state","modeName","target","elapsed","events","attempts","success","failures","successRate","avgTime","minTime","maxTime"}){String line=String(key)+": "+doc[key].as<String>();rows.push_back({line,[line](){displayInfo(line,true);}});}rows.push_back({MaliText::back_587eac,[](){}});loopOptions(rows,MENU_TYPE_SUBMENU,MaliText::results_time_in_ms_7fdcf2);}},
+        {MaliText::run_again_c3c61a,[&](){again=true;}},{MaliText::save_result_4e0488,[](){String error;if(!saveResult(error))displayError(error,true);else displayInfo(MaliText::result_saved_fde29e,true);}},{MaliText::back_587eac,[](){}}
     };
-    loopOptions(results,MENU_TYPE_SUBMENU,"COUNTER / RESULTS");repeat=again;
+    loopOptions(results,MENU_TYPE_SUBMENU,MaliText::counter_results_ddeae6);repeat=again;
     } while(repeat && !returnToMenu);
 }
 void configure(Config &c){
     bool done=false;
     while(!done&&!returnToMenu){std::vector<Option> options={
-        {"MODE",[&](){std::vector<Option> modesMenu;for(int i=0;i<modeCount(c.category);++i)modesMenu.push_back({String(modeName(c.category,i))+(simulationOnly(c.category,i)?" [SIM]":""),[&,i](){c.mode=i;if(simulationOnly(c.category,i))c.simulation=true;c.interval=max(c.interval,minimumInterval(c));}});loopOptions(modesMenu,MENU_TYPE_SUBMENU,"MODE");}},
-        {String("SIMULATION: ")+(c.simulation?"ON":"OFF"),[&](){c.simulation=!c.simulation;if(simulationOnly(c.category,c.mode))c.simulation=true;}},
-        {"TARGET / HOST",[&](){String value=keyboard(c.target,64,"Target address / IPv4 host");if(value!="\x1B")value.toCharArray(c.target,sizeof(c.target));}},
-        {"WIFI PASSWORD",[&](){String value=keyboard("",64,"Lab Wi-Fi password",true);if(value!="\x1B")value.toCharArray(c.password,sizeof(c.password));}},
-        {"DURATION",[&](){std::vector<Option> list;for(int n:{5,10,30,60,0})list.push_back({n?String(n)+" sec":"Unlimited",[&,n](){c.duration=n;}});list.push_back({"Custom 1..3600",[&](){int n=num_keyboard("30",4,"Seconds").toInt();if(n>=1&&n<=3600)c.duration=n;}});loopOptions(list,MENU_TYPE_SUBMENU,"DURATION");}},
-        {String("INTENSITY: ")+String(c.interval)+"ms",[&](){std::vector<Option> list;for(int factor:{4,2,1}){uint32_t interval=min(uint32_t(60000),minimumInterval(c)*factor);list.push_back({String(factor==4?"LOW ":factor==2?"MEDIUM ":"HIGH ")+String(interval)+"ms",[&,interval](){c.interval=interval;}});}list.push_back({"CUSTOM",[&](){int n=num_keyboard(String(c.interval),5,"Interval ms").toInt();if(n>=int(minimumInterval(c))&&n<=60000)c.interval=n;}});loopOptions(list,MENU_TYPE_SUBMENU,"INTENSITY / POLLING");}},
-        {"RF CENTER MHz",[&](){String f=keyboard(String(c.frequency,3),12,"CC1101 center MHz");float n=f.toFloat();if(CounterSuite::validRfFrequency(n))c.frequency=n;}},
-        {"LAB / AUTHORIZED TARGETS ONLY",[&](){c.authorized=true;}},
-        {"RUN",[&](){localRun(c);}},{"BACK",[&](){done=true;}}
-    };if(loopOptions(options,MENU_TYPE_SUBMENU,"COUNTER / CONFIGURE")<0)break;}
+        {MaliText::mode_5a5019,[&](){std::vector<Option> modesMenu;for(int i=0;i<modeCount(c.category);++i)modesMenu.push_back({String(modeName(c.category,i))+(simulationOnly(c.category,i)?" [SIM]":""),[&,i](){c.mode=i;if(simulationOnly(c.category,i))c.simulation=true;c.interval=max(c.interval,minimumInterval(c));}});loopOptions(modesMenu,MENU_TYPE_SUBMENU,MaliText::mode_5a5019);}},
+        {String("SIMULATION: ")+(c.simulation?MaliText::on_387d7a:MaliText::off_ad5048),[&](){c.simulation=!c.simulation;if(simulationOnly(c.category,c.mode))c.simulation=true;}},
+        {MaliText::target_host_4cc99e,[&](){String value=keyboard(c.target,64,MaliText::target_address_ipv4_host_7f4f5b);if(value!="\x1B")value.toCharArray(c.target,sizeof(c.target));}},
+        {MaliText::wifi_password_42cde1,[&](){String value=keyboard("",64,MaliText::lab_wi_fi_password_af999f,true);if(value!="\x1B")value.toCharArray(c.password,sizeof(c.password));}},
+        {MaliText::duration_ed67cb,[&](){std::vector<Option> list;for(int n:{5,10,30,60,0})list.push_back({n?String(n)+" sec":MaliText::unlimited_b8bef3,[&,n](){c.duration=n;}});list.push_back({MaliText::custom_1_3600_275225,[&](){int n=num_keyboard("30",4,MaliText::seconds_5fb1db).toInt();if(n>=1&&n<=3600)c.duration=n;}});loopOptions(list,MENU_TYPE_SUBMENU,MaliText::duration_ed67cb);}},
+        {String(MaliText::intensity_4faf52)+String(c.interval)+"ms",[&](){std::vector<Option> list;for(int factor:{4,2,1}){uint32_t interval=min(uint32_t(60000),minimumInterval(c)*factor);list.push_back({String(factor==4?MaliText::low_37f1db:factor==2?MaliText::medium_8b895d:MaliText::high_d8932a)+String(interval)+"ms",[&,interval](){c.interval=interval;}});}list.push_back({MaliText::custom_63d55e,[&](){int n=num_keyboard(String(c.interval),5,MaliText::interval_ms_c94b94).toInt();if(n>=int(minimumInterval(c))&&n<=60000)c.interval=n;}});loopOptions(list,MENU_TYPE_SUBMENU,MaliText::intensity_polling_4c5388);}},
+        {MaliText::rf_center_mhz_71ad46,[&](){String f=keyboard(String(c.frequency,3),12,MaliText::cc1101_center_mhz_1a2b38);float n=f.toFloat();if(CounterSuite::validRfFrequency(n))c.frequency=n;}},
+        {MaliText::lab_authorized_targets_only_089a40,[&](){c.authorized=true;}},
+        {MaliText::run_ad173e,[&](){localRun(c);}},{MaliText::back_587eac,[&](){done=true;}}
+    };if(loopOptions(options,MENU_TYPE_SUBMENU,MaliText::counter_configure_fb6853)<0)break;}
     memset(c.password,0,sizeof(c.password));
 }
 void categoryMenu(Category category){
     Config c;c.category=category;c.interval=max(c.interval,minimumInterval(c));bool done=false;
     while(!done&&!returnToMenu){std::vector<Option> options;
-        if(category==WIFI||category==BLE)options.push_back({"SCAN / SELECT",[&](){Config scan=c;scan.mode=0;scan.duration=10;scan.interval=minimumInterval(scan);localRun(scan,true);
+        if(category==WIFI||category==BLE)options.push_back({MaliText::scan_select_c4f92a,[&](){Config scan=c;scan.mode=0;scan.duration=10;scan.interval=minimumInterval(scan);localRun(scan,true);
             std::vector<CounterSuite::Target> copy(32);portENTER_CRITICAL(&mux);uint8_t count=foundCount;for(int i=0;i<count;++i)copy[i]=found[i];portEXIT_CRITICAL(&mux);
-            std::vector<Option> list;for(int i=0;i<count;++i){auto t=copy[i];list.push_back({String(t.name[0]?t.name:t.address)+" "+String(t.rssi)+"dBm",[&,t](){c.selected=t;strlcpy(c.target,t.address,sizeof(c.target));displayInfo(String(t.address)+" CH:"+String(t.channel)+" "+t.detail+" Adv:"+String(t.advType)+(t.connectable?" connectable":""),true);}});}list.push_back({"BACK",[](){}});loopOptions(list,MENU_TYPE_SUBMENU,"SELECT / max 32");}});
-        options.push_back({"CONFIGURE / RUN",[&](){configure(c);}});options.push_back({"SIMULATION MODE",[&](){c.simulation=true;configure(c);}});options.push_back({"BACK",[&](){done=true;}});
+            std::vector<Option> list;for(int i=0;i<count;++i){auto t=copy[i];list.push_back({String(t.name[0]?t.name:t.address)+" "+String(t.rssi)+"dBm",[&,t](){c.selected=t;strlcpy(c.target,t.address,sizeof(c.target));displayInfo(String(t.address)+" CH:"+String(t.channel)+" "+t.detail+" Adv:"+String(t.advType)+(t.connectable?MaliText::connectable_543b82:""),true);}});}list.push_back({MaliText::back_587eac,[](){}});loopOptions(list,MENU_TYPE_SUBMENU,MaliText::select_max_32_4688d1);}});
+        options.push_back({MaliText::configure_run_fa7a84,[&](){configure(c);}});options.push_back({MaliText::simulation_mode_8f424c,[&](){c.simulation=true;configure(c);}});options.push_back({MaliText::back_587eac,[&](){done=true;}});
         if(loopOptions(options,MENU_TYPE_SUBMENU,categoryName(category))<0)break;
     }
 }
@@ -428,9 +433,9 @@ void open(){
     bool done=false;
     while(!done&&!returnToMenu){std::vector<Option> options;
         for(int i=0;i<COUNT;++i)if(available(Category(i)))options.push_back({categoryName(Category(i)),[i](){categoryMenu(Category(i));}});
-        options.push_back({"History",[](){JsonDocument doc;historyJson(doc);std::vector<Option> list;for(JsonObject item:doc["items"].as<JsonArray>()){String line=String(item["modeName"].as<const char*>())+" "+String(item["events"].as<uint32_t>())+" events";list.push_back({line,[line](){displayInfo(line,true);}});}list.push_back({"BACK",[](){}});loopOptions(list,MENU_TYPE_SUBMENU,"HISTORY / SUMMARY");}});
-        options.push_back({"Settings",[](){int n=num_keyboard(String(historyLimit),2,"History limit 1..50").toInt();configureHistory(n);}});
-        options.push_back({"Back",[&](){done=true;}});
+        options.push_back({MaliText::history_90ccd6,[](){JsonDocument doc;historyJson(doc);std::vector<Option> list;for(JsonObject item:doc["items"].as<JsonArray>()){String line=String(item["modeName"].as<const char*>())+" "+String(item["events"].as<uint32_t>())+MaliText::events_17aa99;list.push_back({line,[line](){displayInfo(line,true);}});}list.push_back({MaliText::back_587eac,[](){}});loopOptions(list,MENU_TYPE_SUBMENU,MaliText::history_summary_16356c);}});
+        options.push_back({MaliText::settings_c7f73b,[](){int n=num_keyboard(String(historyLimit),2,MaliText::history_limit_1_50_6a908c).toInt();configureHistory(n);}});
+        options.push_back({MaliText::back_b52b36,[&](){done=true;}});
         if(loopOptions(options,MENU_TYPE_GEAR,"COUNTER")<0)break;
     }
 }

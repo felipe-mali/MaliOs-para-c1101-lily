@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "MaliUI.h"
 #include "core/display.h"
 #include <cmath>
@@ -40,6 +41,9 @@ template<class T> void symbol(Canvas<T> &p,Icon type,int cx,int cy,int size,uint
         p.circle(cx,cy,2,c,true);p.circle(cx,cy,r,c);p.line(cx,cy,cx,cy+r+2,c);p.line(cx-a,cy+r+2,cx+a,cy+r+2,c);break;
     case Icon::Tools:
         p.line(cx-r,cy+r,cx+r,cy-r,c);p.line(cx-r,cy+r-2,cx+r-2,cy-r,c);p.circle(cx+r-2,cy-r+2,3,c);p.circle(cx-r+2,cy+r-2,2,c);break;
+    case Icon::Key:
+        p.circle(cx-r/2,cy,max(2,r/2),c);p.line(cx,cy,cx+r,cy,c);
+        p.line(cx+r,cy,cx+r,cy+a,c);p.line(cx+r/2,cy,cx+r/2,cy+a,c);break;
     case Icon::Counter:
         for(int i=0;i<4;++i){int h=(i==2?2:i+2)*r/3;p.rect(cx-r+i*r/2,cy+r-h,max(2,r/3),h,1,c,true);}break;
     case Icon::Files:
@@ -72,8 +76,15 @@ template<class T> void gearScene(Canvas<T> &p,const Tile *tiles,const GearMotion
         const String &label=*tiles[k+2].label;
         int font=selected&&int(label.length())*12<cardW-55?TITLE:PRIMARY;
         int tx=cardX+inset+37,ty=y+h/2-font*4-(selected?6:0);
-        p.text(label,tx,ty,font,color,bg);
-        if(selected)p.text(tiles[k+2].detail,tx,y+h/2+9,SECONDARY,TEXT_SECONDARY,bg);
+        const int available=cardX+cardW-inset-7-tx;
+        if(selected && label.length()>size_t(max(1,available/6))) {
+            auto lines=wrapText(label,max(1,available/6));
+            p.text(lines[0],tx,y+h/2-10,PRIMARY,color,bg);
+            if(lines.size()>1)p.text(fitText(lines[1]+(lines.size()>2?"...":""),available),tx,y+h/2+2,PRIMARY,color,bg);
+        } else {
+            p.text(fitText(label,available,font),tx,ty,font,color,bg);
+            if(selected)p.text(fitText(tiles[k+2].detail,available),tx,y+h/2+9,SECONDARY,TEXT_SECONDARY,bg);
+        }
     }
     // Small axis, not a literal large gear. Direction follows encoder steps.
     p.circle(gearX,gearY,portrait?23:27,BORDER);
@@ -83,32 +94,36 @@ template<class T> void gearScene(Canvas<T> &p,const Tile *tiles,const GearMotion
 }
 }
 Icon iconFor(const String &label){
-    if(label=="NETWORK"||label=="Rede"||label=="Wi-Fi")return Icon::Network;
+    if(label=="Chaves"||label.indexOf("Chave ")==0||label=="Medir Chave")return Icon::Key;
+    if(label==MaliText::network_6845c6||label=="Rede"||label=="Wi-Fi")return Icon::Network;
     if(label=="RADIO"||label=="Sub-GHz"||label=="RF")return Icon::Radio;
-    if(label=="TOOLS"||label=="Mali Tools"||label=="KEY GAUGE"||label=="PIXEL PAINT")return Icon::Tools;
+    if(label==MaliText::tools_9d0e51||label=="Mali Tools"||label=="KEY GAUGE"||label=="PIXEL PAINT")return Icon::Tools;
     if(label=="COUNTER"||label=="Counter Suite")return Icon::Counter;
-    if(label=="FILES"||label=="Arquivos")return Icon::Files;
+    if(label==MaliText::files_9fb4f1||label=="Arquivos")return Icon::Files;
     if(label.indexOf("BLE")>=0||label=="Bluetooth")return Icon::Ble;
     if(label.indexOf("NFC")>=0)return Icon::Nfc;
-    if(label=="Infrared"||label=="Infravermelho")return Icon::Ir;
+    if(label==MaliText::infrared_2ec516||label=="Infravermelho")return Icon::Ir;
     return Icon::Settings;
 }
 const char *description(const String &label){
-    if(label=="NETWORK")return "Wi-Fi / BLE / LAN";
+    if(label=="Chaves")return "Medir / catalogar";
+    if(label=="Chave Plana")return "Vista lateral";
+    if(label=="Chave Cruciforme")return "Quatro faces / cruz";
+    if(label==MaliText::network_6845c6)return "Wi-Fi / BLE / LAN";
     if(label=="RADIO")return "RF / IR / NFC";
-    if(label=="TOOLS")return "Mali utilities";
-    if(label=="COUNTER")return "Resilience lab";
-    if(label=="FILES")return "SD / internal";
-    if(label=="SYSTEM")return "Device / settings";
-    if(label=="KEY GAUGE")return "Profile viewer";
-    if(label=="PIXEL PAINT")return "Pixel canvas";
-    if(label=="D20")return "Roll / explore";
-    if(label=="Bluetooth / BLE")return "Signal / resilience";
-    if(label=="Wi-Fi")return "Network diagnostics";
-    if(label=="RF")return "Passive spectrum";
-    if(label=="Infrared")return "Capture / timing";
-    if(label=="NFC")return "Read / measure";
-    return "Click to open";
+    if(label==MaliText::tools_9d0e51)return MaliText::mali_utilities_49e09d;
+    if(label=="COUNTER")return MaliText::resilience_lab_084d42;
+    if(label==MaliText::files_9fb4f1)return MaliText::sd_internal_f286f5;
+    if(label==MaliText::system_29d437)return MaliText::device_settings_622232;
+    if(label=="KEY GAUGE")return MaliText::profile_viewer_5459e2;
+    if(label=="PIXEL PAINT")return MaliText::pixel_canvas_4ab78b;
+    if(label=="D20")return MaliText::roll_explore_7c1b7d;
+    if(label=="Bluetooth / BLE")return MaliText::signal_resilience_564c11;
+    if(label=="Wi-Fi")return MaliText::network_diagnostics_626fa0;
+    if(label=="RF")return MaliText::passive_spectrum_ea2023;
+    if(label==MaliText::infrared_2ec516)return MaliText::capture_timing_e013ca;
+    if(label=="NFC")return MaliText::read_measure_3d1580;
+    return MaliText::click_to_open_f724b8;
 }
 void drawIcon(Icon icon,int x,int y,int size,uint16_t color){Canvas<tft_logger> p{tft,0};symbol(p,icon,x,y,size,color);}
 void drawHeader(const String &section,bool status){
@@ -130,10 +145,24 @@ void drawHeader(const String &section,bool status){
 }
 void drawFooter(const String &text){
     tft.fillRect(0,tftHeight-16,tftWidth,16,BACKGROUND);tft.setTextDatum(0);tft.setTextSize(FOOTER);tft.setTextColor(TEXT_SECONDARY,BACKGROUND);
-    String value=text;if(tftWidth<240 && text=="Turn: select   Click: open   Hold: back")value="Turn / Click / Hold: back";
+    String value=text;if(tftWidth<240 && text==MaliText::turn_select_click_open_hold_back_359426)value=MaliText::turn_click_hold_back_98d423;
     tft.drawString(value.substring(0,(tftWidth-12)/6),6,tftHeight-12,1);
 }
 void drawCard(int x,int y,int w,int h,bool selected){tft.fillRoundRect(x,y,w,h,MALI_RADIUS_LARGE,SURFACE);tft.drawRoundRect(x,y,w,h,MALI_RADIUS_LARGE,selected?ACCENT:BORDER);}
+void drawRoundedBox(int x,int y,int w,int h,uint16_t color){
+    if(w<=0||h<=0)return;
+    tft.drawRoundRect(x,y,w,h,min(MALI_RADIUS_MEDIUM,min(w,h)/2),color);
+}
+void drawRoundedFill(int x,int y,int w,int h,uint16_t color){
+    if(w<=0||h<=0)return;
+    tft.fillRoundRect(x,y,w,h,min(MALI_RADIUS_MEDIUM,min(w,h)/2),color);
+}
+String fitText(const String &text,int pixels,int size){
+    int count=max(0,pixels/max(1,size*6));
+    if(text.length()<=size_t(count))return text;
+    if(count<4)return text.substring(0,count);
+    return text.substring(0,count-3)+"...";
+}
 void drawMenuItem(const String &label,int x,int y,int w,int h,bool selected,bool enabled){
     uint16_t bg=selected?SURFACE_ALT:BACKGROUND;
     tft.fillRoundRect(x,y,w,h,MALI_RADIUS_MEDIUM,bg);if(selected){tft.drawRoundRect(x,y,w,h,MALI_RADIUS_MEDIUM,ACCENT_DIM);tft.fillRoundRect(x+3,y+5,2,h-10,1,ACCENT);}
@@ -157,7 +186,7 @@ void drawTabs(const char *const *labels,int count,int selected,int y){drawSelect
 void drawBoot(int progress,bool ready){
     if(progress==0||ready){tft.fillScreen(BACKGROUND);Canvas<tft_logger> p{tft,0};symbol(p,Icon::Mali,tftWidth/2,tftHeight/2-32,32,ACCENT);
         tft.setTextDatum(0);tft.setTextSize(TITLE);tft.setTextColor(TEXT_PRIMARY,BACKGROUND);tft.drawCentreString(ready?"MALI OS":"MALI",tftWidth/2,tftHeight/2-3,1);
-        tft.setTextSize(SECONDARY);tft.setTextColor(TEXT_SECONDARY,BACKGROUND);tft.drawCentreString(ready?String("v")+MALIOS_VERSION:"Predatory Firmware",tftWidth/2,tftHeight/2+23,1);}
+        tft.setTextSize(SECONDARY);tft.setTextColor(TEXT_SECONDARY,BACKGROUND);tft.drawCentreString(ready?String("v")+MALIOS_VERSION:MaliText::predatory_firmware_4cbdb6,tftWidth/2,tftHeight/2+23,1);}
     drawProgress(tftWidth/4,tftHeight/2+45,tftWidth/2,progress,100);
 }
 bool beginGear(){

@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "rf_utils.h"
 #include "core/bus_HAL.h"
 #include "core/sd_functions.h"
@@ -13,7 +14,7 @@ const int range_limits[4][2] = {
     {48, 56}, // 779-928 MHz
     {0,  56}  // All ranges
 };
-const char *subghz_frequency_ranges[] = {"300-348 MHz", "387-464 MHz", "779-928 MHz", "All ranges"};
+const char *subghz_frequency_ranges[] = {"300-348 MHz", "387-464 MHz", "779-928 MHz", MaliText::all_ranges_89f40d};
 
 String rf_subghz_header(float frequencyMHz) {
     return "Filetype: Bruce SubGhz File\nVersion 1\n" + String("Frequency: ") +
@@ -557,9 +558,9 @@ void rf_range_selection(float currentFrequency) {
     float freq = currentFrequency > 0 ? currentFrequency : bruceConfigPins.rfFreq;
     int idx = bruceConfigPins.rfFxdFreq ? 0 : 2 + constrain(bruceConfigPins.rfScanRange, 0, 3);
     options = {
-        {String("Fixed [" + String(bruceConfigPins.rfFreq) + "]").c_str(),
+        {String(MaliText::fixed_31efa8 + String(bruceConfigPins.rfFreq) + "]").c_str(),
          [=]() { bruceConfigPins.setRfFreq(bruceConfigPins.rfFreq, 1); }                                               },
-        {String("Choose Fixed").c_str(),                                   [&]() { option = 1; }                       },
+        {String(MaliText::choose_fixed_934240).c_str(),                                   [&]() { option = 1; }                       },
         {subghz_frequency_ranges[0],                                       [=]() { bruceConfigPins.setRfScanRange(0); }},
         {subghz_frequency_ranges[1],                                       [=]() { bruceConfigPins.setRfScanRange(1); }},
         {subghz_frequency_ranges[2],                                       [=]() { bruceConfigPins.setRfScanRange(2); }},

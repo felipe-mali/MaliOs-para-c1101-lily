@@ -90,7 +90,7 @@ void registerKeyGaugeWebApi(AsyncWebServer &server, bool (*authenticate)(AsyncWe
         KeyGauge::KeyGaugeProfile p; if (!decode(request, p)) return;
         KeyGauge::queueWebPreview(p);
         JsonDocument doc;
-        doc["message"] = "Enviado em RAM. Na tela WebUI do dispositivo, o perfil aparece automaticamente. Em segundo plano: Mali Tools > KEY GAUGE > WEB PREVIEW. Nao salvo.";
+        doc["message"] = "Enviado em RAM. Na tela WebUI do dispositivo, o perfil aparece automaticamente. Em segundo plano: Ferramentas > Mali Tools > KEY GAUGE > PREVIA WEB. Nao salvo.";
         reply(request, doc, 202);
     });
 }

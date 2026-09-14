@@ -14,7 +14,7 @@ void LoRaMenu::optionsMenu() {
     addOptionToMainMenu();
     options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::LORA); }});
     String txt = "LoRa";
-    loopOptions(options, MENU_TYPE_SUBMENU, txt.c_str());
+    loopOptions(options, MENU_TYPE_GEAR, txt.c_str());
 }
 
 void LoRaMenu::drawIcon(float scale) {

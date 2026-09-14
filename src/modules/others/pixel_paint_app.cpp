@@ -1,3 +1,5 @@
+#include "core/ui/MaliUI.h"
+#include "core/ui/PtBr.h"
 #include "pixel_paint_app.h"
 
 #include "core/display.h"
@@ -24,6 +26,7 @@ struct CanvasLayout {
     int y;
     int cell;
     int panelX;
+    int panelY;
 };
 
 bool pixelAt(const PaintState &state, uint16_t index) {
@@ -46,14 +49,14 @@ void clearPainting(PaintState &state, bool resetTools) {
 }
 
 CanvasLayout calculateLayout() {
-    constexpr int top = 28;
-    int byHeight = (tftHeight - top - 12) / CANVAS_HEIGHT;
-    int byWidth = ((tftWidth * 3) / 5) / CANVAS_WIDTH;
-    int cell = byHeight < byWidth ? byHeight : byWidth;
-    if (cell < 2) cell = 2;
-
+    const bool portrait = tftHeight > tftWidth;
+    const int top = 38;
+    int byHeight = (tftHeight - top - (portrait ? 122 : 22)) / CANVAS_HEIGHT;
+    int byWidth = (portrait ? tftWidth - 20 : tftWidth * 3 / 5 - 12) / CANVAS_WIDTH;
+    int cell = max(2, min(byHeight, byWidth));
     const int canvasWidth = cell * CANVAS_WIDTH;
-    return {6, top, cell, 6 + canvasWidth + 8};
+    return {10, top, cell, portrait ? 10 : 10 + canvasWidth + 12,
+            portrait ? top + canvasWidth + 14 : top};
 }
 
 void drawCell(const PaintState &state, const CanvasLayout &layout, uint16_t index, bool cursor) {
@@ -71,31 +74,24 @@ void drawCell(const PaintState &state, const CanvasLayout &layout, uint16_t inde
 }
 
 void drawPanel(const PaintState &state, const CanvasLayout &layout) {
-    const int panelWidth = tftWidth - layout.panelX - 4;
-    if (panelWidth <= 0) return;
-
-    tft.fillRect(layout.panelX, 28, panelWidth, tftHeight - 40, bruceConfig.bgColor);
-    tft.setTextSize(FP);
-    tft.setTextColor(bruceConfig.secColor, bruceConfig.bgColor);
-    tft.drawString("Ferramenta", layout.panelX, 32, 1);
-    tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-    tft.drawString(state.eraseMode ? "Apagar" : "Pintar", layout.panelX, 44, 1);
-
-    const int col = state.cursor % CANVAS_WIDTH;
-    const int row = state.cursor / CANVAS_WIDTH;
-    tft.setTextColor(bruceConfig.secColor, bruceConfig.bgColor);
-    tft.drawString("Cursor", layout.panelX, 64, 1);
-    tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-    tft.drawString(String(col + 1) + "," + String(row + 1), layout.panelX, 76, 1);
-
-    tft.setTextColor(bruceConfig.secColor, bruceConfig.bgColor);
-    tft.drawString(state.dirty ? "Alterado" : "Salvo", layout.panelX, 96, 1);
-    tft.drawString("SEL aplica", layout.panelX, 116, 1);
-    tft.drawString("BACK menu", layout.panelX, 128, 1);
+    const int panelWidth = tftWidth - layout.panelX - 10;
+    const int y = layout.panelY;
+    MaliUI::drawCard(layout.panelX - 4, y - 4, panelWidth + 8, tftHeight - y - 18);
+    tft.setTextDatum(0);
+    tft.setTextSize(1);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, MaliUI::SURFACE);
+    tft.drawString(state.eraseMode ? "Apagar" : "Pintar", layout.panelX + 4, y + 4, 1);
+    const int col = state.cursor % CANVAS_WIDTH, row = state.cursor / CANVAS_WIDTH;
+    tft.setTextColor(MaliUI::TEXT_SECONDARY, MaliUI::SURFACE);
+    tft.drawString("Cursor " + String(col + 1) + "," + String(row + 1), layout.panelX + 4, y + 22, 1);
+    tft.drawString(state.dirty ? "Alterado" : "Salvo", layout.panelX + 4, y + 40, 1);
+    MaliUI::drawFooter("SEL: pintar  VOLTAR: menu");
 }
 
 void drawPainting(const PaintState &state, const CanvasLayout &layout) {
-    drawMainBorderWithTitle("Mini Pixel Paint");
+    tft.fillScreen(MaliUI::BACKGROUND);
+    MaliUI::drawHeader("Pixel Paint");
+    MaliUI::drawRoundedBox(layout.x - 3, layout.y - 3, layout.cell * CANVAS_WIDTH + 6, layout.cell * CANVAS_HEIGHT + 6, MaliUI::BORDER);
     for (uint16_t i = 0; i < PIXEL_COUNT; ++i) drawCell(state, layout, i, i == state.cursor);
     drawPanel(state, layout);
 }

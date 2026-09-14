@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "counter_main.h"
 #include "modules/NRF24/nrf_common.h"
 #include <globals.h>
@@ -42,7 +43,7 @@ public:
         NRFradio.setAutoAck(false);
         NRFradio.disableCRC();
         data.barCount = 80;
-        data.status = "NO SIGNAL";
+        data.status = MaliText::no_signal_b1069c;
         return true;
 #else
         return false;
@@ -62,13 +63,13 @@ public:
         }
         data.bars[ch] = 100 * hits[ch] / samples[ch];
         if (data.bars[ch] > data.bars[busiest]) busiest = ch;
-        data.status = hit ? "SIGNAL" : "NO SIGNAL";
-        data.lines[0] = "RPD hits: " + String(events);
-        data.lines[1] = "Most active: " + String(2400 + busiest) + " MHz";
-        data.lines[2] = "Channel: " + String(ch) + " occupancy: " + String(data.bars[ch]) + "%";
-        data.lines[3] = "2400..2479 MHz / RPD threshold";
-        data.lines[4] = "Energy samples, not devices";
-        if (ch == 79 && events) event(NRF, "RPD sweep: " + String(events) + " cumulative hits");
+        data.status = hit ? MaliText::signal_289e7c : MaliText::no_signal_b1069c;
+        data.lines[0] = MaliText::rpd_hits_deb7c0 + String(events);
+        data.lines[1] = MaliText::most_active_6f1e13 + String(2400 + busiest) + " MHz";
+        data.lines[2] = MaliText::channel_a58aee + String(ch) + MaliText::occupancy_9ccb80 + String(data.bars[ch]) + "%";
+        data.lines[3] = MaliText::text_2400_2479_mhz_rpd_threshold_51dae9;
+        data.lines[4] = MaliText::energy_samples_not_devices_268b22;
+        if (ch == 79 && events) event(NRF, MaliText::rpd_sweep_e2cb82 + String(events) + MaliText::cumulative_hits_867c94);
         ch = (ch + 1) % 80;
 #endif
     }

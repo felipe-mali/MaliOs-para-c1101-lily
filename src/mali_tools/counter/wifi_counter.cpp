@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "core/radio_mem.h"
 #include "counter_main.h"
 #include "counter_metrics.h"
@@ -60,20 +61,20 @@ public:
     bool begin() override {
         // Refuse an existing session: never replace another tool's callback or stop its AP.
         if (WiFi.getMode() != WIFI_MODE_NULL && shared) {
-            if (WiFi.scanComplete() == WIFI_SCAN_RUNNING) { data.status = "SCAN IN USE"; return false; }
+            if (WiFi.scanComplete() == WIFI_SCAN_RUNNING) { data.status = MaliText::scan_in_use_16c042; return false; }
             scanAt = millis() - max(uint32_t(4000),sampleInterval);
             window = millis();
-            data.status = "PASSIVE SCAN / SHARED WIFI";
+            data.status = MaliText::passive_scan_shared_wifi_c72978;
             data.barCount = 14;
             return true;
         }
         if (WiFi.getMode() != WIFI_MODE_NULL) {
-            data.status = "WIFI IN USE";
+            data.status = MaliText::wifi_in_use_e6e0ff;
             data.lines[0] = "Desligue Wi-Fi no menu Rede";
             return false;
         }
         if (!radioHasMemForWifi()) {
-            data.status = "LOW MEMORY";
+            data.status = MaliText::low_memory_c1837e;
             return false;
         }
         if (!WiFi.mode(WIFI_STA)) return false;
@@ -100,7 +101,7 @@ public:
         if (!scanning && now - scanAt >= max(uint32_t(4000),sampleInterval)) {
             scanAt = now;
             scanning = WiFi.scanNetworks(true, true, true, 100) == WIFI_SCAN_RUNNING;
-            if (!scanning) data.status = "SCAN ERROR";
+            if (!scanning) data.status = MaliText::scan_error_1e6ed9;
         }
         if (scanning) {
             int n = WiFi.scanComplete();
@@ -146,7 +147,7 @@ public:
                 if (haveScan && kept < 64 && previousCount < 64 && added + gone >= 8) {
                     churn = true;
                     churnAt = now;
-                    event(WIFI, "SUSPICIOUS: AP churn (scan visibility)", true);
+                    event(WIFI, MaliText::suspicious_ap_churn_scan_visibility_ee7dc4, true);
                 }
                 memcpy(previousMac, macs, sizeof(macs));
                 previousCount = kept;
@@ -159,7 +160,7 @@ public:
                     data.bars[i] = min(100, counts[i] * 10);
                 }
                 data.lines[0] = "APs/BSSIDs: " + String(n) + " (nao SSIDs unicos)";
-                data.lines[1] = "Canais: " + String(occupied) + " Busy CH " + String(busiest + 1);
+                data.lines[1] = "Canais: " + String(occupied) + MaliText::busy_ch_56a394 + String(busiest + 1);
                 data.lines[2] =
                     n ? "RSSI avg/peak: " + String(sum / n) + " / " + String(strongest) : "RSSI: --";
                 data.lines[3] = "AP novos/sumiram: " + String(added) + " / " + String(gone);
@@ -169,7 +170,7 @@ public:
                 esp_wifi_scan_stop();
                 WiFi.scanDelete();
                 scanning = false;
-                data.status = "SCAN ERROR";
+                data.status = MaliText::scan_error_1e6ed9;
             }
         }
         if (now - window < 1000) return;
@@ -181,7 +182,7 @@ public:
         uint32_t rate = perSecond(copy.packets - previous, now - window);
         uint32_t attacks = copy.deauth - previousDeauth;
         if (churn && now - churnAt > 5000) churn = false;
-        static const char *labels[] = {"NORMAL", "BUSY", "HIGH TRAFFIC", "SUSPICIOUS", "DEAUTH DETECTED"};
+        static const char *labels[] = {"NORMAL", "BUSY", MaliText::high_traffic_5ffc69, MaliText::suspicious_fbe77e, MaliText::deauth_detected_da49a0};
         String previousStatus = data.status;
         data.status = labels[static_cast<unsigned>(wifiLevel(rate, baseline, attacks, churn))];
         uint8_t busiestPackets = 0;
@@ -194,8 +195,8 @@ public:
                 busiestPackets = ch + 1;
             }
         }
-        data.lines[11] = "Packet hot CH: " + String(busiestPackets);
-        data.warning = attacks || data.status == "SUSPICIOUS" || data.status == "HIGH TRAFFIC";
+        data.lines[11] = MaliText::packet_hot_ch_0b07a5 + String(busiestPackets);
+        data.warning = attacks || data.status == MaliText::suspicious_fbe77e || data.status == MaliText::high_traffic_5ffc69;
         if (data.warning || (data.status == "BUSY" && previousStatus != data.status))
             event(
                 WIFI,
@@ -206,8 +207,8 @@ public:
         previous = copy.packets;
         previousDeauth = copy.deauth;
         window = now;
-        data.lines[4] = "Packets: " + String(copy.packets) + " /s: " + String(rate);
-        data.lines[5] = "Management: " + String(copy.management);
+        data.lines[4] = MaliText::packets_d20264 + String(copy.packets) + " /s: " + String(rate);
+        data.lines[5] = MaliText::management_296e42 + String(copy.management);
         data.lines[6] = "Deauth/disassoc: " + String(copy.deauth);
         data.lines[7] = "TX MACs: " + String(copy.used) + (copy.used == 64 ? "+ (limite)" : "");
         data.lines[8] = "CH 1-14: barras = APs";

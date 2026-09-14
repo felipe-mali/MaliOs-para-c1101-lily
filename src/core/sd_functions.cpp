@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "sd_functions.h"
 #include "bus_HAL.h"
 #include "display.h" // using displayRedStripe as error msg
@@ -371,7 +372,7 @@ bool createFolder(FS fs, String path) {
     String foldername = keyboard("", 76, "Nome da pasta: ");
     if (foldername == "\x1B") return false;
     if (!fs.mkdir(path + "/" + foldername)) {
-        displayRedStripe("Couldn't create folder");
+        displayRedStripe(MaliText::couldn_t_create_folder_307878);
         return false;
     }
     return true;
@@ -587,7 +588,7 @@ void readFs(FS &fs, const String &folder, const String &allowed_ext) {
     Serial.println("Files listed with: " + String(fileList.size()) + " files/folders found");
 
     // Adds Operational btn at the botton
-    object.filename = "> Back";
+    object.filename = "> Voltar";
     object.folder = false;
     object.operation = true;
 
@@ -946,7 +947,7 @@ String loopSD(FS &fs, bool filePicker, const String &allowed_ext, String rootPat
                     size_t filesize = getFileSize(fs, filepath);
                     // Serial.println(filesize);
                     if (filesize < SAFE_STACK_BUFFER_SIZE && filesize > 0) {
-                        options.push_back({"QR code", [&]() {
+                        options.push_back({MaliText::qr_code_abba02, [&]() {
                                                delay(200);
                                                qrcode_display(readSmallFile(fs, filepath));
                                            }});

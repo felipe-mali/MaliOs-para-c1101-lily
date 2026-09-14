@@ -1,3 +1,5 @@
+#include "core/ui/MaliUI.h"
+#include "core/ui/PtBr.h"
 /**
  * @file nrf_mousejack.cpp
  * @brief MouseJack scan, fingerprint, and HID injection for Bruce firmware.
@@ -176,7 +178,7 @@ static const MjDuckyKey DUCKY_KEYS[] = {
     {"TAB",         MJ_MOD_NONE,   MJ_KEY_TAB       },
     {"SPACE",       MJ_MOD_NONE,   MJ_KEY_SPACE     },
     {"CAPSLOCK",    MJ_MOD_NONE,   MJ_KEY_CAPSLOCK  },
-    {"DELETE",      MJ_MOD_NONE,   MJ_KEY_DELETE    },
+    {MaliText::delete_d6f563,      MJ_MOD_NONE,   MJ_KEY_DELETE    },
     {"INSERT",      MJ_MOD_NONE,   MJ_KEY_INSERT    },
     {"HOME",        MJ_MOD_NONE,   MJ_KEY_HOME      },
     {"END",         MJ_MOD_NONE,   MJ_KEY_END       },
@@ -213,7 +215,7 @@ static const MjDuckyKey DUCKY_KEYS[] = {
     {"ALT",         MJ_MOD_LALT,   MJ_KEY_NONE      },
     {"GUI",         MJ_MOD_LGUI,   MJ_KEY_NONE      },
     {"WINDOWS",     MJ_MOD_LGUI,   MJ_KEY_NONE      },
-    {"COMMAND",     MJ_MOD_LGUI,   MJ_KEY_NONE      },
+    {MaliText::command_2e4854,     MJ_MOD_LGUI,   MJ_KEY_NONE      },
     {"MENU",        MJ_MOD_NONE,   0x65             }, // HID Usage: Keyboard Application
     {"APP",         MJ_MOD_NONE,   0x65             },
     {nullptr,       0,             0                }  // Sentinel
@@ -606,7 +608,7 @@ static void mj_drawScanScreen(uint8_t currentCh, bool initial) {
     // Status line (below title, inside border)
     tft.setTextSize(FP);
     tft.fillRect(7, contentY, tftWidth - 14, 12, bruceConfig.bgColor);
-    tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
     char statusBuf[40];
     snprintf(statusBuf, sizeof(statusBuf), "CH:%3d  Targets:%d", currentCh, mj_targetCount);
     tft.drawCentreString(statusBuf, tftWidth / 2, contentY, 1);
@@ -632,7 +634,7 @@ static void mj_drawScanScreen(uint8_t currentCh, bool initial) {
     // Footer (inside border)
     int footerY = tftHeight - BORDER_PAD_X - FP * LH - 2;
     tft.fillRect(7, footerY, tftWidth - 14, FP * LH, bruceConfig.bgColor);
-    tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::TEXT_SECONDARY, bruceConfig.bgColor);
     tft.drawCentreString("[ESC] Parar", tftWidth / 2, footerY, 1);
 }
 
@@ -744,7 +746,7 @@ static void mj_attackString(int targetIndex) {
     const MjTarget &target = mj_targets[targetIndex];
 
     // Get string from user via keyboard
-    String text = keyboard("", 200, "Inject text:");
+    String text = keyboard("", 200, MaliText::inject_text_7b3811);
     if (text.length() == 0 || text == "\x1B") return;
 
     drawMainBorderWithTitle("INJETANDO");
@@ -755,14 +757,14 @@ static void mj_attackString(int targetIndex) {
         "[" + String(mj_getTypeLabel(target.type)) + "] " + mj_formatAddr(target), tftWidth / 2, cy, 1
     );
     cy += 16;
-    tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
     tft.drawCentreString("Enviando teclas...", tftWidth / 2, cy, 1);
     cy += 16;
 
     // Show first 30 chars of the text
     String preview = text.substring(0, 30);
     if (text.length() > 30) preview += "...";
-    tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::WARNING, bruceConfig.bgColor);
     tft.drawCentreString(preview, tftWidth / 2, cy, 1);
 
     if (!mj_validateNrfMode()) return;
@@ -812,14 +814,14 @@ static void mj_attackDucky(int targetIndex) {
         "[" + String(mj_getTypeLabel(target.type)) + "] " + mj_formatAddr(target), tftWidth / 2, cy, 1
     );
     cy += 16;
-    tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
     tft.drawCentreString("Executando script...", tftWidth / 2, cy, 1);
     cy += 16;
 
     // Show filename
     int lastSlash = filepath.lastIndexOf('/');
     String fname = (lastSlash >= 0) ? filepath.substring(lastSlash + 1) : filepath;
-    tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::WARNING, bruceConfig.bgColor);
     tft.drawCentreString(fname, tftWidth / 2, cy, 1);
 
     if (!mj_validateNrfMode()) return;
@@ -896,7 +898,7 @@ static void mj_attackMenu(int targetIndex) {
     const MjTarget &target = mj_targets[targetIndex];
 
     options = {
-        {"Inject String", [&]() { mj_attackString(targetIndex); }},
+        {MaliText::inject_string_35452e, [&]() { mj_attackString(targetIndex); }},
         {"DuckyScript",   [&]() { mj_attackDucky(targetIndex); } },
         {"Voltar",        [=]() { /* return */ }                 },
     };

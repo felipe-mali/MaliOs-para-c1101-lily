@@ -1,3 +1,5 @@
+#include "core/ui/MaliUI.h"
+#include "core/ui/PtBr.h"
 #include "rf_waterfall.h"
 #ifndef TFT_MOSI
 #define TFT_MOSI -1
@@ -94,7 +96,7 @@ void rf_waterfall_run() {
             } else if (i == 3 && selected_item == 1) {
                 tft.setTextColor(TFT_PINK, TFT_BLACK);
             } else {
-                tft.setTextColor(TFT_WHITE, TFT_BLACK);
+                tft.setTextColor(MaliUI::TEXT_PRIMARY, TFT_BLACK);
             }
 
             tft.drawFastVLine(x, 0, tft.height(), TFT_DARKGREY);
@@ -183,7 +185,7 @@ void rf_waterfall_run() {
             tft.fillRect(0, 10, screen_width, 10, TFT_BLACK);
             tft.setCursor(3, 10);
             tft.setTextSize(1);
-            tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+            tft.setTextColor(MaliUI::WARNING, TFT_BLACK);
             tft.printf("%d dBm @ %.3f", max_rssi, max_freq);
 
             lastMaxUpdate = millis();
@@ -191,13 +193,13 @@ void rf_waterfall_run() {
 
         tft.setCursor(3, 20);
         tft.setTextColor(TFT_DARKCYAN);
-        tft.print("[OK] Item [PREV/NEXT] Value ");
+        tft.print(MaliText::ok_item_prev_next_value_c6fb2e);
 
         if (selected_item == 2) {
-            tft.setTextColor(TFT_RED);
+            tft.setTextColor(MaliUI::ERROR);
             tft.print("SAIR");
         } else {
-            tft.setTextColor(TFT_WHITE);
+            tft.setTextColor(MaliUI::TEXT_PRIMARY);
             tft.print("SAIR");
         }
 

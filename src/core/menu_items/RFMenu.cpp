@@ -43,7 +43,7 @@ void RFMenu::optionsMenu() {
     if (bruceConfigPins.rfModule == CC1101_SPI_MODULE) txt += " (CC1101)"; // Indicates if CC1101 is connected
     else txt += " Tx: " + String(bruceConfigPins.rfTx) + " Rx: " + String(bruceConfigPins.rfRx);
 
-    loopOptions(options, MENU_TYPE_SUBMENU, txt.c_str());
+    loopOptions(options, MENU_TYPE_GEAR, txt.c_str());
 }
 
 void RFMenu::configMenu() {
@@ -55,7 +55,7 @@ void RFMenu::configMenu() {
         {"Voltar", [this]() { optionsMenu(); }},
     };
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "Config. RF");
+    loopOptions(options, MENU_TYPE_GEAR, "Config. RF");
 }
 
 void RFMenu::drawIcon(float scale) {

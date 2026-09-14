@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "rf_scan.h"
 #include "core/led_control.h"
 #include "core/sd_functions.h"
@@ -508,12 +509,12 @@ void RFScan::reset_signals() {
 void RFScan::set_threshold() {
     int idx = constrain((-rssiThreshold - 55) / 5, 0, 5);
     options = {
-        {"(-55) More Accurate", [&]() { rssiThreshold = -55; }},
+        {MaliText::text_55_more_accurate_d84baf, [&]() { rssiThreshold = -55; }},
         {"(-60)",               [&]() { rssiThreshold = -60; }},
-        {"(-65) Default",       [&]() { rssiThreshold = -65; }},
+        {MaliText::text_65_default_5959d8,       [&]() { rssiThreshold = -65; }},
         {"(-70)",               [&]() { rssiThreshold = -70; }},
         {"(-75)",               [&]() { rssiThreshold = -75; }},
-        {"(-80) Less Accurate", [&]() { rssiThreshold = -80; }},
+        {MaliText::text_80_less_accurate_e76a98, [&]() { rssiThreshold = -80; }},
     };
     loopOptions(options, idx);
 }

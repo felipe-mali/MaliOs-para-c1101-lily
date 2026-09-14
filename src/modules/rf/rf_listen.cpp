@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "rf_listen.h"
 
 #include "../others/audio.h"
@@ -80,7 +81,7 @@ void rf_listen() {
     lastEdgeMicros = micros();
     newPulse = false;
     attachInterrupt(digitalPinToInterrupt(bruceConfigPins.CC1101_bus.io0), onPulse, RISING);
-    displayRedStripe("Listening...", getComplementaryColor2(bruceConfig.priColor), bruceConfig.priColor);
+    displayRedStripe(MaliText::listening_4fc251, getComplementaryColor2(bruceConfig.priColor), bruceConfig.priColor);
 
     unsigned long lastPulseTime = millis();
     unsigned long lastTone = 0;

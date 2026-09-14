@@ -1,3 +1,5 @@
+#include "core/ui/MaliUI.h"
+#include "core/ui/PtBr.h"
 #ifndef LITE_VERSION
 #include "karma_attack.h"
 #include "FS.h"
@@ -2435,7 +2437,7 @@ void updateKarmaDisplay() {
         tft.setCursor(10, y);
 
         if (karmaPaused) {
-            tft.setTextColor(TFT_RED, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::ERROR, bruceConfig.bgColor);
             tft.setCursor(10, y);
             tft.print("KARMA PAUSADO");
             tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
@@ -2452,7 +2454,7 @@ void updateKarmaDisplay() {
         padprint("Karma:" + String(karmaResponsesSent), 13);
         padprintln("Clone:" + String(cloneAttacksLaunched), 19);
 
-        padprint("Port:" + String(autoPortalsLaunched) + "/" + String(activePortalCount()));
+        padprint(MaliText::port_448bc9 + String(autoPortalsLaunched) + "/" + String(activePortalCount()));
         padprint("HS:" + String(handshakeBuffer.size()), 10);
         padprintln("PMKID:" + String(pmkidCaptured), 16);
 
@@ -2606,7 +2608,7 @@ void karma_setup() {
     karmaMode = MODE_PASSIVE;
 
     drawMainBorderWithTitle("ATAQUE KARMA MODERNO");
-    displayTextLine("Enhanced Karma v3.0");
+    displayTextLine(MaliText::enhanced_karma_v3_0_bc402c);
     delay(500);
 
     if (!selectPortalTemplate(true)) {

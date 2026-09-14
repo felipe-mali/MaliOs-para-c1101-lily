@@ -1,3 +1,4 @@
+#include "core/ui/MaliUI.h"
 #ifndef LITE_VERSION
 // SSH borrowed from https://github.com/m5stack/M5Cardputer :)
 
@@ -392,13 +393,13 @@ bool isSessionConnecting() {
 void resetClientScreen(const char *title) {
     (void)title;
     tft.fillScreen(bruceConfig.bgColor);
-    tft.drawRect(0, 0, tftWidth, tftHeight, bruceConfig.priColor);
+    MaliUI::drawRoundedBox(0, 0, tftWidth, tftHeight, bruceConfig.priColor);
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     tft.setTextSize(FP);
     tft.setCursor(TERMINAL_PAD_X, TERMINAL_PAD_Y);
     String context = getQueuedPromptContext();
     if (!context.isEmpty()) {
-        tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
+        tft.setTextColor(MaliUI::ACCENT, bruceConfig.bgColor);
         tft.println(context);
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
         tft.setCursor(TERMINAL_PAD_X, tft.getCursorY());
@@ -517,7 +518,7 @@ void redrawCurrentCommandLine() {
 
     tft.fillRect(TERMINAL_PAD_X, lineY, tftWidth - (TERMINAL_PAD_X * 2), lineHeight, bruceConfig.bgColor);
     tft.setCursor(TERMINAL_PAD_X, lineY);
-    tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
     tft.print(commandBuffer);
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     cursorY = tft.getCursorY();
@@ -595,7 +596,7 @@ void renderPrompt(bool forceNewLine) {
         if (!promptPrefix.isEmpty()) commandBuffer = promptPrefix;
     }
     if (forceNewLine) ensureCursorOnFreshLine();
-    tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
     tft.print(commandBuffer);
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     cursorY = tft.getCursorY();
@@ -657,7 +658,7 @@ int getTerminalRows() {
 
 void renderVisibleText(const String &title, const String &text, bool appendNewline) {
     ensureCursorOnFreshLine();
-    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
     for (size_t i = 0; i < text.length(); ++i) {
         if (tft.getCursorX() > tftWidth - TERMINAL_PAD_X - (FP * LW)) {
             tft.println();
@@ -667,7 +668,7 @@ void renderVisibleText(const String &title, const String &text, bool appendNewli
         if (tft.getCursorY() > tftHeight - TERMINAL_PAD_Y - (FP * LH)) {
             resetClientScreen(title.c_str());
             renderPrompt();
-            tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
         }
         if (tft.getCursorX() == 0) tft.setCursor(TERMINAL_PAD_X, tft.getCursorY());
     }
@@ -1102,7 +1103,7 @@ void runSessionUiLoop(const String &title) {
                         setTerminalLiveInput(liveInput);
                         queueSessionCommand(String(c));
                     }
-                    tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
                     tft.print(c);
                 }
 
@@ -1169,7 +1170,7 @@ void runSessionUiLoop(const String &title) {
                 tft.setTextSize(FP);
                 appendSessionCommandToLog(message);
                 queueSessionCommand(message + "\r");
-                tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+                tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
                 tft.println("> " + message);
                 tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
             }

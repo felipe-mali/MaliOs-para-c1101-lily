@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #if !defined(LITE_VERSION)
 #include "serial_commands.h"
 #include "core/display.h"
@@ -110,7 +111,7 @@ EspSerialCmd::Message EspSerialCmd::createCmdMessage() {
     tft.fillScreen(bruceConfig.bgColor);
     delay(500);
 
-    String command = keyboard("", ESP_DATA_SIZE, "Serial Command");
+    String command = keyboard("", ESP_DATA_SIZE, MaliText::serial_command_de239b);
     if (command == "\x1B") command = "";
     Message msg = createMessage(command);
     printMessage(msg);

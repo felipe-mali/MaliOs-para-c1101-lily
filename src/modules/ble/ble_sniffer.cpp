@@ -1,3 +1,4 @@
+#include "core/ui/MaliUI.h"
 /*
  * BLE Sniffer - Standalone module for LITE_VERSION
  * Author: Ninja-jr
@@ -187,7 +188,7 @@ void BLE_Sniffer() {
                 int visibleItems = (tftHeight - y - 50) / lineH;
 
                 tft.setTextSize(FP);
-                tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
+                tft.setTextColor(MaliUI::ACCENT, bruceConfig.bgColor);
                 tft.setCursor(10, y);
                 tft.println("Pacotes: " + String(snifferPacketCount));
                 y += lineH;
@@ -209,7 +210,7 @@ void BLE_Sniffer() {
                 }
 
                 if (snifferPacketCount > visibleItems) {
-                    tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::ACCENT, bruceConfig.bgColor);
                     tft.setCursor(tftWidth - 30, BORDER_PAD_Y + FM * LH + 4 + lineH);
                     if (scrollOffset > 0)
                         tft.drawString("^", tftWidth - 25, BORDER_PAD_Y + FM * LH + 4 + lineH, 1);
@@ -220,7 +221,7 @@ void BLE_Sniffer() {
                     }
                 }
 
-                tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
+                tft.setTextColor(MaliUI::TEXT_SECONDARY, bruceConfig.bgColor);
                 tft.setCursor(10, tftHeight - 20);
                 tft.drawString("PREV/NEXT: Navegar SEL: Detalhes ESC: Voltar", 10, tftHeight - 20, 1);
 
@@ -245,7 +246,7 @@ void BLE_Sniffer() {
                     int dy = BORDER_PAD_Y + FM * LH + 4;
                     int dlh = max(12, tftHeight / 14);
                     tft.setTextSize(FP);
-                    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
 
                     tft.setCursor(10, dy);
                     tft.println("Dispositivo: " + pkt.name);
@@ -262,16 +263,16 @@ void BLE_Sniffer() {
                     dy += dlh;
 
                     String parsed = parseManufacturerData(pkt.payload);
-                    tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::ACCENT, bruceConfig.bgColor);
                     tft.println(parsed);
                     dy += dlh;
 
-                    tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
                     String hexDump = pkt.payloadHex;
                     if (hexDump.length() > 400) hexDump = hexDump.substring(0, 400) + "...\n(truncado)";
                     tft.println(hexDump);
 
-                    tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::TEXT_SECONDARY, bruceConfig.bgColor);
                     tft.setCursor(10, tftHeight - 20);
                     tft.drawString("Pressione uma tecla para continuar", 10, tftHeight - 20, 1);
 

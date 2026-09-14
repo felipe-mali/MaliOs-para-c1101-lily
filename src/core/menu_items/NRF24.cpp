@@ -25,7 +25,7 @@ void NRF24Menu::optionsMenu() {
     addOptionToMainMenu();
     options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::NRF24); }});
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "NRF24");
+    loopOptions(options, MENU_TYPE_GEAR, "NRF24");
 }
 
 void NRF24Menu::configMenu() {
@@ -38,7 +38,7 @@ void NRF24Menu::configMenu() {
         {"Voltar",                [this]() { optionsMenu(); }},
     };
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "Config. RF", idx);
+    loopOptions(options, MENU_TYPE_GEAR, "Config. RF", idx);
     if (opt == 1) {
         bruceConfigPins.setNrf24Pins(
             {(gpio_num_t)NRF24_SCK_PIN,

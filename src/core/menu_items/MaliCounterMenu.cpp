@@ -15,7 +15,7 @@ void MaliCounterMenu::optionsMenu() {
         {"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::MALI_COUNTER); }},
     };
 
-    loopOptions(counterOptions, MENU_TYPE_SUBMENU, "Mali Counter");
+    loopOptions(counterOptions, MENU_TYPE_GEAR, "Mali Counter");
 }
 
 void MaliCounterMenu::drawIcon(float scale) {

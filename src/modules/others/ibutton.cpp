@@ -1,3 +1,4 @@
+#include "core/ui/MaliUI.h"
 #ifndef LITE_VERSION
 #include "ibutton.h"
 #include "core/display.h"
@@ -33,11 +34,11 @@ static void displayStatus() {
     if (keyLoaded) {
         padprintln("UID: " + bufferToHexStr(keyBuffer, 8));
         if (!bufferCrcValid()) {
-            tft.setTextColor(TFT_RED);
+            tft.setTextColor(MaliUI::ERROR);
             padprintln("ERRO DE CRC!");
             tft.setTextColor(bruceConfig.priColor);
         } else {
-            tft.setTextColor(TFT_GREEN);
+            tft.setTextColor(MaliUI::SUCCESS);
             padprintln("CRC OK");
             tft.setTextColor(bruceConfig.priColor);
         }
@@ -384,14 +385,14 @@ Restart:
             if (ok) {
                 displayStatus();
                 padprintln("");
-                tft.setTextColor(TFT_GREEN);
+                tft.setTextColor(MaliUI::SUCCESS);
                 padprintln("Chave lida com sucesso!");
                 tft.setTextColor(bruceConfig.priColor);
             } else if (keyLoaded) {
                 // Read failed CRC but we have data
                 displayStatus();
                 padprintln("");
-                tft.setTextColor(TFT_YELLOW);
+                tft.setTextColor(MaliUI::WARNING);
                 padprintln("Leitura com erros de CRC");
                 tft.setTextColor(bruceConfig.priColor);
             } else {

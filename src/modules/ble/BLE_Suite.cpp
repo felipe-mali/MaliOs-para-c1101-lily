@@ -1,3 +1,6 @@
+#include "core/scrollableTextArea.h"
+#include "core/ui/MaliUI.h"
+#include "core/ui/PtBr.h"
 /*
  * BLE Suite v3.1 - Complete BLE attack and analysis toolkit
  * Author: Ninja-jr
@@ -2009,7 +2012,7 @@ bool HIDDuckyService::executeDuckyScript(NimBLEAddress target) {
     String connectionMethod = "";
     NimBLEClient *pClient = attemptConnectionWithStrategies(target, connectionMethod);
     if (!pClient) {
-        showAttackResult(false, "Failed to connect");
+        showAttackResult(false, MaliText::failed_to_connect_8a4f7f);
         return false;
     }
 
@@ -2018,7 +2021,7 @@ bool HIDDuckyService::executeDuckyScript(NimBLEAddress target) {
 
     NimBLERemoteService *pHIDService = pClient->getService(NimBLEUUID((uint16_t)0x1812));
     if (!pHIDService) {
-        showAttackResult(false, "No HID service found");
+        showAttackResult(false, MaliText::no_hid_service_found_66e18c);
         pClient->disconnect();
         BLEStateManager::unregisterClient(pClient);
         NimBLEDevice::deleteClient(pClient);
@@ -2038,7 +2041,7 @@ bool HIDDuckyService::executeDuckyScript(NimBLEAddress target) {
     }
 
     if (!pReportChar) {
-        showAttackResult(false, "No writable HID characteristic");
+        showAttackResult(false, MaliText::no_writable_hid_characteristic_921907);
         pClient->disconnect();
         BLEStateManager::unregisterClient(pClient);
         NimBLEDevice::deleteClient(pClient);
@@ -2135,7 +2138,7 @@ bool HIDDuckyService::forceInjectDuckyScript(
 
     NimBLERemoteService *pHIDService = pClient->getService(NimBLEUUID((uint16_t)0x1812));
     if (!pHIDService) {
-        showAttackResult(false, "No HID service found");
+        showAttackResult(false, MaliText::no_hid_service_found_66e18c);
         pClient->disconnect();
         BLEStateManager::unregisterClient(pClient);
         NimBLEDevice::deleteClient(pClient);
@@ -2155,7 +2158,7 @@ bool HIDDuckyService::forceInjectDuckyScript(
     }
 
     if (!pReportChar) {
-        showAttackResult(false, "No writable HID characteristic");
+        showAttackResult(false, MaliText::no_writable_hid_characteristic_921907);
         pClient->disconnect();
         BLEStateManager::unregisterClient(pClient);
         NimBLEDevice::deleteClient(pClient);
@@ -2677,16 +2680,16 @@ bool HIDAttackServiceClass::injectKeystrokes(NimBLEAddress target) {
     String connectionMethod = "";
     NimBLEClient *pClient = attemptConnectionWithStrategies(target, connectionMethod);
     if (!pClient) {
-        showAttackResult(false, "Failed to connect");
+        showAttackResult(false, MaliText::failed_to_connect_8a4f7f);
         return false;
     }
 
     BLEStateManager::registerClient(pClient);
-    showAttackProgress("Connected! Finding HID service...", TFT_GREEN);
+    showAttackProgress(MaliText::connected_finding_hid_service_ae45e2, TFT_GREEN);
 
     NimBLERemoteService *pHIDService = pClient->getService(NimBLEUUID((uint16_t)0x1812));
     if (!pHIDService) {
-        showAttackResult(false, "No HID service found");
+        showAttackResult(false, MaliText::no_hid_service_found_66e18c);
         pClient->disconnect();
         BLEStateManager::unregisterClient(pClient);
         NimBLEDevice::deleteClient(pClient);
@@ -2706,7 +2709,7 @@ bool HIDAttackServiceClass::injectKeystrokes(NimBLEAddress target) {
     }
 
     if (!pReportChar) {
-        showAttackResult(false, "No writable HID characteristic");
+        showAttackResult(false, MaliText::no_writable_hid_characteristic_921907);
         pClient->disconnect();
         BLEStateManager::unregisterClient(pClient);
         NimBLEDevice::deleteClient(pClient);
@@ -2741,14 +2744,14 @@ bool HIDAttackServiceClass::forceHIDKeystrokes(NimBLEAddress target, const Strin
     HIDExploitEngine hidExploit;
     HIDConnectionResult connResult = hidExploit.forceHIDConnection(target, deviceName, rssi);
     if (!connResult.success) {
-        showAttackResult(false, "Failed to establish HID connection");
+        showAttackResult(false, MaliText::failed_to_establish_hid_connection_8b5ede);
         return false;
     }
 
     String connectionMethod = "";
     NimBLEClient *pClient = attemptConnectionWithStrategies(target, connectionMethod);
     if (!pClient) {
-        showAttackResult(false, "Failed to create client after exploit");
+        showAttackResult(false, MaliText::failed_to_create_client_after_exploit_a36d23);
         return false;
     }
 
@@ -2757,7 +2760,7 @@ bool HIDAttackServiceClass::forceHIDKeystrokes(NimBLEAddress target, const Strin
 
     NimBLERemoteService *pHIDService = pClient->getService(NimBLEUUID((uint16_t)0x1812));
     if (!pHIDService) {
-        showAttackResult(false, "No HID service found");
+        showAttackResult(false, MaliText::no_hid_service_found_66e18c);
         pClient->disconnect();
         BLEStateManager::unregisterClient(pClient);
         NimBLEDevice::deleteClient(pClient);
@@ -2777,7 +2780,7 @@ bool HIDAttackServiceClass::forceHIDKeystrokes(NimBLEAddress target, const Strin
     }
 
     if (!pReportChar) {
-        showAttackResult(false, "No writable HID characteristic");
+        showAttackResult(false, MaliText::no_writable_hid_characteristic_921907);
         pClient->disconnect();
         BLEStateManager::unregisterClient(pClient);
         NimBLEDevice::deleteClient(pClient);
@@ -2889,7 +2892,7 @@ bool DoSAttackServiceClass::connectionFlood(NimBLEAddress target) {
     AutoCleanup cleanup([]() { BLEStateManager::deinitBLE(true); });
 
     if (!confirmAttack("WARNING: This may disrupt BLE. Continue?")) return false;
-    showAttackProgress("Starting connection flood...", TFT_ORANGE);
+    showAttackProgress(MaliText::starting_connection_flood_acd532, TFT_ORANGE);
 
     bool anySuccess = false;
     const int MAX_ATTEMPTS = 20;
@@ -2917,8 +2920,8 @@ bool DoSAttackServiceClass::connectionFlood(NimBLEAddress target) {
     }
 
     cleanup.disable();
-    if (anySuccess) showAttackResult(true, "Connection flood completed");
-    else showAttackResult(false, "Flood attack failed");
+    if (anySuccess) showAttackResult(true, MaliText::connection_flood_completed_310496);
+    else showAttackResult(false, MaliText::flood_attack_failed_e99df8);
     return anySuccess;
 }
 
@@ -2936,7 +2939,7 @@ bool DoSAttackServiceClass::advertisingSpam(NimBLEAddress target) {
 
     NimBLEAdvertising *pAdvertising = NimBLEDevice::getAdvertising();
     if (!pAdvertising) {
-        showAttackResult(false, "Failed to get advertising");
+        showAttackResult(false, MaliText::failed_to_get_advertising_128fc8);
         return false;
     }
 
@@ -2964,7 +2967,7 @@ bool DoSAttackServiceClass::advertisingSpam(NimBLEAddress target) {
 
     pAdvertising->stop();
     cleanup.disable();
-    showAttackResult(true, String("Sent " + String(spamCount) + " spam advertisements").c_str());
+    showAttackResult(true, String(MaliText::sent_060fbc + String(spamCount) + " spam advertisements").c_str());
     return true;
 }
 
@@ -3014,15 +3017,15 @@ String selectFileFromSD() {
     while (!exitMenu) {
         if (selected != lastSelected || scrollOffset != lastScrollOffset) {
             tft.fillScreen(bruceConfig.bgColor);
-            tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_WHITE);
+            MaliUI::drawRoundedBox(5, 5, tftWidth - 10, tftHeight - 10, MaliUI::BORDER);
 
-            tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
             tft.setTextSize(2);
             tft.setCursor((tftWidth - strlen("ARQUIVOS DO SD") * 12) / 2, 15);
             tft.print("ARQUIVOS DO SD");
             tft.setTextSize(1);
 
-            tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::WARNING, bruceConfig.bgColor);
             tft.setCursor(20, 40);
             tft.print("Encontrados: ");
             tft.print(fileCount);
@@ -3034,13 +3037,13 @@ String selectFileFromSD() {
                 if (yPos + menuItemHeight > tftHeight - 45) break;
 
                 if (fileIdx == selected) {
-                    tft.fillRect(20, yPos, tftWidth - 40, menuItemHeight - 3, TFT_WHITE);
-                    tft.setTextColor(TFT_BLACK, TFT_WHITE);
+                    MaliUI::drawRoundedFill(20, yPos, tftWidth - 40, menuItemHeight - 3, MaliUI::SURFACE_ALT);
+                    tft.setTextColor(MaliUI::TEXT_PRIMARY, MaliUI::SURFACE_ALT);
                     tft.setCursor(25, yPos + 8);
                     tft.print("> ");
                 } else {
                     tft.fillRect(20, yPos, tftWidth - 40, menuItemHeight - 3, bruceConfig.bgColor);
-                    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
                     tft.setCursor(25, yPos + 8);
                     tft.print("  ");
                 }
@@ -3051,14 +3054,14 @@ String selectFileFromSD() {
             }
 
             if (fileCount > maxVisibleItems) {
-                tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
+                tft.setTextColor(MaliUI::ACCENT, bruceConfig.bgColor);
                 tft.setCursor(tftWidth - 25, menuStartY + 5);
                 if (scrollOffset > 0) tft.print("^");
                 tft.setCursor(tftWidth - 25, menuStartY + (maxVisibleItems * menuItemHeight) - 20);
                 if (scrollOffset + maxVisibleItems < fileCount) tft.print("v");
             }
 
-            tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
             tft.setCursor(20, tftHeight - 30);
             tft.print("SEL: Selecionar PREV/NEXT: Navegar");
             tft.setCursor(20, tftHeight - 20);
@@ -3148,9 +3151,9 @@ String getScriptFromUser() {
         if (selected != lastSelected || scrollOffset != lastScrollOffset) {
             tft.fillScreen(bruceConfig.bgColor);
             TouchFooter();
-            tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_WHITE);
+            MaliUI::drawRoundedBox(5, 5, tftWidth - 10, tftHeight - 10, MaliUI::BORDER);
 
-            tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
             tft.setTextSize(2);
             tft.setCursor((tftWidth - strlen("SELECIONE O SCRIPT") * 12) / 2, 15);
             tft.print("SELECIONE O SCRIPT");
@@ -3162,13 +3165,13 @@ String getScriptFromUser() {
                 if (yPos + menuItemHeight > tftHeight - 45) break;
 
                 if (scriptIdx == selected) {
-                    tft.fillRect(20, yPos, tftWidth - 40, menuItemHeight - 3, TFT_WHITE);
-                    tft.setTextColor(TFT_BLACK, TFT_WHITE);
+                    MaliUI::drawRoundedFill(20, yPos, tftWidth - 40, menuItemHeight - 3, MaliUI::SURFACE_ALT);
+                    tft.setTextColor(MaliUI::TEXT_PRIMARY, MaliUI::SURFACE_ALT);
                     tft.setCursor(25, yPos + 8);
                     tft.print("> ");
                 } else {
                     tft.fillRect(20, yPos, tftWidth - 40, menuItemHeight - 3, bruceConfig.bgColor);
-                    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
                     tft.setCursor(25, yPos + 8);
                     tft.print("  ");
                 }
@@ -3179,14 +3182,14 @@ String getScriptFromUser() {
             }
 
             if (scriptCount > maxVisibleItems) {
-                tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
+                tft.setTextColor(MaliUI::ACCENT, bruceConfig.bgColor);
                 tft.setCursor(tftWidth - 25, menuStartY + 5);
                 if (scrollOffset > 0) tft.print("^");
                 tft.setCursor(tftWidth - 25, menuStartY + (maxVisibleItems * menuItemHeight) - 20);
                 if (scrollOffset + maxVisibleItems < scriptCount) tft.print("v");
             }
 
-            tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
             tft.setCursor(20, tftHeight - 30);
             tft.print("SEL: Selecionar PREV/NEXT: Navegar");
             tft.setCursor(20, tftHeight - 20);
@@ -3974,7 +3977,7 @@ void BLE_Sniffer() {
                     drawMainBorderWithTitle("PACOTES CAPTURADOS");
 
                     tft.setTextSize(FP);
-                    tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::ACCENT, bruceConfig.bgColor);
                     tft.setCursor(10, y);
                     tft.println("Pacotes: " + String(snifferPacketCount));
                     y += lineH;
@@ -3997,7 +4000,7 @@ void BLE_Sniffer() {
                     }
 
                     if (snifferPacketCount > visibleItems) {
-                        tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
+                        tft.setTextColor(MaliUI::ACCENT, bruceConfig.bgColor);
                         tft.setCursor(tftWidth - 30, BORDER_PAD_Y + FM * LH + 4 + lineH);
                         if (scrollOffset > 0)
                             tft.drawString("^", tftWidth - 25, BORDER_PAD_Y + FM * LH + 4 + lineH, 1);
@@ -4008,10 +4011,10 @@ void BLE_Sniffer() {
                         }
                     }
 
-                    tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::TEXT_SECONDARY, bruceConfig.bgColor);
                     tft.setCursor(10, tftHeight - 20);
                     tft.drawString(
-                        "PREV/NEXT: Navigate  SEL: View Details  ESC: Back", 10, tftHeight - 20, 1
+                        MaliText::prev_next_navigate_sel_view_details_esc_back_ccc2c5, 10, tftHeight - 20, 1
                     );
                     redraw = false; // view screen
                     TouchFooter();
@@ -4040,7 +4043,7 @@ void BLE_Sniffer() {
                     int dy = BORDER_PAD_Y + FM * LH + 4;
                     int dlh = max(12, tftHeight / 14);
                     tft.setTextSize(FP);
-                    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
 
                     tft.setCursor(10, dy);
                     tft.println("Dispositivo: " + pkt.name);
@@ -4057,16 +4060,16 @@ void BLE_Sniffer() {
                     dy += dlh;
 
                     String parsed = parseManufacturerData(pkt.payload);
-                    tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::ACCENT, bruceConfig.bgColor);
                     tft.println(parsed);
                     dy += dlh;
 
-                    tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
                     String hexDump = pkt.payloadHex;
                     if (hexDump.length() > 400) hexDump = hexDump.substring(0, 400) + "...\n(truncated)";
                     tft.println(hexDump);
 
-                    tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::TEXT_SECONDARY, bruceConfig.bgColor);
                     tft.setCursor(10, tftHeight - 20);
                     tft.drawString("Pressione uma tecla para continuar", 10, tftHeight - 20, 1);
 
@@ -4178,10 +4181,10 @@ String selectTargetFromScan(const char *title) {
     g_pBLEScan->clearResults();
 
     tft.fillScreen(bruceConfig.bgColor);
-    tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_WHITE);
+    MaliUI::drawRoundedBox(5, 5, tftWidth - 10, tftHeight - 10, MaliUI::BORDER);
     TouchFooter();
 
-    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
     tft.setTextSize(2);
     String titleStr = String(title);
     int maxTitleWidth = tftWidth - 20;
@@ -4292,9 +4295,9 @@ String selectTargetFromScan(const char *title) {
 
     DeviceSnapshot *snapshot = scannerData.getSnapshot();
     if (!snapshot || snapshot->count == 0) {
-        tft.fillScreen(TFT_YELLOW);
-        tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_BLACK);
-        tft.setTextColor(TFT_BLACK, TFT_YELLOW);
+        tft.fillScreen(bruceConfig.bgColor);
+        MaliUI::drawRoundedBox(5, 5, tftWidth - 10, tftHeight - 10, TFT_BLACK);
+        tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
         tft.setTextSize(2);
         tft.setCursor((tftWidth - tft.textWidth("SEM DISPOSITIVOS")) / 2, 15);
         tft.print("SEM DISPOSITIVOS");
@@ -4348,16 +4351,16 @@ String selectTargetFromScan(const char *title) {
     while (!exitLoop) {
         if (selectedIdx != lastSelected || scrollOffset != lastScrollOffset) {
             tft.fillScreen(bruceConfig.bgColor);
-            tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_WHITE);
+            MaliUI::drawRoundedBox(5, 5, tftWidth - 10, tftHeight - 10, MaliUI::BORDER);
             TouchFooter();
 
-            tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
             tft.setTextSize(2);
             tft.setCursor((tftWidth - tft.textWidth("SELECIONE O DISPOSITIVO")) / 2, 15);
             tft.print("SELECIONE O DISPOSITIVO");
             tft.setTextSize(1);
 
-            tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::WARNING, bruceConfig.bgColor);
             tft.setCursor(20, 40);
             tft.print("Encontrados: ");
             tft.print(deviceCount);
@@ -4377,13 +4380,13 @@ String selectTargetFromScan(const char *title) {
                 if (snapshot->types[idx] & 0x02) displayText += " [HID]";
 
                 if (idx == selectedIdx) {
-                    tft.fillRect(15, yPos, tftWidth - 30, deviceItemHeight - 5, TFT_WHITE);
-                    tft.setTextColor(TFT_BLACK, TFT_WHITE);
+                    MaliUI::drawRoundedFill(15, yPos, tftWidth - 30, deviceItemHeight - 5, MaliUI::SURFACE_ALT);
+                    tft.setTextColor(MaliUI::TEXT_PRIMARY, MaliUI::SURFACE_ALT);
                     tft.setCursor(20, yPos + 10);
                     tft.print("> ");
                 } else {
                     tft.fillRect(15, yPos, tftWidth - 30, deviceItemHeight - 5, bruceConfig.bgColor);
-                    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+                    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
                     tft.setCursor(20, yPos + 10);
                     tft.print("  ");
                 }
@@ -4391,14 +4394,14 @@ String selectTargetFromScan(const char *title) {
             }
 
             if (deviceCount > (size_t)maxVisibleDevices) {
-                tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
+                tft.setTextColor(MaliUI::ACCENT, bruceConfig.bgColor);
                 tft.setCursor(tftWidth - 25, menuStartY + 10);
                 if (scrollOffset > 0) tft.print("^");
                 tft.setCursor(tftWidth - 25, menuStartY + (maxVisibleDevices * deviceItemHeight) - 15);
                 if (scrollOffset + maxVisibleDevices < (int)deviceCount) tft.print("v");
             }
 
-            tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
             tft.setCursor(20, tftHeight - 30);
             tft.print("SEL: Selecionar PREV/NEXT: Navegar");
             tft.setCursor(20, tftHeight - 20);
@@ -4474,16 +4477,16 @@ String selectMultipleTargetsFromScan(const char *title, std::vector<NimBLEAddres
 
     while (!exitMenu) {
         tft.fillScreen(bruceConfig.bgColor);
-        tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_WHITE);
+        MaliUI::drawRoundedBox(5, 5, tftWidth - 10, tftHeight - 10, MaliUI::BORDER);
         TouchFooter();
 
-        tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+        tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
         tft.setTextSize(2);
         tft.setCursor((tftWidth - tft.textWidth(title)) / 2, 15);
         tft.print(title);
         tft.setTextSize(1);
 
-        tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+        tft.setTextColor(MaliUI::WARNING, bruceConfig.bgColor);
         tft.setCursor(20, 40);
         tft.print("Selecionados: ");
         tft.print(targets.size());
@@ -4496,13 +4499,13 @@ String selectMultipleTargetsFromScan(const char *title, std::vector<NimBLEAddres
             if (yPos + menuItemHeight > tftHeight - 45) break;
 
             if (idx == currentIndex) {
-                tft.fillRect(20, yPos, tftWidth - 40, menuItemHeight - 3, TFT_WHITE);
-                tft.setTextColor(TFT_BLACK, TFT_WHITE);
+                MaliUI::drawRoundedFill(20, yPos, tftWidth - 40, menuItemHeight - 3, MaliUI::SURFACE_ALT);
+                tft.setTextColor(MaliUI::TEXT_PRIMARY, MaliUI::SURFACE_ALT);
                 tft.setCursor(25, yPos + 8);
                 tft.print(selected[idx] ? "[X] " : "[ ] ");
             } else {
                 tft.fillRect(20, yPos, tftWidth - 40, menuItemHeight - 3, bruceConfig.bgColor);
-                tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+                tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
                 tft.setCursor(25, yPos + 8);
                 tft.print(selected[idx] ? "[X] " : "[ ] ");
             }
@@ -4513,14 +4516,14 @@ String selectMultipleTargetsFromScan(const char *title, std::vector<NimBLEAddres
         }
 
         if (deviceCount > (size_t)maxVisibleItems) {
-            tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::ACCENT, bruceConfig.bgColor);
             tft.setCursor(tftWidth - 25, menuStartY + 5);
             if (scrollOffset > 0) tft.print("^");
             tft.setCursor(tftWidth - 25, menuStartY + (maxVisibleItems * menuItemHeight) - 20);
             if (scrollOffset + maxVisibleItems < (int)deviceCount) tft.print("v");
         }
 
-        tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+        tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
         tft.setCursor(20, tftHeight - 30);
         tft.print("SEL: Marcar NEXT: Confirmar PREV: Selecionar");
         tft.setCursor(20, tftHeight - 20);
@@ -4749,7 +4752,7 @@ void runFastPairAllExploits(NimBLEAddress target) {
 void runFastPairHIDChain(NimBLEAddress target) {
     AutoCleanup cleanup([]() { BLEStateManager::deinitBLE(true); });
 
-    showAttackProgress("FastPair → HID chain attack...", TFT_CYAN);
+    showAttackProgress(MaliText::fastpair_hid_chain_attack_e38b09, TFT_CYAN);
 
     FastPairExploitEngine fpEngine;
     bool fpSuccess = fpEngine.testVulnerability(target);
@@ -4882,25 +4885,10 @@ static bool welcomeShown = false;
 
 void showWelcomeScreen() {
     if (welcomeShown) return;
-
-    tft.fillScreen(bruceConfig.bgColor);
-    TouchFooter();
-    tft.setTextSize(4);
-    tft.setTextColor(TFT_PURPLE, bruceConfig.bgColor);
-    tft.setCursor((tftWidth - tft.textWidth("BRUCE")) / 2, 35);
-    tft.print("BRUCE");
-
-    tft.setTextColor(TFT_BLUE, bruceConfig.bgColor);
-    tft.setTextSize(2);
-    tft.setCursor((tftWidth - tft.textWidth("BLE SUITE")) / 2, 80);
-    tft.print("BLE SUITE");
-
-    tft.setTextColor(TFT_LIGHTGREY, bruceConfig.bgColor);
-    tft.setTextSize(1.5);
-    tft.setCursor((tftWidth - tft.textWidth("v3.1")) / 2, 100);
-    tft.print("v3.1");
-    delay(2000);
-
+    drawMainBorder();
+    MaliUI::drawHeader("Suite BLE");
+    MaliUI::drawIcon(MaliUI::Icon::Ble, tftWidth / 2, tftHeight / 2 - 15, 32);
+    MaliUI::drawFooter("MaliOS / Suite BLE");
     welcomeShown = true;
 }
 
@@ -4929,101 +4917,27 @@ void BleSuiteMenu() {
         "Ataques HID",
         "Corrupcao de memoria",
         "Ataques DoS",
-        "Payload Delivery",
+        MaliText::payload_delivery_512836,
         "Ferramentas de teste",
         "Cadeia universal de ataque",
         "Captura BLE"
     };
 
-    int selected = 0, scrollOffset = 0;
-    int lastSelected = -1, lastScrollOffset = -1;
-    int maxVisible = (tftHeight - 80) / 25;
-
-    while (true) {
-        if (selected != lastSelected || scrollOffset != lastScrollOffset) {
-            tft.fillScreen(bruceConfig.bgColor);
-            TouchFooter();
-            tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_WHITE);
-
-            tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
-            tft.setTextSize(2);
-            tft.setCursor((tftWidth - tft.textWidth("BLE SUITE")) / 2, 15);
-            tft.print("BLE SUITE");
-            tft.setTextSize(1);
-
-            for (int i = 0; i < maxVisible && (scrollOffset + i) < MENU_ITEMS; i++) {
-                int idx = scrollOffset + i;
-                int yPos = 60 + (i * 25);
-
-                if (idx == selected) {
-                    tft.fillRect(20, yPos, tftWidth - 40, 20, TFT_WHITE);
-                    tft.setTextColor(TFT_BLACK, TFT_WHITE);
-                    tft.setCursor(25, yPos + 5);
-                    tft.print("> ");
-                } else {
-                    tft.fillRect(20, yPos, tftWidth - 40, 20, bruceConfig.bgColor);
-                    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
-                    tft.setCursor(25, yPos + 5);
-                    tft.print("  ");
-                }
-                tft.print(String(idx + 1) + ". " + menuItems[idx]);
-            }
-
-            if (MENU_ITEMS > maxVisible) {
-                tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
-                tft.setCursor(tftWidth - 25, 65);
-                if (scrollOffset > 0) tft.print("^");
-                tft.setCursor(tftWidth - 25, 65 + (maxVisible * 25) - 10);
-                if (scrollOffset + maxVisible < MENU_ITEMS) tft.print("v");
-            }
-
-            tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
-            tft.setCursor(20, tftHeight - 30);
-            tft.print("SEL: Selecionar PREV/NEXT: Navegar");
-            tft.setCursor(20, tftHeight - 20);
-            tft.print("ESC: Voltar");
-
-            lastSelected = selected;
-            lastScrollOffset = scrollOffset;
-        }
-
-        if (check(EscPress)) {
-            // Clear data when exiting the menu
-            if (g_pBLEScan) {
-                g_pBLEScan->stop();
-                g_pBLEScan->clearResults();
-                g_bleScanActive = false;
-            }
-            scannerData.clear();
-            g_selectedDevice.address = "";
-            g_selectedDevice.name = "";
-
-            // Deinit BLE stack when exiting the suite
-            BLEStateManager::deinitBLE(true);
-            return;
-        }
-        if (check(PrevPress)) {
-            selected = (selected > 0) ? selected - 1 : MENU_ITEMS - 1;
-            if (selected < scrollOffset) scrollOffset = selected;
-            if (selected >= scrollOffset + maxVisible) scrollOffset = selected - maxVisible + 1;
-            delay(150);
-        }
-        if (check(NextPress)) {
-            selected = (selected < MENU_ITEMS - 1) ? selected + 1 : 0;
-            if (selected < scrollOffset) scrollOffset = selected;
-            if (selected >= scrollOffset + maxVisible) scrollOffset = selected - maxVisible + 1;
-            delay(150);
-        }
-        if (check(SelPress)) {
-            if (selected == MENU_ITEMS - 1) {
-                BLE_Sniffer();
-            } else {
-                executeAttackWithTargetScan(selected);
-            }
-            lastSelected = -1;
-        }
-        delay(50);
+    while (!returnToMenu) {
+        int selected = showSubMenu("Suite BLE", menuItems, MENU_ITEMS);
+        if (selected < 0) break;
+        if (selected == MENU_ITEMS - 1) BLE_Sniffer();
+        else executeAttackWithTargetScan(selected);
     }
+    if (g_pBLEScan) {
+        g_pBLEScan->stop();
+        g_pBLEScan->clearResults();
+        g_bleScanActive = false;
+    }
+    scannerData.clear();
+    g_selectedDevice.address = "";
+    g_selectedDevice.name = "";
+    BLEStateManager::deinitBLE(true);
 }
 
 //=============================================================================
@@ -5040,7 +4954,7 @@ const char *getScanTitle(int attackIndex) {
         case 5: return "DISPOSITIVO HID";
         case 6: return "ALVO PARA TESTE DE MEMORIA";
         case 7: return "ALVO DO DOS";
-        case 8: return "SELECT PAYLOAD TARGET";
+        case 8: return MaliText::select_payload_target_610ef8;
         case 9: return "ALVO PARA TESTE";
         case 10: return "ALVO UNIVERSAL";
         default: return "SELECIONE O ALVO";
@@ -5089,92 +5003,14 @@ void executeAttackWithTargetScan(int attackIndex) {
 //=============================================================================
 
 int showSubMenu(const char *title, const char *options[], int optionCount) {
-    tft.fillScreen(bruceConfig.bgColor);
-    TouchFooter();
-    tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_WHITE);
-
-    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
-    tft.setTextSize(2);
-    tft.setTextWrap(true, true);
-    tft.setCursor((tftWidth - tft.textWidth(title)) / 2, 15);
-    tft.print(title);
-    tft.setTextSize(1);
-
-    int selected = 0, scrollOffset = 0;
-    int lastSelected = -1, lastScrollOffset = -1;
-    int maxVisible = (tftHeight - 80) / 25;
-
-    while (true) {
-        if (selected != lastSelected || scrollOffset != lastScrollOffset) {
-            tft.fillRect(20, 60, tftWidth - 40, tftHeight - 115, bruceConfig.bgColor);
-
-            for (int i = 0; i < maxVisible && (scrollOffset + i) < optionCount; i++) {
-                int idx = scrollOffset + i;
-                int yPos = 60 + (i * 25);
-
-                int availWidth = (tftWidth - 40) - 20;
-
-                String displayText = options[idx];
-
-                if (tft.textWidth(displayText.c_str()) > availWidth) {
-                    String ellipsis = "...";
-                    int ellipsisWidth = tft.textWidth(ellipsis.c_str());
-                    while (displayText.length() > 0 &&
-                           tft.textWidth(displayText.c_str()) + ellipsisWidth > availWidth) {
-                        displayText.remove(displayText.length() - 1);
-                    }
-                    displayText += ellipsis;
-                }
-
-                if (idx == selected) {
-                    tft.fillRect(20, yPos, tftWidth - 40, 20, TFT_WHITE);
-                    tft.setTextColor(TFT_BLACK, TFT_WHITE);
-                    tft.setCursor(25, yPos + 5);
-                    tft.print("> ");
-                } else {
-                    tft.fillRect(20, yPos, tftWidth - 40, 20, bruceConfig.bgColor);
-                    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
-                    tft.setCursor(25, yPos + 5);
-                    tft.print("  ");
-                }
-                tft.print(displayText);
-            }
-
-            if (optionCount > maxVisible) {
-                tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
-                tft.setCursor(tftWidth - 25, 65);
-                if (scrollOffset > 0) tft.print("^");
-                tft.setCursor(tftWidth - 25, 65 + (maxVisible * 25) - 10);
-                if (scrollOffset + maxVisible < optionCount) tft.print("v");
-            }
-
-            tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
-            tft.setCursor(20, tftHeight - 30);
-            tft.print("SEL: Selecionar PREV/NEXT: Navegar");
-            tft.setCursor(20, tftHeight - 20);
-            tft.print("ESC: Voltar");
-
-            lastSelected = selected;
-            lastScrollOffset = scrollOffset;
-        }
-
-        if (check(EscPress)) return -1;
-        if (check(PrevPress)) {
-            selected = (selected > 0) ? selected - 1 : optionCount - 1;
-            if (selected < scrollOffset) scrollOffset = selected;
-            if (selected >= scrollOffset + maxVisible) scrollOffset = selected - maxVisible + 1;
-            delay(150);
-        }
-        if (check(NextPress)) {
-            selected = (selected < optionCount - 1) ? selected + 1 : 0;
-            if (selected < scrollOffset) scrollOffset = selected;
-            if (selected >= scrollOffset + maxVisible) scrollOffset = selected - maxVisible + 1;
-            delay(150);
-        }
-        if (check(SelPress)) return selected;
-
-        delay(50);
-    }
+    if (optionCount <= 0) return -1;
+    std::vector<Option> entries;
+    entries.reserve(optionCount);
+    int chosen = -1;
+    for (int i = 0; i < optionCount; ++i)
+        entries.push_back({options[i], [&, i]() { chosen = i; }});
+    loopOptions(entries, MENU_TYPE_GEAR, title);
+    return chosen;
 }
 
 //=============================================================================
@@ -5267,7 +5103,7 @@ void showFastPairSubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
 
 void showHFPSubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
     const char *options[] = {
-        "Test Vulnerability (CVE)", "Establish HFP Connection", "Full HFP Attack Chain", "HFP → HID Pivot"
+        MaliText::test_vulnerability_cve_95dee5, MaliText::establish_hfp_connection_bc9897, MaliText::full_hfp_attack_chain_90d66c, MaliText::hfp_hid_pivot_210ddb
     };
 
     int choice = showSubMenu("HFP Attacks", options, 4);
@@ -5285,7 +5121,7 @@ void showHFPSubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
 
 void showAudioSubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
     const char *options[] = {
-        "AVRCP Media Control", "Audio Stack Crash", "Telephony Alert Test", "Run All Audio Tests"
+        MaliText::avrcp_media_control_cfaa04, MaliText::audio_stack_crash_cfe173, MaliText::telephony_alert_test_202d38, MaliText::run_all_audio_tests_81037c
     };
 
     int choice = showSubMenu("Audio Attacks", options, 4);
@@ -5296,7 +5132,7 @@ void showAudioSubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
     String connectionMethod = "";
     NimBLEClient *pClient = attemptConnectionWithStrategies(target, connectionMethod);
     if (!pClient) {
-        showAttackResult(false, "Failed to connect");
+        showAttackResult(false, MaliText::failed_to_connect_8a4f7f);
         return;
     }
 
@@ -5324,12 +5160,12 @@ void showAudioSubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
 
 void showHIDSubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
     const char *options[] = {
-        "Test HID Vulnerability",
-        "Force HID Connection",
-        "Basic Keystrokes",
-        "DuckyScript Injection",
-        "OS-Specific Exploits",
-        "Run All HID Attacks"
+        MaliText::test_hid_vulnerability_c40a07,
+        MaliText::force_hid_connection_3c71b8,
+        MaliText::basic_keystrokes_eacf4b,
+        MaliText::duckyscript_injection_7f0377,
+        MaliText::os_specific_exploits_923728,
+        MaliText::run_all_hid_attacks_7e1718
     };
 
     int choice = showSubMenu("HID Attacks", options, 6);
@@ -5364,15 +5200,15 @@ void showHIDSubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
 
 void showMemorySubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
     const char *options[] = {
-        "FastPair Memory Corruption",
-        "FastPair State Confusion",
-        "FastPair Crypto Overflow",
-        "FastPair Handshake Fault",
-        "FastPair Rapid Connection",
-        "Run All FastPair Attacks"
+        MaliText::fastpair_memory_corruption_6baf18,
+        MaliText::fastpair_state_confusion_8ad41c,
+        MaliText::fastpair_crypto_overflow_8e3d97,
+        MaliText::fastpair_handshake_fault_70d939,
+        MaliText::fastpair_rapid_connection_68f81a,
+        MaliText::run_all_fastpair_attacks_d391a8
     };
 
-    int choice = showSubMenu("Memory Corruption", options, 6);
+    int choice = showSubMenu(MaliText::memory_corruption_dfbb48, options, 6);
     if (choice == -1) return;
 
     FastPairExploitEngine fpEngine;
@@ -5392,7 +5228,7 @@ void showMemorySubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
     }
 
     if (!pKbpChar) {
-        showAttackResult(false, "No FastPair service found");
+        showAttackResult(false, MaliText::no_fastpair_service_found_31bca0);
         if (pClient) {
             pClient->disconnect();
             BLEStateManager::unregisterClient(pClient);
@@ -5427,7 +5263,7 @@ void showMemorySubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
 
 void showDoSSubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
     const char *options[] = {
-        "Connection Flood", "Advertising Spam", "Jam & Connect (NRF24)", "Protocol Fuzzer"
+        MaliText::connection_flood_c742e2, MaliText::advertising_spam_e93df4, MaliText::jam_connect_nrf24_19cef6, MaliText::protocol_fuzzer_4dad0e
     };
 
     int choice = showSubMenu("DoS Attacks", options, 4);
@@ -5445,9 +5281,9 @@ void showDoSSubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
 }
 
 void showPayloadSubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
-    const char *options[] = {"DuckyScript Injection", "PIN Brute Force", "Auth Bypass Suite"};
+    const char *options[] = {MaliText::duckyscript_injection_7f0377, MaliText::pin_brute_force_62206d, MaliText::auth_bypass_suite_bf0974};
 
-    int choice = showSubMenu("Payload Delivery", options, 3);
+    int choice = showSubMenu(MaliText::payload_delivery_512836, options, 3);
     if (choice == -1) return;
 
     switch (choice) {
@@ -5463,10 +5299,10 @@ void showPayloadSubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
 
 void showTestingSubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
     const char *options[] = {
-        "Write Access Test", "Audio Control Test", "Protocol Fuzzer", "HID Service Test"
+        MaliText::write_access_test_597b23, MaliText::audio_control_test_6a51fc, MaliText::protocol_fuzzer_4dad0e, MaliText::hid_service_test_f62363
     };
 
-    int choice = showSubMenu("Testing Tools", options, 4);
+    int choice = showSubMenu(MaliText::testing_tools_25cf1a, options, 4);
     if (choice == -1) return;
 
     switch (choice) {
@@ -5484,135 +5320,135 @@ void showTestingSubMenu(NimBLEAddress target, SelectedDevice deviceInfo) {
 void runUniversalAttack(NimBLEAddress target, SelectedDevice deviceInfo) {
     AutoCleanup cleanup([]() { BLEStateManager::deinitBLE(true); });
 
-    if (!confirmAttack("Execute universal attack chain (HFP + HID + FastPair)?")) return;
+    if (!confirmAttack(MaliText::execute_universal_attack_chain_hfp_hid_fastp_a62230)) return;
 
     std::vector<String> lines = {
-        "UNIVERSAL ATTACK CHAIN",
-        "Device: " + deviceInfo.name,
-        "HFP: " + String(deviceInfo.hasHFP ? "YES" : "NO"),
-        "FastPair: " + String(deviceInfo.hasFastPair ? "YES" : "NO")
+        MaliText::universal_attack_chain_3683e3,
+        MaliText::device_906f89 + deviceInfo.name,
+        "HFP: " + String(deviceInfo.hasHFP ? MaliText::yes_8fff03 : MaliText::no_a0509b),
+        "FastPair: " + String(deviceInfo.hasFastPair ? MaliText::yes_8fff03 : MaliText::no_a0509b)
     };
 
     bool hfpSuccess = false, fpSuccess = false, hidSuccess = false;
 
     if (deviceInfo.hasHFP) {
-        showAttackProgress("Phase 1: Testing HFP vulnerability...", TFT_CYAN);
+        showAttackProgress(MaliText::phase_1_testing_hfp_vulnerability_3efb47, TFT_CYAN);
         HFPExploitEngine hfp;
         hfpSuccess = hfp.executeHFPAttackChain(target);
-        lines.push_back("HFP Attack: " + String(hfpSuccess ? "SUCCESS" : "FAILED"));
+        lines.push_back(MaliText::hfp_attack_3efa13 + String(hfpSuccess ? MaliText::success_805c3d : MaliText::failed_8d33f3));
 
         if (hfpSuccess) {
-            showAttackProgress("HFP success! Phase 2: HID injection...", TFT_GREEN);
+            showAttackProgress(MaliText::hfp_success_phase_2_hid_injection_1d8bb2, TFT_GREEN);
             HIDAttackServiceClass hidAttack;
             hidSuccess = hidAttack.injectKeystrokes(target);
-            lines.push_back("HID Injection: " + String(hidSuccess ? "SUCCESS" : "FAILED"));
+            lines.push_back(MaliText::hid_injection_720106 + String(hidSuccess ? MaliText::success_805c3d : MaliText::failed_8d33f3));
         }
     }
 
     if (deviceInfo.hasFastPair && (!hfpSuccess || !hidSuccess)) {
-        showAttackProgress("Phase 3: Testing FastPair vulnerability...", TFT_BLUE);
+        showAttackProgress(MaliText::phase_3_testing_fastpair_vulnerability_d71c9f, TFT_BLUE);
         FastPairExploitEngine fpEngine;
         fpSuccess = fpEngine.testVulnerability(target);
-        lines.push_back("FastPair Attack: " + String(fpSuccess ? "SUCCESS" : "FAILED"));
+        lines.push_back(MaliText::fastpair_attack_db1959 + String(fpSuccess ? MaliText::success_805c3d : MaliText::failed_8d33f3));
     }
 
     lines.push_back("");
-    lines.push_back("Attack chain completed");
+    lines.push_back(MaliText::attack_chain_completed_c6b68b);
     cleanup.disable();
 
     if (hfpSuccess || fpSuccess || hidSuccess) {
-        showDeviceInfoScreen("ATTACK SUCCESS", lines, TFT_GREEN, TFT_BLACK);
+        showDeviceInfoScreen(MaliText::attack_success_f9406b, lines, TFT_GREEN, TFT_BLACK);
     } else {
-        showDeviceInfoScreen("ATTACK FAILED", lines, TFT_RED, TFT_WHITE);
+        showDeviceInfoScreen(MaliText::attack_failed_a04f7d, lines, TFT_RED, TFT_WHITE);
     }
 }
 
 void runQuickTest(NimBLEAddress target, SelectedDevice deviceInfo) {
     AutoCleanup cleanup([]() { BLEStateManager::deinitBLE(true); });
 
-    showAttackProgress("Quick testing (HFP + FastPair)...", TFT_WHITE);
+    showAttackProgress(MaliText::quick_testing_hfp_fastpair_affed8, TFT_WHITE);
 
     std::vector<String> results;
 
     if (deviceInfo.hasHFP) {
         HFPExploitEngine hfp;
         bool hfpVulnerable = hfp.testCVE202536911(target);
-        results.push_back("HFP (CVE-2025-36911): " + String(hfpVulnerable ? "VULNERABLE" : "SAFE"));
+        results.push_back("HFP (CVE-2025-36911): " + String(hfpVulnerable ? MaliText::vulnerable_73a9df : MaliText::safe_04f52a));
     } else {
-        results.push_back("HFP: Not detected");
+        results.push_back(MaliText::hfp_not_detected_686787);
     }
 
     FastPairExploitEngine fpEngine;
     bool fpVulnerable = fpEngine.testVulnerability(target);
-    results.push_back("FastPair: " + String(fpVulnerable ? "VULNERABLE" : "SAFE"));
+    results.push_back("FastPair: " + String(fpVulnerable ? MaliText::vulnerable_73a9df : MaliText::safe_04f52a));
 
     std::vector<String> lines;
-    lines.push_back("QUICK VULNERABILITY TEST");
-    lines.push_back("Target: " + String(target.toString().c_str()));
+    lines.push_back(MaliText::quick_vulnerability_test_e0de84);
+    lines.push_back(MaliText::target_593eec + String(target.toString().c_str()));
     for (auto &result : results) lines.push_back(result);
     lines.push_back("");
-    lines.push_back("Test completed");
+    lines.push_back(MaliText::test_completed_723760);
 
     cleanup.disable();
 
-    if (deviceInfo.hasHFP && results[0].indexOf("VULNERABLE") != -1) {
-        lines.push_back("Try HFP-based attacks first!");
-        showDeviceInfoScreen("VULNERABLE DEVICE", lines, TFT_ORANGE, TFT_BLACK);
+    if (deviceInfo.hasHFP && results[0].indexOf(MaliText::vulnerable_73a9df) != -1) {
+        lines.push_back(MaliText::try_hfp_based_attacks_first_b9b2e2);
+        showDeviceInfoScreen(MaliText::vulnerable_device_580e6d, lines, TFT_ORANGE, TFT_BLACK);
     } else if (fpVulnerable) {
-        showDeviceInfoScreen("VULNERABLE", lines, TFT_RED, TFT_WHITE);
+        showDeviceInfoScreen(MaliText::vulnerable_73a9df, lines, TFT_RED, TFT_WHITE);
     } else {
-        showDeviceInfoScreen("SAFE", lines, TFT_GREEN, TFT_BLACK);
+        showDeviceInfoScreen(MaliText::safe_04f52a, lines, TFT_GREEN, TFT_BLACK);
     }
 }
 
 void runDeviceProfiling(NimBLEAddress target, SelectedDevice deviceInfo) {
     AutoCleanup cleanup([]() { BLEStateManager::deinitBLE(true); });
 
-    if (!confirmAttack("Profile device services?")) return;
-    showAttackProgress("Profiling device...", TFT_WHITE);
+    if (!confirmAttack(MaliText::profile_device_services_d76c58)) return;
+    showAttackProgress(MaliText::profiling_device_f2fbb7, TFT_WHITE);
 
     BLEAttackManager bleManager;
     DeviceProfile profile = bleManager.profileDevice(target);
 
     std::vector<String> lines;
-    lines.push_back("DEVICE PROFILE REPORT");
-    lines.push_back("Address: " + profile.address);
-    lines.push_back("Connected: " + String(profile.connected ? "YES" : "NO"));
+    lines.push_back(MaliText::device_profile_report_d83fd3);
+    lines.push_back(MaliText::address_8fc0fd + profile.address);
+    lines.push_back(MaliText::connected_65003d + String(profile.connected ? MaliText::yes_8fff03 : MaliText::no_a0509b));
 
     if (profile.connected) {
-        lines.push_back("Services found: " + String(profile.services.size()));
-        lines.push_back("FastPair: " + String(profile.hasFastPair ? "YES" : "NO"));
-        lines.push_back("AVRCP: " + String(profile.hasAVRCP ? "YES" : "NO"));
-        lines.push_back("HID: " + String(profile.hasHID ? "YES" : "NO"));
-        lines.push_back("Battery: " + String(profile.hasBattery ? "YES" : "NO"));
-        lines.push_back("Device Info: " + String(profile.hasDeviceInfo ? "YES" : "NO"));
+        lines.push_back(MaliText::services_found_3dea42 + String(profile.services.size()));
+        lines.push_back("FastPair: " + String(profile.hasFastPair ? MaliText::yes_8fff03 : MaliText::no_a0509b));
+        lines.push_back("AVRCP: " + String(profile.hasAVRCP ? MaliText::yes_8fff03 : MaliText::no_a0509b));
+        lines.push_back("HID: " + String(profile.hasHID ? MaliText::yes_8fff03 : MaliText::no_a0509b));
+        lines.push_back(MaliText::battery_76c62d + String(profile.hasBattery ? MaliText::yes_8fff03 : MaliText::no_a0509b));
+        lines.push_back(MaliText::device_info_c49348 + String(profile.hasDeviceInfo ? MaliText::yes_8fff03 : MaliText::no_a0509b));
 
         int writableCount = 0;
         for (auto &ch : profile.characteristics)
             if (ch.canWrite) writableCount++;
-        lines.push_back("Writable chars: " + String(writableCount));
+        lines.push_back(MaliText::writable_chars_9b107a + String(writableCount));
     } else {
-        lines.push_back("Failed to connect for profiling");
+        lines.push_back(MaliText::failed_to_connect_for_profiling_436371);
     }
 
     cleanup.disable();
-    showDeviceInfoScreen("DEVICE PROFILE", lines, TFT_BLUE, TFT_WHITE);
+    showDeviceInfoScreen(MaliText::device_profile_0c22e0, lines, TFT_BLUE, TFT_WHITE);
 }
 
 void runWriteAccessTest(NimBLEAddress target) {
     AutoCleanup cleanup([]() { BLEStateManager::deinitBLE(true); });
 
-    if (!confirmAttack("Test write access on all characteristics?")) return;
+    if (!confirmAttack(MaliText::test_write_access_on_all_characteristics_e5eb0b)) return;
 
     String connectionMethod = "";
     NimBLEClient *pClient = attemptConnectionWithStrategies(target, connectionMethod);
     if (!pClient) {
-        showAttackResult(false, "Failed to connect");
+        showAttackResult(false, MaliText::failed_to_connect_8a4f7f);
         return;
     }
 
     BLEStateManager::registerClient(pClient);
-    showAttackProgress("Connected! Testing write access...", TFT_GREEN);
+    showAttackProgress(MaliText::connected_testing_write_access_6970f5, TFT_GREEN);
 
     std::vector<String> writeableChars;
     const std::vector<NimBLERemoteService *> &services = pClient->getServices(true);
@@ -5634,39 +5470,39 @@ void runWriteAccessTest(NimBLEAddress target) {
 
     if (!writeableChars.empty()) {
         std::vector<String> lines;
-        lines.push_back("WRITABLE CHARACTERISTICS:");
-        lines.push_back("Connection: " + connectionMethod);
-        lines.push_back("Found: " + String(writeableChars.size()));
+        lines.push_back(MaliText::writable_characteristics_500038);
+        lines.push_back(MaliText::connection_db6db2 + connectionMethod);
+        lines.push_back(MaliText::found_cf32b4 + String(writeableChars.size()));
 
         for (int i = 0; i < std::min(5, (int)writeableChars.size()); i++) lines.push_back(writeableChars[i]);
 
         if (writeableChars.size() > 5)
-            lines.push_back("... and " + String(writeableChars.size() - 5) + " more");
+            lines.push_back(MaliText::and_e15ced + String(writeableChars.size() - 5) + MaliText::more_84b30f);
 
-        showDeviceInfoScreen("WRITE ACCESS TEST", lines, TFT_BLUE, TFT_WHITE);
+        showDeviceInfoScreen(MaliText::write_access_test_efd2e9, lines, TFT_BLUE, TFT_WHITE);
     } else {
-        showAttackResult(false, "No writable characteristics found");
+        showAttackResult(false, MaliText::no_writable_characteristics_found_cae5f4);
     }
 }
 
 void runProtocolFuzzer(NimBLEAddress target) {
     AutoCleanup cleanup([]() { BLEStateManager::deinitBLE(true); });
 
-    if (!confirmAttack("Fuzz BLE protocol with random data?")) return;
+    if (!confirmAttack(MaliText::fuzz_ble_protocol_with_random_data_e05cea)) return;
 
     String connectionMethod = "";
     NimBLEClient *pClient = attemptConnectionWithStrategies(target, connectionMethod);
     if (!pClient) {
-        showAttackResult(false, "Failed to connect");
+        showAttackResult(false, MaliText::failed_to_connect_8a4f7f);
         return;
     }
 
     BLEStateManager::registerClient(pClient);
-    showAttackProgress("Connected! Fuzzing protocol...", TFT_GREEN);
+    showAttackProgress(MaliText::connected_fuzzing_protocol_5f9756, TFT_GREEN);
 
     NimBLERemoteService *pService = pClient->getService(NimBLEUUID((uint16_t)0xFE2C));
     if (!pService) {
-        showAttackResult(false, "No FastPair service found");
+        showAttackResult(false, MaliText::no_fastpair_service_found_31bca0);
         pClient->disconnect();
         BLEStateManager::unregisterClient(pClient);
         NimBLEDevice::deleteClient(pClient);
@@ -5683,7 +5519,7 @@ void runProtocolFuzzer(NimBLEAddress target) {
     }
 
     if (!pChar) {
-        showAttackResult(false, "No writable characteristic");
+        showAttackResult(false, MaliText::no_writable_characteristic_23587f);
         pClient->disconnect();
         BLEStateManager::unregisterClient(pClient);
         NimBLEDevice::deleteClient(pClient);
@@ -5714,24 +5550,24 @@ void runProtocolFuzzer(NimBLEAddress target) {
     NimBLEDevice::deleteClient(pClient);
     cleanup.disable();
 
-    if (anySent) showAttackResult(true, "Fuzzing completed!");
-    else showAttackResult(false, "Fuzzing failed");
+    if (anySent) showAttackResult(true, MaliText::fuzzing_completed_5fc819);
+    else showAttackResult(false, MaliText::fuzzing_failed_1c5b22);
 }
 
 void runHIDTest(NimBLEAddress target) {
     AutoCleanup cleanup([]() { BLEStateManager::deinitBLE(true); });
 
-    if (!confirmAttack("Test HID (Keyboard/Mouse) capabilities?")) return;
+    if (!confirmAttack(MaliText::test_hid_keyboard_mouse_capabilities_fa630d)) return;
 
     String connectionMethod = "";
     NimBLEClient *pClient = attemptConnectionWithStrategies(target, connectionMethod);
     if (!pClient) {
-        showAttackResult(false, "Failed to connect");
+        showAttackResult(false, MaliText::failed_to_connect_8a4f7f);
         return;
     }
 
     BLEStateManager::registerClient(pClient);
-    showAttackProgress("Connected! Testing HID services...", TFT_GREEN);
+    showAttackProgress(MaliText::connected_testing_hid_services_07c907, TFT_GREEN);
 
     std::vector<String> hidServices;
     const std::vector<NimBLERemoteService *> &services = pClient->getServices(true);
@@ -5740,7 +5576,7 @@ void runHIDTest(NimBLEAddress target) {
 
         if (uuidStr.indexOf("1812") != -1 || uuidStr.indexOf("1813") != -1 || uuidStr.indexOf("1814") != -1 ||
             uuidStr.indexOf("2a4a") != -1 || uuidStr.indexOf("2a4b") != -1 || uuidStr.indexOf("2a4d") != -1) {
-            hidServices.push_back(uuidStr + " - HID Service");
+            hidServices.push_back(uuidStr + MaliText::hid_service_9c0f2e);
         }
 
         const std::vector<NimBLERemoteCharacteristic *> &chars = service->getCharacteristics(true);
@@ -5760,13 +5596,13 @@ void runHIDTest(NimBLEAddress target) {
 
     if (!hidServices.empty()) {
         std::vector<String> lines;
-        lines.push_back("HID SERVICES FOUND:");
-        lines.push_back("Connection: " + connectionMethod);
+        lines.push_back(MaliText::hid_services_found_75e74e);
+        lines.push_back(MaliText::connection_db6db2 + connectionMethod);
         for (int i = 0; i < std::min(6, (int)hidServices.size()); i++) lines.push_back(hidServices[i]);
-        if (hidServices.size() > 6) lines.push_back("... and " + String(hidServices.size() - 6) + " more");
-        showDeviceInfoScreen("HID TEST RESULTS", lines, TFT_DARKGREEN, TFT_WHITE);
+        if (hidServices.size() > 6) lines.push_back(MaliText::and_e15ced + String(hidServices.size() - 6) + MaliText::more_84b30f);
+        showDeviceInfoScreen(MaliText::hid_test_results_8b3f51, lines, TFT_DARKGREEN, TFT_WHITE);
     } else {
-        showAttackResult(false, "No HID services found");
+        showAttackResult(false, MaliText::no_hid_services_found_82fdf3);
     }
 }
 
@@ -5775,7 +5611,7 @@ void runAudioControlTest(NimBLEAddress target) {
 
     const int AUDIO_TESTS = 4;
     const char *audioTestNames[] = {
-        "Test AVRCP Service", "Test Media Control", "Test Telephony", "Test All Audio"
+        MaliText::test_avrcp_service_6a4058, MaliText::test_media_control_937d1c, MaliText::test_telephony_0708e6, MaliText::test_all_audio_02a8e7
     };
 
     int selectedTest = 0;
@@ -5786,15 +5622,15 @@ void runAudioControlTest(NimBLEAddress target) {
         if (selectedTest != lastSelected) {
             tft.fillScreen(bruceConfig.bgColor);
             TouchFooter();
-            tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_WHITE);
+            MaliUI::drawRoundedBox(5, 5, tftWidth - 10, tftHeight - 10, MaliUI::BORDER);
 
-            tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
             tft.setTextSize(2);
-            tft.setCursor((tftWidth - tft.textWidth("AUDIO CONTROL TEST")) / 2, 15);
-            tft.print("AUDIO CONTROL TEST");
+            tft.setCursor((tftWidth - tft.textWidth(MaliText::audio_control_test_f99a16)) / 2, 15);
+            tft.print(MaliText::audio_control_test_f99a16);
             tft.setTextSize(1);
 
-            tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
             tft.setCursor(20, 60);
             tft.println("Selecione o teste de audio:");
 
@@ -5809,20 +5645,20 @@ void runAudioControlTest(NimBLEAddress target) {
                 if (displayName.length() > 28) displayName = displayName.substring(0, 25) + "...";
 
                 if (i == selectedTest) {
-                    tft.fillRoundRect(30, yPos, tftWidth - 60, testHeight - 5, 5, TFT_WHITE);
-                    tft.setTextColor(TFT_BLACK, TFT_WHITE);
+                    MaliUI::drawRoundedFill(30, yPos, tftWidth - 60, testHeight - 5, MaliUI::SURFACE_ALT);
+                    tft.setTextColor(MaliUI::TEXT_PRIMARY, MaliUI::SURFACE_ALT);
                     tft.setCursor(40, yPos + 10);
                     tft.print("> ");
                 } else {
                     tft.fillRoundRect(30, yPos, tftWidth - 60, testHeight - 5, 5, TFT_DARKGREY);
-                    tft.setTextColor(TFT_WHITE, TFT_DARKGREY);
+                    tft.setTextColor(MaliUI::TEXT_PRIMARY, MaliUI::TEXT_SECONDARY);
                     tft.setCursor(40, yPos + 10);
                     tft.print("  ");
                 }
                 tft.print(displayName);
             }
 
-            tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
             tft.setCursor(20, tftHeight - 30);
             tft.print("SEL: Selecionar PREV/NEXT: Navegar");
             tft.setCursor(20, tftHeight - 20);
@@ -5854,7 +5690,7 @@ void executeAudioTest(int testIndex, NimBLEAddress target) {
     String connectionMethod = "";
     NimBLEClient *pClient = attemptConnectionWithStrategies(target, connectionMethod);
     if (!pClient) {
-        showAttackResult(false, "Failed to connect");
+        showAttackResult(false, MaliText::failed_to_connect_8a4f7f);
         return;
     }
 
@@ -5863,39 +5699,39 @@ void executeAudioTest(int testIndex, NimBLEAddress target) {
     AudioAttackService audioAttack;
     switch (testIndex) {
         case 0:
-            showAttackProgress("Testing AVRCP service...", TFT_WHITE);
+            showAttackProgress(MaliText::testing_avrcp_service_502ab8, TFT_WHITE);
             if (pClient->discoverAttributes()) {
                 NimBLERemoteService *pService = pClient->getService(NimBLEUUID((uint16_t)0x110E));
                 if (pService) {
                     audioAttack.attackAVRCP(pService);
-                    showAttackResult(true, "AVRCP test completed");
-                } else showAttackResult(false, "No AVRCP service found");
+                    showAttackResult(true, MaliText::avrcp_test_completed_29f5d5);
+                } else showAttackResult(false, MaliText::no_avrcp_service_found_172564);
             }
             break;
         case 1:
-            showAttackProgress("Testing Media Control...", TFT_WHITE);
+            showAttackProgress(MaliText::testing_media_control_00563c, TFT_WHITE);
             if (pClient->discoverAttributes()) {
                 NimBLERemoteService *pService = pClient->getService(NimBLEUUID((uint16_t)0x1843));
                 if (pService) {
                     audioAttack.attackAudioMedia(pService);
-                    showAttackResult(true, "Media control test completed");
-                } else showAttackResult(false, "No Media service found");
+                    showAttackResult(true, MaliText::media_control_test_completed_e729a5);
+                } else showAttackResult(false, MaliText::no_media_service_found_5bd95d);
             }
             break;
         case 2:
-            showAttackProgress("Testing Telephony...", TFT_WHITE);
+            showAttackProgress(MaliText::testing_telephony_692bd8, TFT_WHITE);
             if (pClient->discoverAttributes()) {
                 NimBLERemoteService *pService = pClient->getService(NimBLEUUID((uint16_t)0x1124));
                 if (pService) {
                     audioAttack.attackTelephony(pService);
-                    showAttackResult(true, "Telephony test completed");
-                } else showAttackResult(false, "No Telephony service found");
+                    showAttackResult(true, MaliText::telephony_test_completed_d45fbb);
+                } else showAttackResult(false, MaliText::no_telephony_service_found_c0ad64);
             }
             break;
         case 3:
-            showAttackProgress("Testing all audio services...", TFT_WHITE);
+            showAttackProgress(MaliText::testing_all_audio_services_2e4989, TFT_WHITE);
             audioAttack.executeAudioAttack(target);
-            showAttackResult(true, "Complete audio test done");
+            showAttackResult(true, MaliText::complete_audio_test_done_3b9681);
             break;
     }
     pClient->disconnect();
@@ -5907,22 +5743,22 @@ void executeAudioTest(int testIndex, NimBLEAddress target) {
 void runHFPHIDPivotAttack(NimBLEAddress target) {
     AutoCleanup cleanup([]() { BLEStateManager::deinitBLE(true); });
 
-    if (!confirmAttack("Execute HFP → HID pivot attack?")) return;
+    if (!confirmAttack(MaliText::execute_hfp_hid_pivot_attack_260868)) return;
 
     HFPExploitEngine hfp;
-    showAttackProgress("Testing HFP vulnerability...", TFT_WHITE);
+    showAttackProgress(MaliText::testing_hfp_vulnerability_bdbd1f, TFT_WHITE);
 
     if (hfp.testCVE202536911(target)) {
-        showAttackProgress("Device vulnerable! Attempting HFP connection...", TFT_GREEN);
+        showAttackProgress(MaliText::device_vulnerable_attempting_hfp_connection_bdff02, TFT_GREEN);
 
         if (hfp.establishHFPConnection(target)) {
-            showAttackProgress("HFP connected! Pivoting to HID...", TFT_CYAN);
+            showAttackProgress(MaliText::hfp_connected_pivoting_to_hid_b56d2d, TFT_CYAN);
 
             HIDAttackServiceClass hidAttack;
             bool hidSuccess = hidAttack.injectKeystrokes(target);
 
             if (hidSuccess) {
-                showAttackProgress("HID access confirmed! Running DuckyScript...", TFT_BLUE);
+                showAttackProgress(MaliText::hid_access_confirmed_running_duckyscript_172771, TFT_BLUE);
                 HIDDuckyService ducky;
                 String defaultScript = "GUI r\nDELAY 500\nSTRING cmd\nDELAY 300\nENTER";
                 bool scriptSuccess = ducky.injectDuckyScript(target, defaultScript);
@@ -5930,18 +5766,18 @@ void runHFPHIDPivotAttack(NimBLEAddress target) {
                 cleanup.disable();
 
                 if (scriptSuccess) showAttackResult(true, "HFP → HID → DuckyScript chain successful!");
-                else showAttackResult(true, "HFP → HID pivot worked but script failed");
+                else showAttackResult(true, MaliText::hfp_hid_pivot_worked_but_script_failed_a19754);
             } else {
                 cleanup.disable();
-                showAttackResult(false, "HFP worked but HID pivot failed");
+                showAttackResult(false, MaliText::hfp_worked_but_hid_pivot_failed_5ffe45);
             }
         } else {
             cleanup.disable();
-            showAttackResult(false, "HFP test passed but connection failed");
+            showAttackResult(false, MaliText::hfp_test_passed_but_connection_failed_f2fb48);
         }
     } else {
         cleanup.disable();
-        showAttackResult(false, "Device not vulnerable to CVE-2025-36911");
+        showAttackResult(false, MaliText::device_not_vulnerable_to_cve_2025_36911_d0b5b0);
     }
 }
 
@@ -5950,153 +5786,28 @@ void runHFPHIDPivotAttack(NimBLEAddress target) {
 //=============================================================================
 
 void showAttackProgress(const char *message, uint16_t color) {
-    tft.fillScreen(bruceConfig.bgColor);
-    TouchFooter();
-    tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_WHITE);
-
-    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
-    tft.setTextSize(2);
-    tft.setCursor((tftWidth - tft.textWidth("BLE SUITE")) / 2, 15);
-    tft.print("BLE SUITE");
-    tft.setTextSize(1);
-
-    tft.setTextColor(color, bruceConfig.bgColor);
-
-    String msg = message;
-    int maxWidth = tftWidth - 40;
-    int lineHeight = 20;
-    int yPos = 80;
-    int start = 0;
-    int len = msg.length();
-
-    while (start < len) {
-        int end = start;
-        int lastSpace = -1;
-
-        while (end < len && (end - start) * 6 < maxWidth) {
-            if (msg.charAt(end) == ' ') lastSpace = end;
-            end++;
-        }
-
-        if (end == len || lastSpace == -1) {
-            tft.setCursor(20, yPos);
-            tft.print(msg.substring(start, end));
-            start = end;
-        } else {
-            tft.setCursor(20, yPos);
-            tft.print(msg.substring(start, lastSpace));
-            start = lastSpace + 1;
-        }
-        yPos += lineHeight;
-        if (yPos > tftHeight - 60) break;
-    }
-
-    static uint8_t spinnerPos = 0;
-    const char *spinner = "|/-\\";
-    tft.setCursor(tftWidth - 40, 80);
-    tft.print(spinner[spinnerPos % 4]);
-    spinnerPos++;
-
-    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
-    tft.setCursor(20, tftHeight - 30);
-    tft.print("Aguarde...");
+    drawMainBorder();
+    MaliUI::drawHeader("Suite BLE");
+    const uint16_t tone = color == TFT_RED ? MaliUI::ERROR : color == TFT_GREEN ? MaliUI::SUCCESS : MaliUI::ACCENT;
+    MaliUI::drawDialog(message, tone);
+    MaliUI::drawFooter("Aguarde...");
 }
 
 void showAttackResult(bool success, const char *message) {
-    if (success) {
-        tft.fillScreen(TFT_GREEN);
-        TouchFooter();
-        tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_BLACK);
-        tft.setTextColor(TFT_WHITE, TFT_GREEN);
-        tft.setTextSize(2);
-        tft.setCursor((tftWidth - tft.textWidth("SUCCESS")) / 2, 15);
-        tft.print("SUCESSO");
-        tft.setTextSize(1);
-        tft.setTextColor(TFT_BLACK, TFT_GREEN);
-    } else {
-        tft.fillScreen(TFT_RED);
-        TouchFooter();
-        tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_BLACK);
-        tft.setTextColor(TFT_WHITE, TFT_RED);
-        tft.setTextSize(2);
-        tft.setCursor((tftWidth - tft.textWidth("FAILED")) / 2, 15);
-        tft.print("FALHOU");
-        tft.setTextSize(1);
-        tft.setTextColor(TFT_WHITE, TFT_RED);
-    }
-
-    tft.setTextColor(success ? TFT_BLACK : TFT_WHITE, success ? TFT_GREEN : TFT_RED);
-
-    if (message) {
-        String msg = message;
-        int maxWidth = tftWidth - 40;
-        int lineHeight = 20;
-        int yPos = 80;
-        int start = 0;
-        int len = msg.length();
-
-        while (start < len) {
-            int end = start;
-            int lastSpace = -1;
-
-            while (end < len && (end - start) * 6 < maxWidth) {
-                if (msg.charAt(end) == ' ') lastSpace = end;
-                end++;
-            }
-
-            if (end == len || lastSpace == -1) {
-                tft.setCursor(20, yPos);
-                tft.print(msg.substring(start, end));
-                start = end;
-            } else {
-                tft.setCursor(20, yPos);
-                tft.print(msg.substring(start, lastSpace));
-                start = lastSpace + 1;
-            }
-            yPos += lineHeight;
-            if (yPos > tftHeight - 100) break;
-        }
-    } else {
-        tft.setCursor(20, 80);
-        tft.print(success ? "Ataque concluido!" : "Ataque falhou");
-    }
-
-    tft.setTextColor(TFT_WHITE, success ? TFT_GREEN : TFT_RED);
-    tft.setCursor(20, tftHeight - 35);
-    tft.print("SEL: Continuar ESC: Voltar");
-
+    drawMainBorder();
+    MaliUI::drawHeader(success ? "SUCESSO" : "FALHOU");
+    MaliUI::drawDialog(message ? message : (success ? "Ataque concluido!" : "Ataque falhou"),
+                       success ? MaliUI::SUCCESS : MaliUI::ERROR);
+    MaliUI::drawFooter("SEL: continuar ESC: voltar");
     while (!check(SelPress) && !check(EscPress)) delay(50);
     delay(200);
 }
 
 bool confirmAttack(const char *targetName) {
-    tft.fillScreen(bruceConfig.bgColor);
-    TouchFooter();
-    tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_WHITE);
-
-    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
-    tft.setTextSize(2);
-    tft.setCursor((tftWidth - tft.textWidth("CONFIRMAR ATAQUE")) / 2, 15);
-    tft.print("CONFIRMAR ATAQUE");
-    tft.setTextSize(1);
-
-    tft.setCursor(20, 60);
-    tft.print("Alvo: ");
-
-    String targetStr = targetName;
-    if (targetStr.length() > 30) {
-        tft.println(targetStr.substring(0, 27) + "...");
-    } else {
-        tft.println(targetStr);
-    }
-
-    tft.setCursor(20, 90);
-    tft.println("FastPair buffer overflow exploit");
-
-    tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
-    tft.setCursor(20, tftHeight - 30);
-    tft.print("SEL: Sim NEXT: Nao ESC: Cancelar");
-
+    drawMainBorder();
+    MaliUI::drawHeader("Confirmar ataque");
+    MaliUI::drawDialog(String("Alvo: ") + targetName + "\nFastPair: estouro de buffer", MaliUI::WARNING);
+    MaliUI::drawFooter("SEL: sim PROX: nao ESC: sair");
     while (true) {
         if (check(EscPress)) return false;
         if (check(SelPress)) return true;
@@ -6108,9 +5819,9 @@ bool confirmAttack(const char *targetName) {
 bool requireSimpleConfirmation(const char *message) {
     tft.fillScreen(bruceConfig.bgColor);
     TouchFooter();
-    tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_WHITE);
+    MaliUI::drawRoundedBox(5, 5, tftWidth - 10, tftHeight - 10, MaliUI::BORDER);
 
-    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
     tft.setTextSize(2);
     tft.setCursor((tftWidth - tft.textWidth("CONFIRMAR")) / 2, 15);
     tft.print("CONFIRMAR");
@@ -6148,7 +5859,7 @@ bool requireSimpleConfirmation(const char *message) {
         if (yPos > 130) break;
     }
 
-    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
     tft.setCursor(20, tftHeight - 35);
     tft.print("SEL: OK ESC: Cancelar");
 
@@ -6174,8 +5885,8 @@ int8_t showAdaptiveMessage(
 
     tft.fillScreen(bruceConfig.bgColor);
     TouchFooter();
-    tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_WHITE);
-    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+    MaliUI::drawRoundedBox(5, 5, tftWidth - 10, tftHeight - 10, MaliUI::BORDER);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
     tft.setTextSize(2);
     tft.setCursor((tftWidth - tft.textWidth("MENSAGEM")) / 2, 15);
     tft.print("MENSAGEM");
@@ -6212,7 +5923,7 @@ int8_t showAdaptiveMessage(
         if (yPos > 140) break;
     }
 
-    tft.setTextColor(TFT_BLACK, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
     tft.setCursor(20, tftHeight - 35);
 
     if (buttonCount == 0) {
@@ -6266,49 +5977,10 @@ int8_t showAdaptiveMessage(
 }
 
 void showWarningMessage(const char *message) {
-    tft.fillScreen(TFT_YELLOW);
-    TouchFooter();
-    tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_BLACK);
-    tft.setTextColor(TFT_BLACK, TFT_YELLOW);
-    tft.setTextSize(2);
-    tft.setCursor((tftWidth - tft.textWidth("AVISO")) / 2, 15);
-    tft.print("AVISO");
-    tft.setTextSize(1);
-    tft.setTextColor(TFT_BLACK, TFT_YELLOW);
-    tft.fillRect(20, 60, tftWidth - 40, 100, TFT_YELLOW);
-
-    String msgStr = message;
-    int maxWidth = tftWidth - 40;
-    int lineHeight = 20;
-    int yPos = 70;
-    int start = 0;
-    int len = msgStr.length();
-
-    while (start < len) {
-        int end = start;
-        int lastSpace = -1;
-
-        while (end < len && (end - start) * 6 < maxWidth) {
-            if (msgStr.charAt(end) == ' ') lastSpace = end;
-            end++;
-        }
-
-        if (end == len || lastSpace == -1) {
-            tft.setCursor(20, yPos);
-            tft.print(msgStr.substring(start, end));
-            start = end;
-        } else {
-            tft.setCursor(20, yPos);
-            tft.print(msgStr.substring(start, lastSpace));
-            start = lastSpace + 1;
-        }
-        yPos += lineHeight;
-        if (yPos > 160) break;
-    }
-
-    tft.setTextColor(TFT_BLACK, TFT_YELLOW);
-    tft.setCursor(20, tftHeight - 35);
-    tft.print("Pressione uma tecla...");
+    drawMainBorder();
+    MaliUI::drawHeader("AVISO");
+    MaliUI::drawDialog(message, MaliUI::WARNING);
+    MaliUI::drawFooter("Pressione uma tecla...");
 
     while (true) {
         if (check(EscPress) || check(SelPress) || check(PrevPress) || check(NextPress)) {
@@ -6320,48 +5992,10 @@ void showWarningMessage(const char *message) {
 }
 
 void showErrorMessage(const char *message) {
-    tft.fillScreen(TFT_RED);
-    TouchFooter();
-    tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_BLACK);
-    tft.setTextColor(TFT_WHITE, TFT_RED);
-    tft.setTextSize(2);
-    tft.setCursor((tftWidth - tft.textWidth("ERRO")) / 2, 15);
-    tft.print("ERRO");
-    tft.setTextSize(1);
-    tft.setTextColor(TFT_WHITE, TFT_RED);
-    tft.fillRect(20, 60, tftWidth - 40, 100, TFT_RED);
-
-    String msgStr = message;
-    int maxWidth = tftWidth - 40;
-    int lineHeight = 20;
-    int yPos = 70;
-    int start = 0;
-    int len = msgStr.length();
-
-    while (start < len) {
-        int end = start;
-        int lastSpace = -1;
-
-        while (end < len && (end - start) * 6 < maxWidth) {
-            if (msgStr.charAt(end) == ' ') lastSpace = end;
-            end++;
-        }
-
-        if (end == len || lastSpace == -1) {
-            tft.setCursor(20, yPos);
-            tft.print(msgStr.substring(start, end));
-            start = end;
-        } else {
-            tft.setCursor(20, yPos);
-            tft.print(msgStr.substring(start, lastSpace));
-            start = lastSpace + 1;
-        }
-        yPos += lineHeight;
-        if (yPos > 160) break;
-    }
-
-    tft.setCursor(20, tftHeight - 35);
-    tft.print("Pressione uma tecla...");
+    drawMainBorder();
+    MaliUI::drawHeader("ERRO");
+    MaliUI::drawDialog(message, MaliUI::ERROR);
+    MaliUI::drawFooter("Pressione uma tecla...");
 
     while (true) {
         if (check(EscPress) || check(SelPress) || check(PrevPress) || check(NextPress)) {
@@ -6373,48 +6007,10 @@ void showErrorMessage(const char *message) {
 }
 
 void showSuccessMessage(const char *message) {
-    tft.fillScreen(TFT_GREEN);
-    TouchFooter();
-    tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_BLACK);
-    tft.setTextColor(TFT_WHITE, TFT_GREEN);
-    tft.setTextSize(2);
-    tft.setCursor((tftWidth - tft.textWidth("SUCESSO")) / 2, 15);
-    tft.print("SUCESSO");
-    tft.setTextSize(1);
-    tft.setTextColor(TFT_BLACK, TFT_GREEN);
-    tft.fillRect(20, 60, tftWidth - 40, 100, TFT_GREEN);
-
-    String msgStr = message;
-    int maxWidth = tftWidth - 40;
-    int lineHeight = 20;
-    int yPos = 70;
-    int start = 0;
-    int len = msgStr.length();
-
-    while (start < len) {
-        int end = start;
-        int lastSpace = -1;
-
-        while (end < len && (end - start) * 6 < maxWidth) {
-            if (msgStr.charAt(end) == ' ') lastSpace = end;
-            end++;
-        }
-
-        if (end == len || lastSpace == -1) {
-            tft.setCursor(20, yPos);
-            tft.print(msgStr.substring(start, end));
-            start = end;
-        } else {
-            tft.setCursor(20, yPos);
-            tft.print(msgStr.substring(start, lastSpace));
-            start = lastSpace + 1;
-        }
-        yPos += lineHeight;
-        if (yPos > 160) break;
-    }
-
-    tft.setCursor(20, tftHeight - 35);
-    tft.print("Pressione uma tecla...");
+    drawMainBorder();
+    MaliUI::drawHeader("SUCESSO");
+    MaliUI::drawDialog(message, MaliUI::SUCCESS);
+    MaliUI::drawFooter("Pressione uma tecla...");
 
     while (true) {
         if (check(EscPress) || check(SelPress) || check(PrevPress) || check(NextPress)) {
@@ -6428,64 +6024,10 @@ void showSuccessMessage(const char *message) {
 void showDeviceInfoScreen(
     const char *title, const std::vector<String> &lines, uint16_t bgColor, uint16_t textColor
 ) {
-    tft.fillScreen(bgColor);
-    TouchFooter();
-    tft.drawRect(5, 5, tftWidth - 10, tftHeight - 10, TFT_WHITE);
-
-    tft.setTextColor(TFT_WHITE, bgColor);
-    tft.setTextSize(2);
-    tft.setCursor((tftWidth - tft.textWidth(title)) / 2, 15);
-    tft.print(title);
-    tft.setTextSize(1);
-
-    tft.setTextColor(textColor, bgColor);
-    int yPos = 60;
-    int lineHeight = 20;
-    int maxLines = 8;
-
-    for (int i = 0; i < std::min((int)lines.size(), maxLines); i++) {
-        if (yPos + lineHeight > tftHeight - 45) break;
-
-        String displayLine = lines[i];
-        int maxWidth = tftWidth - 40;
-        int lineY = yPos;
-        int start = 0;
-        int len = displayLine.length();
-
-        while (start < len) {
-            int end = start;
-            int lastSpace = -1;
-
-            while (end < len && (end - start) * 6 < maxWidth) {
-                if (displayLine.charAt(end) == ' ') lastSpace = end;
-                end++;
-            }
-
-            if (end == len || lastSpace == -1) {
-                tft.setCursor(20, lineY);
-                tft.print(displayLine.substring(start, end));
-                start = end;
-            } else {
-                tft.setCursor(20, lineY);
-                tft.print(displayLine.substring(start, lastSpace));
-                start = lastSpace + 1;
-            }
-            lineY += lineHeight;
-            if (lineY > tftHeight - 45) break;
-        }
-        yPos = lineY;
-    }
-
-    tft.setTextColor(TFT_BLACK, bgColor);
-    tft.setCursor(20, tftHeight - 35);
-    tft.print("Pressione uma tecla...");
-
-    while (true) {
-        if (check(EscPress) || check(SelPress) || check(PrevPress) || check(NextPress)) {
-            delay(200);
-            return;
-        }
-        delay(50);
-    }
+    (void)bgColor;
+    (void)textColor;
+    ScrollableTextArea area(title);
+    for (const String &line : lines) area.addLine(line);
+    area.show();
 }
 #endif

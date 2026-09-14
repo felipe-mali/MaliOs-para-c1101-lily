@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #if !defined(LITE_VERSION)
 #include "file_sharing.h"
 #include "core/display.h"
@@ -123,7 +124,7 @@ File FileSharing::selectFile() {
     setupSdCard();
     if (sdcardMounted) {
         options = {
-            {"SD Card",  [&]() { fs = &SD; }      },
+            {MaliText::sd_card_14cdf0,  [&]() { fs = &SD; }      },
             {"LittleFS", [&]() { fs = &LittleFS; }},
         };
         loopOptions(options);

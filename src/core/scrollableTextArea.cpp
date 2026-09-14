@@ -1,3 +1,4 @@
+#include "core/ui/MaliUI.h"
 #include "scrollableTextArea.h"
 #define _scrollBuffer tft
 ScrollableTextArea::ScrollableTextArea(const String &title)
@@ -30,7 +31,7 @@ ScrollableTextArea::~ScrollableTextArea() {
 }
 
 void ScrollableTextArea::setup() {
-    _scrollBuffer.setTextColor(bruceConfig.priColor);
+    _scrollBuffer.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
     _scrollBuffer.setTextSize(_fontSize);
     _scrollBuffer.fillRect(_startX, _startY, _width, _height, bruceConfig.bgColor);
 
@@ -183,7 +184,7 @@ void ScrollableTextArea::draw(bool force) {
     if (!_redraw && !force) return;
 
     _scrollBuffer.fillRect(_startX, _startY, _width, _height, bruceConfig.bgColor);
-    _scrollBuffer.setTextColor(bruceConfig.priColor);
+    _scrollBuffer.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
     uint8_t _fSize = tft.getTextSize();
     tft.setTextSize(FP);
 

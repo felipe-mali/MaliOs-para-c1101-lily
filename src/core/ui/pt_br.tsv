@@ -1,0 +1,590 @@
+# Fonte central de textos da interface. Chaves inglesas nao sao protocolos.
+(-55) More Accurate	(-55) Mais preciso
+(-65) Default	(-65) Padrao
+(-80) Less Accurate	(-80) Menos preciso
+ Tuning: 	 Sintonia: 
+ clicks	 cliques
+ connectable	 conectavel
+<< PREV | SEL | NEXT >>	<< ANT | SEL | PROX >>
+ABOUT	SOBRE
+ACTIVE 	ATIVO 
+AUDIO CONTROL TEST	TESTE DE AUDIO
+AUTO CLICKER v1.1	CLIQUES AUTOMATICOS v1.1
+All codes sent!	Todos os codigos enviados!
+Append number	Adicionar numero
+BACK	VOLTAR
+BACK TO EDIT	VOLTAR A EDICAO
+BACK menu	VOLTAR: menu
+BACK: WebUI options	VOLTAR: opcoes WebUI
+BLE Keyboard:	Teclado BLE:
+Back	Voltar
+Blue	Azul
+Btn name:	Nome do botao:
+CALIBRATION	CALIBRACAO
+CANCEL	CANCELAR
+CC1101 center MHz	Centro CC1101 MHz
+Choose cmd	Escolher comando
+Choose digit	Escolher unidade
+Choose frequency	Escolher frequencia
+Choose tens	Escolher dezena
+Clear Log	Limpar registro
+Clicks:	Cliques:
+Clicks: 	Cliques: 
+CONFIGURE / RUN	CONFIGURAR / INICIAR
+COUNTER / CONFIGURE	COUNTER / CONFIGURAR
+COUNTER / RESULTS	COUNTER / RESULTADOS
+CUSTOM	PERSONALIZADO
+Cannot find radio	Radio nao encontrado
+Change name	Alterar nome
+Connections	Conexoes
+Couldn't create folder	Nao foi possivel criar pasta
+Counter Log	Registro Counter
+Custom 1..3600	Personalizado 1..3600
+Custom Read	Leitura personalizada
+DELETE	EXCLUIR
+DELETE PROFILE	EXCLUIR PERFIL
+DELETE PROFILE?	EXCLUIR PERFIL?
+DURATION	DURACAO
+Dark Gray	Cinza escuro
+Dark Green	Verde escuro
+Dashboard	Painel
+Default	Padrao
+Delay:	Intervalo:
+Delay: 	Intervalo: 
+Delete	Excluir
+Delete failed	Falha ao excluir
+Display	Tela
+Duration: 	Duracao: 
+EDIT	EDITAR
+EXIT	SAIR
+Emitting: 	Transmitindo: 
+Enhanced Karma v3.0	Karma avancado v3.0
+Event Log	Registro de eventos
+Event Log (uptime)	Eventos (tempo ligado)
+Export Log	Exportar registro
+FILES	ARQUIVOS
+FastPair buffer overflow exploit	FastPair: estouro de buffer
+Frames: 	Quadros: 
+Frames:               	Quadros:              
+Full        	Completo    
+GUIDE	GUIA
+Gain:	Ganho:
+Gain: 	Ganho: 
+Global Monitor	Monitor global
+Green	Verde
+HISTORY / SUMMARY	HISTORICO / RESUMO
+HOLD / CLICK / BACK: STOP	SEGURAR / CLIQUE: PARAR
+History	Historico
+Hold Vol +	Segure Vol +
+INTENSITY / POLLING	INTENSIDADE / INTERVALO
+IR Jamming Stopped	Jammer IR parado
+Inject String	Digitar texto
+Inject text:	Texto para digitar:
+Invalid profile	Perfil invalido
+KEY GAUGE / EDIT	KEY GAUGE / EDICAO
+KEY GAUGE\nGeometric profile tool\nManual profile visualization\nfor educational use and\nowned objects.\nReference measurements only.	KEY GAUGE\nPerfis geometricos\nVisualizacao manual para\nuso educativo e objetos\nproprios. Medidas apenas\ncomo referencia.
+LAB / AUTHORIZED TARGETS ONLY	LAB / ALVOS AUTORIZADOS
+LED STRIP	FITA LED
+LOAD PROFILE	CARREGAR PERFIL
+Lab Wi-Fi password	Senha Wi-Fi do laboratorio
+Light Blue	Azul claro
+Lime Green	Verde lima
+Listening...	Escutando...
+Load ISO15693	Carregar ISO15693
+Load MFC	Carregar MFC
+Load MFU	Carregar MFU
+MARK: 	MARCA: 
+MIC RECORDER	GRAVADOR DE AUDIO
+MODE	MODO
+Message:	Mensagem:
+Midnight Blue	Azul noturno
+Mute	Silenciar
+Mutex init failed	Falha ao iniciar mutex
+NDEF data:	Dados NDEF:
+NETWORK	REDE
+NEW PROFILE	NOVO PERFIL
+NEXT/PREV: tela  ESC: sair	PROX/ANT: tela ESC: sair
+NUMBER OF POINTS	NUMERO DE PONTOS
+Name already exists	Nome ja existe
+Net: 	Rede: 
+No web preview received	Sem previa da WebUI
+None	Nenhum
+OFF	DESL
+ON	LIG
+Orange	Laranja
+Overwrite 	Sobrescrever 
+PAUSED 	PAUSADO 
+PIX Key:	Chave PIX:
+PN9 HW NOISE TX	TX DE RUIDO PN9
+POINTS	PONTOS
+POWER: 	POTENCIA: 
+PRESENTER	APRESENTADOR
+PREV/NEXT: Navigate  SEL: View Details  ESC: Back	ANT/PROX: Navegar SEL: Detalhes ESC: Voltar
+PREVIOUS POINT	PONTO ANTERIOR
+PROFILE	PERFIL
+PROFILE WIDTH	LARGURA DO PERFIL
+Pairing...	Pareando...
+Password:	Senha:
+Paused	Pausado
+Phone Call	Chamada telefonica
+Play/Pause	Reproduzir/Pausar
+Please Wait	Aguarde
+Port:	Porta:
+Predatory Firmware	Firmware Predador
+Press any key to return	Pressione uma tecla para voltar
+Prev Track	Faixa anterior
+Purple	Roxo
+Pwd: 	Senha: 
+QR code	Codigo QR
+QRCode name:	Nome do QR:
+QRCode text:	Texto do QR:
+Queue character:	Caractere para fila:
+Queued: 	Na fila: 
+Quick Remote Setup  	Config. rapida      
+RATE: 	TAXA: 
+RAW Data Captured:	Dados RAW capturados:
+RESULTS	RESULTADOS
+RESULTS / time in ms	RESULTADOS / tempo em ms
+RF CENTER MHz	CENTRO RF MHz
+RUN	INICIAR
+RUN AGAIN	REPETIR
+Recent	Recentes
+Red	Vermelho
+Region EU	Regiao EU
+Region NA	Regiao NA
+Remove	Remover
+Result saved	Resultado salvo
+Retry	Tentar novamente
+Run Time:	Tempo decorrido:
+SAVE AS	SALVAR COMO
+SAVE RESULT	SALVAR RESULTADO
+SCAN / SELECT	ESCANEAR / SELECIONAR
+SD Card	Cartao SD
+SEL rola | BACK volta	SEL: rolar | VOLTAR: sair
+SELECT / max 32	SELECIONAR / max 32
+SIMULATION MODE	MODO SIMULACAO
+SOUND	SOM
+SPACE: 	ESPACO: 
+SPEED: 	VELOCIDADE: 
+SYSTEM	SISTEMA
+Save failed	Falha ao salvar
+Save&Display	Salvar e exibir
+Saved: 	Salvo: 
+Score: %d	Pontos: %d
+ScreenShot	Captura de tela
+Secure	Seguro
+Sent 	Enviado 
+Sent: 	Enviado: 
+Serial Command	Comando serial
+Settings	Configuracoes
+Shocking Pink	Rosa intenso
+Simple	Simples
+Spam all	Spam em todos
+Spectrum Monitor	Monitor de espectro
+Stealth:	Discreto:
+Storage unavailable	Armazenamento indisponivel
+TARGET / HOST	ALVO / HOST
+TARGET: 	ALVO: 
+THICKNESS	ESPESSURA
+TIME'S UP!	TEMPO ESGOTADO!
+TIMING: 	TEMPO: 
+TOOLS	FERRAMENTAS
+Target address / IPv4 host	Endereco do alvo / IPv4
+Target: 	Alvo: 
+Test        	Teste       
+Text	Texto
+Text sent	Texto enviado
+Time	Tempo
+Time : %02d:%02d	Tempo: %02d:%02d
+Time:	Tempo:
+Turn-off to restore USB	Desligue para restaurar USB
+Turn: select   Click: open   Hold: back	Girar: escolher Clique: abrir Segurar: voltar
+Turn / Click / Hold: back	Girar / Clique / Seg: voltar
+Type your message:	Digite sua mensagem:
+USB Keyboard:	Teclado USB:
+USB Mass Storage	Armazenamento USB
+USRN: 	USUARIO: 
+UTILITIES	UTILITARIOS
+Use letters, digits, _ or -	Use letras, numeros, _ ou -
+User Stopped	Parado pelo usuario
+Usr: 	Usuario: 
+Video Stream	Transmissao de video
+View Log	Ver registro
+Visit Bruce	Projeto base
+WEB PREVIEW	PREVIA WEB
+WIFI PASSWORD	SENHA WI-FI
+White	Branco
+Yellow	Amarelo
+[OK] Item [PREV/NEXT] Value 	[OK] Item [ANT/PROX] Valor 
+\n TX power: 	\n Potencia TX: 
+hidden credits!	creditos ocultos!
+local / receiver	local / receptor
+main devs:	desenvolvedores:
+pwd: 	senha: 
+you just found	voce encontrou
+~== Bruce Radio ==~	~== Radio MaliOS ==~
+SCAN NETWORKS	ESCANEAR REDES
+CONNECTION TEST	TESTE DE CONEXAO
+RECONNECT TEST	TESTE DE RECONEXAO
+PACKET LOSS TEST	PERDA DE PACOTES
+LATENCY TEST	TESTE DE LATENCIA
+THROUGHPUT SAMPLE	AMOSTRA DE VAZAO
+SIGNAL STABILITY	ESTABILIDADE DO SINAL
+CHANNEL MONITOR	MONITOR DE CANAIS
+BLE SCANNER	SCANNER BLE
+SIGNAL MONITOR	MONITOR DE SINAL
+ADVERTISEMENT MONITOR	MONITOR DE ANUNCIOS
+SERVICE ENUMERATION	LISTAR SERVICOS
+NOTIFICATION TEST	TESTE DE NOTIFICACOES
+SPECTRUM MONITOR	MONITOR DE ESPECTRO
+ACTIVITY COUNTER	CONTADOR DE ATIVIDADE
+SIGNAL STRENGTH	INTENSIDADE DO SINAL
+EVENT LOGGER	REGISTRO DE EVENTOS
+SIMULATION	SIMULACAO
+IR MONITOR	MONITOR IR
+CAPTURE STATISTICS	ESTATISTICAS DE CAPTURA
+REPEAT TEST	TESTE DE REPETICAO
+TIMING ANALYSIS	ANALISE DE TEMPO
+SCAN	ESCANEAR
+READ STABILITY	ESTABILIDADE DE LEITURA
+REPEATED READ TEST	LEITURA REPETIDA
+TIMING	TEMPO
+ERROR RATE	TAXA DE ERROS
+TIMER / HEAP TEST	TESTE DE TEMPO / HEAP
+EVENTS	EVENTOS
+SUCCESS	SUCESSO
+FAIL	FALHAS
+SIMULATION: no external operations	SIMULACAO: sem operacoes externas
+Wi-Fi in use: local test requires Wi-Fi OFF	Wi-Fi em uso: desligue para teste local
+Wi-Fi unavailable / memory	Wi-Fi indisponivel / memoria
+BLE in use / low memory	BLE em uso / pouca memoria
+BLE init failed	Falha ao iniciar BLE
+BLE client unavailable	Cliente BLE indisponivel
+Connect Wi-Fi and set a unicast IPv4 host	Conecte o Wi-Fi e defina um host IPv4 unicast
+Ping could not start	Falha ao iniciar ping
+Hardware unavailable / already in use	Hardware indisponivel / em uso
+Heap:%u min:%u / timer jitter ms	Heap:%u min:%u / variacao do tempo ms
+STOPPED / resources released	PARADO / recursos liberados
+TEST COMPLETE / result in RAM	TESTE CONCLUIDO / resultado na RAM
+Invalid category/mode; duration 0..3600 s, interval within mode limits	Categoria/modo invalido; duracao 0..3600 s, intervalo nos limites do modo
+This mode requires SIMULATION (no bounded/cancellable lab adapter)	Este modo requer SIMULACAO (sem adaptador de teste limitado e cancelavel)
+Confirm LAB / AUTHORIZED TARGETS ONLY	Confirme LAB / SOMENTE ALVOS AUTORIZADOS
+A test is already pending	Ja existe um teste pendente
+Busy: return device to a menu/WebUI screen before START	Ocupado: volte ao menu ou a tela WebUI antes de INICIAR
+Connection test needs Wi-Fi OFF; use device menu or SIMULATION while WebUI is active	O teste de conexao exige Wi-Fi desligado; use o menu ou SIMULACAO com a WebUI ativa
+SCAN and SELECT a recent target first	ESCANEIE e SELECIONE um alvo recente primeiro
+Set the selected SSID and its Wi-Fi password (8..64 bytes)	Defina o SSID selecionado e sua senha Wi-Fi (8..64 bytes)
+Selected BLE advertisement is not connectable	O anuncio BLE selecionado nao permite conexao
+Set an explicit unicast IPv4 host	Defina um host IPv4 unicast explicito
+Unsupported CC1101 frequency	Frequencia CC1101 sem suporte
+Scan selection is available for Wi-Fi/BLE; use receiver test for other protocols	Selecao de busca disponivel para Wi-Fi/BLE; use teste do receptor nos demais protocolos
+Scan complete: select a target	Busca concluida: selecione um alvo
+Finish or stop a test first	Conclua ou pare um teste primeiro
+History busy	Historico ocupado
+History limit 1..50	Limite do historico: 1..50
+Cannot open result	Nao foi possivel abrir resultado
+Cannot replace history slot	Nao foi possivel substituir registro
+Result commit failed	Falha ao confirmar resultado
+Result write failed	Falha ao gravar resultado
+Interval ms	Intervalo ms
+Interval: 	Intervalo: 
+Seconds	Segundos
+Unlimited	Sem limite
+System Test	Teste do sistema
+POINT 	PONTO 
+ LEVEL: 	 NIVEL: 
+ MODE: 	 MODO: 
+THICKNESS: 	ESPESSURA: 
+  WIDTH: 	 LARG.: 
+OK:options BACK:return	OK:opcoes VOLTAR:sair
+WEB PREVIEW / RAM  BACK:WebUI	PREVIA RAM VOLTAR:WebUI
+ENC:adjust OK:next BACK:options	ENC:ajustar OK:prox VOLTAR:opcoes
+ENC:adjust OK:confirm BACK:return	ENC:ajustar OK:confirmar
+REFERENCE ONLY	APENAS REFERENCIA
+  REFERENCE ONLY	 APENAS REFERENCIA
+ENC:scale OK:save BACK:cancel	ENC:escala OK:salvar VOLTAR:cancelar
+CALIBRATION / 10.0 mm reference	CALIBRACAO / referencia 10,0 mm
+VIEW	VISUALIZAR
+Mali utilities	Utilitarios Mali
+Resilience lab	Testes de resiliencia
+SD / internal	SD / interno
+Device / settings	Ajustes do aparelho
+Profile viewer	Perfis geometricos
+Pixel canvas	Desenho em pixels
+Roll / explore	Rolar dados
+Signal / resilience	Sinal / testes
+Network diagnostics	Diagnostico de rede
+Passive spectrum	Espectro passivo
+Capture / timing	Captura / tempos
+Read / measure	Leitura / medidas
+Click to open	Clique para abrir
+Ready	Pronto
+Unknown	Desconhecido
+WATCHING 	MONITORANDO 
+INTENSITY: 	INTENSIDADE: 
+Events: 	Eventos: 
+Last: 	Ultimo: 
+Last: --	Ultimo: --
+Last: up 	Ultimo: ligado 
+Last type: 	Ultimo tipo: 
+Now: 	Agora: 
+ s ago	 s atras
+Devices (10s): 	Dispositivos (10s): 
+Devices >50 adv/s: 	Dispositivos >50 adv/s: 
+Most active: 	Mais ativo: 
+New/gone: 	Novos/sumiram: 
+Maker: 	Fabricante: 
+Avg RSSI: 	RSSI medio: 
+Overflow adv: 	Anuncios excedentes: 
+UNUSUAL ACTIVITY	ATIVIDADE INCOMUM
+HIGH ADVERTISEMENT RATE	MUITOS ANUNCIOS
+BLE FLOOD SUSPECTED	SUSPEITA DE FLOOD BLE
+DEVICE SPIKE	PICO DE DISPOSITIVOS
+SIGNAL	SINAL
+NO SIGNAL	SEM SINAL
+REPEATING SIGNAL	SINAL REPETIDO
+CONTINUOUS SIGNAL	SINAL CONTINUO
+STRONG SIGNAL	SINAL FORTE
+HIGH IR ACTIVITY	ATIVIDADE IR ALTA
+RAPID NFC ACTIVITY	ATIVIDADE NFC RAPIDA
+DEAUTH DETECTED	DEAUTH DETECTADO
+HIGH TRAFFIC	TRAFEGO ALTO
+LOW MEMORY	POUCA MEMORIA
+SUSPICIOUS	SUSPEITO
+SUSPICIOUS: AP churn (scan visibility)	SUSPEITO: variacao de APs (visibilidade)
+LOW 	BAIXO 
+MEDIUM 	MEDIO 
+HIGH 	ALTO 
+Address: 0x	Endereco: 0x
+Command: 0x	Comando: 0x
+Channel: 	Canal: 
+Protocol: 	Protocolo: 
+Signals: 	Sinais: 
+Strongest: 	Mais forte: 
+Unique: 	Unicos: 
+Packets: 	Pacotes: 
+Scans: 	Varreduras: 
+Peak freq: 	Freq. de pico: 
+Peak hold: 	Pico retido: 
+Bars: peak hold -110..-30 dBm	Barras: pico -110..-30 dBm
+2400..2479 MHz / RPD threshold	2400..2479 MHz / limiar RPD
+Energy samples, not devices	Amostras de energia, nao dispositivos
+Alternating mark/space durations (us):	Duracoes alternadas de pulso/pausa (us):
+Carrier: N/A (demodulated RX)	Portadora: N/D (RX demodulado)
+MaliOS received IR sample; carrier unknown	Amostra IR recebida; portadora desconhecida
+OK: Save Sample (raw timings)	OK: salvar amostra (tempos RAW)
+RPD hits: 	Deteccoes RPD: 
+RPD sweep: 	Varredura RPD: 
+Truncated: 	Truncado: 
+Management: 	Gerenciamento: 
+Packet hot CH: 	Canal com mais pacotes: 
+ Busy CH 	 Canal ocupado 
+ MHz detected	 MHz detectados
+ cumulative hits	 deteccoes acumuladas
+ occupancy: 	 ocupacao: 
+ repeats: 	 repeticoes: 
+ command: 	 comando: 
+ address: 	 endereco: 
+ duration ~	 duracao ~
+ events	 eventos
+ signal	 sinal
+ENC:pag OK:peak reset BACK	ENC:pag OK:zerar pico VOLTAR
+WIFI IN USE	WI-FI EM USO
+UNAVAILABLE / BUSY	INDISPONIVEL / OCUPADO
+SCAN ERROR	ERRO NA BUSCA
+SCAN IN USE	BUSCA EM USO
+PASSIVE SCAN / SHARED WIFI	BUSCA PASSIVA / WI-FI COMPARTILHADO
+AVRCP test completed	Teste AVRCP concluido
+Complete audio test done	Teste completo de audio concluido
+Connected! Finding HID service...	Conectado! Buscando servico HID...
+Connected! Fuzzing protocol...	Conectado! Testando entradas do protocolo...
+Connected! Testing HID services...	Conectado! Testando servicos HID...
+Connected! Testing write access...	Conectado! Testando acesso de escrita...
+Connection flood completed	Flood de conexoes concluido
+Device not vulnerable to CVE-2025-36911	Dispositivo nao vulneravel a CVE-2025-36911
+Device vulnerable! Attempting HFP connection...	Dispositivo vulneravel! Tentando conexao HFP...
+Failed to connect	Falha ao conectar
+Failed to create client after exploit	Falha ao criar cliente apos exploracao
+Failed to establish HID connection	Falha ao estabelecer conexao HID
+Failed to get advertising	Falha ao obter anuncio
+FastPair → HID chain attack...	Ataque encadeado FastPair / HID...
+Flood attack failed	Falha no ataque de flood
+Fuzzing failed	Falha no teste de entradas
+HFP connected! Pivoting to HID...	HFP conectado! Acessando HID...
+HFP success! Phase 2: HID injection...	HFP com sucesso! Fase 2: injecao HID...
+HFP test passed but connection failed	Teste HFP aprovado, mas conexao falhou
+HFP worked but HID pivot failed	HFP funcionou, mas transicao HID falhou
+HFP → HID pivot worked but script failed	Transicao HFP / HID funcionou, mas script falhou
+HID access confirmed! Running DuckyScript...	Acesso HID confirmado! Executando DuckyScript...
+Media control test completed	Teste de controle de midia concluido
+Memory Corruption	Corrupcao de memoria
+No AVRCP service found	Nenhum servico AVRCP encontrado
+No FastPair service found	Nenhum servico FastPair encontrado
+No HID service found	Nenhum servico HID encontrado
+No HID services found	Nenhum servico HID encontrado
+No Media service found	Nenhum servico de midia encontrado
+No Telephony service found	Nenhum servico de telefonia encontrado
+No writable HID characteristic	Nenhuma caracteristica HID gravavel
+No writable characteristic	Nenhuma caracteristica gravavel
+No writable characteristics found	Nenhuma caracteristica gravavel encontrada
+Payload Delivery	Envio de payload
+Profiling device...	Analisando perfil do dispositivo...
+Starting connection flood...	Iniciando flood de conexoes...
+Telephony test completed	Teste de telefonia concluido
+COMMAND	COMANDO
+SELECT PAYLOAD TARGET	SELECIONE O ALVO DO PAYLOAD
+Infrared	Infravermelho
+> Back	> Voltar
+SEL ou BACK para parar	SEL ou VOLTAR para parar
+[BACK] para parar.	[VOLTAR] para parar.
+ - HID Service	 - Servico HID
+ more	 mais
+... and 	... e 
+ATTACK FAILED	ATAQUE FALHOU
+ATTACK SUCCESS	ATAQUE CONCLUIDO
+AVRCP Media Control	Controle de midia AVRCP
+Address: 	Endereco: 
+Advertising Spam	Spam de anuncios
+Attack chain completed	Cadeia de ataque concluida
+Audio Control Test	Teste de controle de audio
+Audio Stack Crash	Falha na pilha de audio
+Auth Bypass Suite	Testes de autenticacao
+Basic Keystrokes	Teclas basicas
+Battery: 	Bateria: 
+Connected: 	Conectado: 
+Connection Flood	Flood de conexoes
+Connection: 	Conexao: 
+DEVICE PROFILE	PERFIL DO DISPOSITIVO
+DEVICE PROFILE REPORT	RELATORIO DO DISPOSITIVO
+Device Info: 	Info do dispositivo: 
+Device: 	Dispositivo: 
+DuckyScript Injection	Injecao DuckyScript
+Establish HFP Connection	Estabelecer conexao HFP
+Execute HFP → HID pivot attack?	Executar ataque de transicao HFP / HID?
+Execute universal attack chain (HFP + HID + FastPair)?	Executar cadeia universal (HFP + HID + FastPair)?
+FAILED	FALHOU
+Failed to connect for profiling	Falha ao conectar para analisar perfil
+FastPair Attack: 	Ataque FastPair: 
+FastPair Crypto Overflow	FastPair: overflow criptografico
+FastPair Handshake Fault	FastPair: falha no handshake
+FastPair Memory Corruption	FastPair: corrupcao de memoria
+FastPair Rapid Connection	FastPair: conexao rapida
+FastPair State Confusion	FastPair: confusao de estado
+Force HID Connection	Forcar conexao HID
+Found: 	Encontrado: 
+Full HFP Attack Chain	Cadeia completa HFP
+Fuzz BLE protocol with random data?	Testar protocolo BLE com dados aleatorios?
+HFP Attack: 	Ataque HFP: 
+HFP → HID Pivot	Transicao HFP / HID
+HFP: Not detected	HFP: nao detectado
+HID Injection: 	Injecao HID: 
+HID SERVICES FOUND:	SERVICOS HID ENCONTRADOS:
+HID Service Test	Teste de servico HID
+HID TEST RESULTS	RESULTADOS HID
+Jam & Connect (NRF24)	Interferir e conectar (NRF24)
+NO	NAO
+OS-Specific Exploits	Exploits por sistema
+PIN Brute Force	Forca bruta de PIN
+Profile device services?	Analisar servicos do dispositivo?
+Protocol Fuzzer	Teste de entradas do protocolo
+QUICK VULNERABILITY TEST	TESTE RAPIDO DE VULNERABILIDADE
+Run All Audio Tests	Executar testes de audio
+Run All FastPair Attacks	Executar ataques FastPair
+Run All HID Attacks	Executar ataques HID
+SAFE	SEGURO
+Services found: 	Servicos encontrados: 
+Telephony Alert Test	Teste de alerta telefonico
+Test AVRCP Service	Testar servico AVRCP
+Test All Audio	Testar todo o audio
+Test HID (Keyboard/Mouse) capabilities?	Testar recursos HID (teclado/mouse)?
+Test HID Vulnerability	Testar vulnerabilidade HID
+Test Media Control	Testar controle de midia
+Test Telephony	Testar telefonia
+Test Vulnerability (CVE)	Testar vulnerabilidade (CVE)
+Test completed	Teste concluido
+Test write access on all characteristics?	Testar acesso de escrita em todas as caracteristicas?
+Try HFP-based attacks first!	Tente ataques HFP primeiro!
+UNIVERSAL ATTACK CHAIN	CADEIA UNIVERSAL DE ATAQUE
+VULNERABLE	VULNERAVEL
+VULNERABLE DEVICE	DISPOSITIVO VULNERAVEL
+WRITABLE CHARACTERISTICS:	CARACTERISTICAS GRAVAVEIS:
+WRITE ACCESS TEST	TESTE DE ESCRITA
+Writable chars: 	Caracteristicas gravaveis: 
+Write Access Test	Teste de acesso de escrita
+YES	SIM
+Request exceeds 2048 bytes	Solicitacao excede 2048 bytes
+Missing config JSON	JSON de configuracao ausente
+Invalid config types	Tipos de configuracao invalidos
+Config out of range	Configuracao fora dos limites
+Invalid target	Alvo invalido
+Invalid target type	Tipo de alvo invalido
+Invalid password	Senha invalida
+Invalid frequency	Frequencia invalida
+Queued on device UI	Na fila da interface do dispositivo
+STOP requested	Parada solicitada
+Summary saved	Resumo salvo
+historyLimit required	Limite do historico obrigatorio
+Invalid limit	Limite invalido
+Limit 1..50	Limite: 1..50
+History limit updated for this boot	Limite do historico atualizado nesta inicializacao
+Quick testing (HFP + FastPair)...	Teste rapido (HFP + FastPair)...
+Testing AVRCP service...	Testando servico AVRCP...
+Testing Media Control...	Testando controle de midia...
+Testing Telephony...	Testando telefonia...
+Testing all audio services...	Testando servicos de audio...
+Testing HFP vulnerability...	Testando vulnerabilidade HFP...
+Testing Tools	Ferramentas de teste
+Phase 1: Testing HFP vulnerability...	Fase 1: testando vulnerabilidade HFP...
+Phase 3: Testing FastPair vulnerability...	Fase 3: testando vulnerabilidade FastPair...
+Fuzzing completed!	Teste de entradas concluido!
+Out of memory	Memoria insuficiente
+Invalid password type	Tipo de senha invalido
+Invalid RF frequency	Frequencia RF invalida
+Type you HEX value:	Digite o valor HEX:
+Insert your number:	Digite o numero:
+Running, Wait	Executando, aguarde
+Initializing USB HID...	Iniciando USB HID...
+Please wait	Aguarde
+Fixed [	Fixa [
+Choose Fixed	Escolher fixa
+Success	Sucesso
+Failed reading data blocks	Falha ao ler blocos de dados
+Failed reading. Tag not found	Falha na leitura. Tag nao encontrada
+Error! Tags don't match	Erro! Tags diferentes
+Failed authenticating	Falha na autenticacao
+Not implemented	Nao implementado
+s OFF / 	s DESL. / 
+s ON	s LIG.
+off/	desl./
+on	lig.
+Invalid or unavailable file system	Armazenamento invalido ou indisponivel
+Invalid destination path	Caminho de destino invalido
+Invalid encryption password	Senha de criptografia invalida
+Invalid upload filename	Nome do arquivo de envio invalido
+Invalid upload path	Caminho de envio invalido
+Failed to open upload destination	Falha ao abrir destino do envio
+Failed to encrypt or write upload	Falha ao criptografar ou gravar envio
+Failed to write upload	Falha ao gravar envio
+Invalid file system or path	Armazenamento ou caminho invalido
+command failed, check the serial log for details	Falha no comando; consulte o registro serial
+http request missing required arg: cmnd	Requisicao HTTP sem o argumento obrigatorio: cmnd
+Invalid file system or folder	Armazenamento ou pasta invalida
+Folder not found	Pasta nao encontrada
+Invalid file system, path or action	Armazenamento, caminho ou acao invalida
+Failed to open file for reading	Falha ao abrir arquivo para leitura
+ERROR: invalid action param supplied	ERRO: parametro action invalido
+Invalid file system, path or content size	Armazenamento, caminho ou tamanho invalido
+Failed to write to file: 	Falha ao gravar arquivo: 
+Failed to open file for writing: 	Falha ao abrir arquivo para gravacao: 
+Invalid upload request	Requisicao de envio invalida
+LEFT	ESQ.
+RIGHT	DIR.
+MID	MEIO
+Infinite	Infinito
+Clicks/Second	Cliques/segundo
+-> CLICKING <-	-> CLICANDO <-
+-> CLICK <-	-> CLIQUE <-
+USB INIT	INICIANDO USB
+All ranges	Todas as faixas
+ENC:pag OK:salvar BACK:sair	ENC:pag OK:salvar VOLTAR
+ENC:pagina BACK:sair	ENC:pagina VOLTAR:sair

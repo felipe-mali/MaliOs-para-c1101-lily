@@ -15,13 +15,18 @@ function asset(name){if(!embedded)return fs.readFileSync(path.join('embedded_res
   });
   await page.goto('http://mali.test/');await page.waitForTimeout(400);
   assert.equal(await page.locator('[data-webui-target]').count(),11);
-  assert.equal(await page.locator('.mali-sidebar .active').textContent(),'Dashboard');
+  assert.equal(await page.locator('.mali-sidebar .active').textContent(),'Painel');
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'home fits viewport');
   const sidebar=await page.locator('.mali-sidebar').boundingBox(),home=await page.locator('.home-view').boundingBox();
   if(width>760)assert.ok(home.x>=sidebar.x+sidebar.width,'desktop content next to sidebar');else assert.ok(home.y>sidebar.y,'mobile nav above content');
   await page.screenshot({path:`tests/mali_ui/home-${width}.png`,fullPage:true});
   for(const view of ['tools','radio','files','system','home']){await page.locator(`[data-webui-target=${view}]`).click();await page.waitForTimeout(80);assert.ok(await page.locator(`.${view}-view`).first().isVisible());assert.equal(await page.locator('.mali-sidebar .active').count(),1);assert.equal(await page.locator(`[data-webui-target=${view}]`).getAttribute('aria-current'),'page');}
   await page.locator('.mali-selector [data-open-view=tools]').click();assert.equal(await page.locator('.tools-view').isVisible(),true);
+  await page.locator('#mali-tools-help summary').click();
+  assert.match(await page.locator('#mali-tools-help').innerText(),/MaliKeys/);
+  assert.match(await page.locator('#mali-tools-help').innerText(),/A \u2212 B/);
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'expanded help fits viewport');
+  await page.screenshot({path:`tests/mali_keys/help-${width}.png`,fullPage:true});
   await page.emulateMedia({reducedMotion:'reduce'});assert.equal(await page.locator('.mali-orbit').evaluate(e=>getComputedStyle(e).transitionDuration),'0s');
   await page.goto('http://mali.test/login');assert.equal(await page.locator('#password').getAttribute('autocomplete'),'current-password');assert.equal(await page.locator('form').getAttribute('action'),'/login');
   await page.screenshot({path:`tests/mali_ui/login-${width}.png`,fullPage:true});assert.deepEqual(errors,[]);

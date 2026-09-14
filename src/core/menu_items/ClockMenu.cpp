@@ -29,7 +29,7 @@ void ClockMenu::showSubMenu() {
     };
 
     delay(200);
-    loopOptions(options);
+    loopOptions(options, MENU_TYPE_GEAR, "Relogio");
 }
 
 void ClockMenu::drawIcon(float scale) {

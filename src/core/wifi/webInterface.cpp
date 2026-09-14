@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "core/ui/MaliUI.h"
 #include "webInterface.h"
 #include "MaliQrWebApi.h"
@@ -300,25 +301,25 @@ void handleUpload(
         const String fsName = request->hasArg("fs") ? request->arg("fs") : "";
         const String folder = request->hasArg("folder") ? request->arg("folder") : "";
         state->fs = selectWebFileSystem(fsName);
-        if (!state->fs) failUpload(state, 400, "Invalid or unavailable file system");
-        if (!isSafeWebPath(folder, true)) failUpload(state, 400, "Invalid destination path");
+        if (!state->fs) failUpload(state, 400, MaliText::invalid_or_unavailable_file_system_9c93a5);
+        if (!isSafeWebPath(folder, true)) failUpload(state, 400, MaliText::invalid_destination_path_5fce50);
         if (request->hasArg("password")) {
             if (request->arg("password").length() > 64)
-                failUpload(state, 400, "Invalid encryption password");
+                failUpload(state, 400, MaliText::invalid_encryption_password_a37433);
             filename += ".enc";
         }
-        if (!isSafeWebPath(filename, false)) failUpload(state, 400, "Invalid upload filename");
+        if (!isSafeWebPath(filename, false)) failUpload(state, 400, MaliText::invalid_upload_filename_0d4668);
         if (state->failed) return;
         const String fullPath = joinWebPath(folder, filename);
         if (!isSafeWebPath(fullPath, true)) {
-            failUpload(state, 400, "Invalid upload path");
+            failUpload(state, 400, MaliText::invalid_upload_path_1ae7a1);
             return;
         }
         strlcpy(state->path, fullPath.c_str(), sizeof(state->path));
         const String dirPath = fullPath.substring(0, fullPath.lastIndexOf('/'));
         if (!dirPath.isEmpty()) createDirRecursive(dirPath, *state->fs);
         request->_tempFile = state->fs->open(fullPath, "w");
-        if (!request->_tempFile) failUpload(state, 500, "Failed to open upload destination");
+        if (!request->_tempFile) failUpload(state, 500, MaliText::failed_to_open_upload_destination_3dbfad);
     }
     if (!state || state->failed) return;
     if (len) {
@@ -338,12 +339,12 @@ void handleUpload(
                     reinterpret_cast<const uint8_t *>(cyphertxt.c_str()), cyphertxt.length()
                 ) != cyphertxt.length()) {
                 if (request->_tempFile) request->_tempFile.close();
-                failUpload(state, 500, "Failed to encrypt or write upload");
+                failUpload(state, 500, MaliText::failed_to_encrypt_or_write_upload_bf4867);
                 return;
             }
         } else if (!request->_tempFile || request->_tempFile.write(data, len) != len) {
             if (request->_tempFile) request->_tempFile.close();
-            failUpload(state, 500, "Failed to write upload");
+            failUpload(state, 500, MaliText::failed_to_write_upload_d93dba);
             return;
         }
     }
@@ -373,7 +374,7 @@ void drawWebUiScreen(bool mode_ap) {
 
     if (mode_ap) {
         tft.setCursor(padX, currentY);
-        tft.print("Net: " + WiFi.softAPSSID());
+        tft.print(MaliText::net_38cc1d + WiFi.softAPSSID());
         currentY += LH * FP + 6;
     }
 
@@ -386,15 +387,15 @@ void drawWebUiScreen(bool mode_ap) {
     currentY += LH * FP + 6;
 
     tft.setCursor(padX, currentY);
-    tft.print("Usr: " + String(bruceConfig.webUI.user));
+    tft.print(MaliText::usr_d7bf67 + String(bruceConfig.webUI.user));
     currentY += LH * FP + 6;
 
     tft.setCursor(padX, currentY);
-    tft.print("Pwd: " + String(bruceConfig.webUI.pwd));
+    tft.print(MaliText::pwd_61681c + String(bruceConfig.webUI.pwd));
 
-    tft.setTextColor(TFT_RED, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::ERROR, bruceConfig.bgColor);
     tft.setTextSize(FP);
-    MaliUI::drawFooter("BACK: WebUI options");
+    MaliUI::drawFooter(MaliText::back_webui_options_01ad92);
 
 #if defined(HAS_TOUCH)
     TouchFooter();
@@ -641,13 +642,13 @@ void configureWebServer() {
         const String filePath = request->arg("filePath");
         if (!fs || !isSafeWebFilename(fileName) || !isSafeWebPath(filePath, true) ||
             filePath == "/") {
-            request->send(400, "text/plain", "Invalid file system or path");
+            request->send(400, "text/plain", MaliText::invalid_file_system_or_path_359116);
             return;
         }
         const String destination =
             filePath.substring(0, filePath.lastIndexOf('/') + 1) + fileName;
         if (!isSafeWebPath(destination, true)) {
-            request->send(400, "text/plain", "Invalid destination path");
+            request->send(400, "text/plain", MaliText::invalid_destination_path_5fce50);
             return;
         }
         if (fs->rename(filePath, destination))
@@ -685,11 +686,11 @@ void configureWebServer() {
                 if (parseSerialCommand(cmnd, false)) {
                     request->send(200, "text/plain", "command " + cmnd + " queued");
                 } else {
-                    request->send(400, "text/plain", "command failed, check the serial log for details");
+                    request->send(400, "text/plain", MaliText::command_failed_check_the_serial_log_for_deta_c85a5d);
                 }
             }
         } else {
-            request->send(400, "text/plain", "http request missing required arg: cmnd");
+            request->send(400, "text/plain", MaliText::http_request_missing_required_arg_cmnd_c4ff4e);
         }
     });
 
@@ -704,11 +705,11 @@ void configureWebServer() {
         const String folder = request->hasArg("folder") ? request->arg("folder") : "/";
         FS *fs = request->hasArg("fs") ? selectWebFileSystem(request->arg("fs")) : nullptr;
         if (!fs || !isSafeWebPath(folder, true)) {
-            request->send(400, "text/plain", "Invalid file system or folder");
+            request->send(400, "text/plain", MaliText::invalid_file_system_or_folder_4cb734);
             return;
         }
         if (!fs->exists(folder)) {
-            request->send(404, "text/plain", "Folder not found");
+            request->send(404, "text/plain", MaliText::folder_not_found_bcaaf7);
             return;
         }
         request->send(200, "text/plain", listFiles(*fs, folder));
@@ -726,7 +727,7 @@ void configureWebServer() {
                                          fileAction == "createfile" || fileAction == "edit";
                 if (!fs || !isSafeWebPath(fileName, true) || !validAction ||
                     (fileName == "/" && fileAction == "delete")) {
-                    request->send(400, "text/plain", "Invalid file system, path or action");
+                    request->send(400, "text/plain", MaliText::invalid_file_system_path_or_action_bed070);
                     return;
                 }
 
@@ -791,11 +792,11 @@ void configureWebServer() {
                             request->send(200, "text/plain", fileContent);
                             editFile.close();
                         } else {
-                            request->send(500, "text/plain", "Failed to open file for reading");
+                            request->send(500, "text/plain", MaliText::failed_to_open_file_for_reading_e97b49);
                         }
 
                     } else {
-                        request->send(400, "text/plain", "ERROR: invalid action param supplied");
+                        request->send(400, "text/plain", MaliText::error_invalid_action_param_supplied_8440e1);
                     }
                 }
         } else {
@@ -816,7 +817,7 @@ void configureWebServer() {
                 FS *fs = selectWebFileSystem(request->arg("fs"));
                 if (!fs || !isSafeWebPath(fileName, true) ||
                     fileContent.length() > WEB_EDITOR_MAX_BYTES) {
-                    request->send(400, "text/plain", "Invalid file system, path or content size");
+                    request->send(400, "text/plain", MaliText::invalid_file_system_path_or_content_size_6b98ad);
                     return;
                 }
 
@@ -825,11 +826,11 @@ void configureWebServer() {
                     if (editFile.write((const uint8_t *)fileContent.c_str(), fileContent.length())) {
                         request->send(200, "text/plain", "File edited: " + fileName);
                     } else {
-                        request->send(500, "text/plain", "Failed to write to file: " + fileName);
+                        request->send(500, "text/plain", MaliText::failed_to_write_to_file_dcf4c0 + fileName);
                     }
                     editFile.close();
                 } else {
-                    request->send(500, "text/plain", "Failed to open file for writing: " + fileName);
+                    request->send(500, "text/plain", MaliText::failed_to_open_file_for_writing_5a1df2 + fileName);
                 }
 
         } else {
@@ -845,7 +846,7 @@ void configureWebServer() {
             if (!checkUserWebAuth(request)) return;
             WebUploadState *state = static_cast<WebUploadState *>(request->_tempObject);
             if (!state) {
-                request->send(400, "text/plain", "Invalid upload request");
+                request->send(400, "text/plain", MaliText::invalid_upload_request_7a15a2);
                 return;
             }
             const uint16_t status = state->failed ? state->status : 200;

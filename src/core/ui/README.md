@@ -1,5 +1,13 @@
 # MaliOS Gear UI
 
+> A seção [Chaves](../../mali_tools/keys/README.md) acrescenta catálogo de
+> referências, medição manual, quatro faces e comparação. A ajuda do firmware,
+> da WebUI e do terminal foi atualizada junto com o módulo.
+
+> A revisão atual de navegação, PT-BR, componentes e validação está em
+> [REVISAO_PT_BR.md](REVISAO_PT_BR.md). Este documento registra a implementação
+> inicial do Gear; nomes de categorias e medidas de build abaixo são históricos.
+
 A interface principal usa seis categorias circulares: NETWORK, RADIO, TOOLS,
 COUNTER, FILES e SYSTEM. O item selecionado recebe cartão e ícone maiores;
 os vizinhos permanecem parcialmente visíveis. Listas de arquivos, resultados

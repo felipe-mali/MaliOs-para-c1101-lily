@@ -1,3 +1,4 @@
+#include "core/ui/MaliUI.h"
 #include "nrf_common.h"
 #include "../../core/bus_HAL.h"
 #include "../../core/mykeyboard.h"
@@ -9,9 +10,9 @@ SPIClass *NRFSPI;
 void nrf_info() {
     tft.fillScreen(bruceConfig.bgColor);
     tft.setTextSize(FM);
-    tft.setTextColor(TFT_RED, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::ERROR, bruceConfig.bgColor);
     tft.drawCentreString("_Aviso_", tftWidth / 2, 10, 1);
-    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
     tft.setTextSize(FP);
     tft.setCursor(15, 33);
     padprintln("Use estas funcoes apenas para ESTUDO em ambiente controlado.");

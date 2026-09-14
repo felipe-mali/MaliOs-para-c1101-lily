@@ -19,7 +19,7 @@ void GpsMenu::optionsMenu() {
     options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::GPS); }});
 
     String txt = "GPS (" + String(bruceConfigPins.gpsBaudrate) + " bps)";
-    loopOptions(options, MENU_TYPE_SUBMENU, txt.c_str());
+    loopOptions(options, MENU_TYPE_GEAR, txt.c_str());
 }
 
 void GpsMenu::wardrivingMenu() {
@@ -30,7 +30,7 @@ void GpsMenu::wardrivingMenu() {
         {"Voltar",               [this]() { optionsMenu(); }      },
     };
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "Wardriving");
+    loopOptions(options, MENU_TYPE_GEAR, "Wardriving");
 }
 void GpsMenu::configMenu() {
     options = {
@@ -39,7 +39,7 @@ void GpsMenu::configMenu() {
         {"Voltar",   [this]() { optionsMenu(); }                        },
     };
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "Config. GPS");
+    loopOptions(options, MENU_TYPE_GEAR, "Config. GPS");
 }
 
 void GpsMenu::drawIcon(float scale) {

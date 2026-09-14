@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "rf_jammer.h"
 #include "core/display.h"
 #include "core/mykeyboard.h"
@@ -368,7 +369,7 @@ void RFJammer::run_noise_jammer() {
     tft.fillCircle(tftWidth / 2 - 50, y + lineH / 2, 4, accent);
     tft.setTextColor(accent, bruceConfig.bgColor);
     tft.setTextSize(FP);
-    tft.drawString("PN9 HW NOISE TX", tftWidth / 2 - 38, y + 2, 1);
+    tft.drawString(MaliText::pn9_hw_noise_tx_ab879d, tftWidth / 2 - 38, y + 2, 1);
 
     uint8_t modCycle = 0;
     static const uint8_t modSchemes[] = {2, 0, 1}; // ASK, 2FSK, MSK

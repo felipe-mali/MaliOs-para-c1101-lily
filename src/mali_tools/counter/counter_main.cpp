@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "counter_main.h"
 #include "core/display.h"
 #include "core/led_control.h"
@@ -10,6 +11,7 @@
 namespace CounterSuite {
 namespace {
 Snapshot latest[COUNT];
+String statusLabel(const String &status) { return status == "IDLE" ? "Inativo" : status; }
 std::unique_ptr<Monitor> create(Module m, bool watch) {
     switch (m) {
         case WIFI: return makeWifi();
@@ -34,7 +36,7 @@ int textRows(const Snapshot &s) {
 void draw(Module m, Snapshot &s, uint8_t page, bool global) {
     drawMainBorderWithTitle(global ? String("GLOBAL / ") + name(m) : String(name(m)));
     tft.setTextSize(1);
-    line(28, s.status, s.warning ? TFT_RED : TFT_GREEN);
+    line(28, statusLabel(s.status), s.warning ? TFT_RED : TFT_GREEN);
     int available = max(1, (tftHeight - 88) / 13);
     int offset = page * available;
     int logical = 0, visible = 0, columns = max(1, (tftWidth - 16) / 6);
@@ -54,9 +56,9 @@ void draw(Module m, Snapshot &s, uint8_t page, bool global) {
     }
     line(
         tftHeight - 15,
-        m == IR   ? "ENC:pag OK:salvar BACK:sair"
-        : m == RF ? "ENC:pag OK:peak reset BACK"
-                  : "ENC:pagina BACK:sair",
+        m == IR   ? MaliText::enc_pag_ok_salvar_back_sair_852d0f
+        : m == RF ? MaliText::enc_pag_ok_peak_reset_back_144700
+                  : MaliText::enc_pagina_back_sair_f899a8,
         bruceConfig.secColor
     );
 }
@@ -65,11 +67,11 @@ void dashboard() {
     for (int i = 0; i < COUNT; ++i) {
         if (i == NRF && !nrfAvailable()) continue;
         Module m = static_cast<Module>(i);
-        String title = String(name(m)) + " " + latest[i].status;
+        String title = String(name(m)) + " " + statusLabel(latest[i].status);
         if (latest[i].updated) title += " (" + String((millis() - latest[i].updated) / 1000) + "s)";
         rows.push_back({title.c_str(), [m]() { run(m); }});
     }
-    rows.push_back({("Events: " + String(eventCount())).c_str(), logMenu});
+    rows.push_back({(MaliText::events_874aae + String(eventCount())).c_str(), logMenu});
     rows.push_back({"Voltar", []() {}});
     loopOptions(rows, MENU_TYPE_SUBMENU, "COUNTER SUITE / ultimo estado");
 }
@@ -89,7 +91,7 @@ void run(Module module, bool global, bool watch) {
     auto monitor = create(module, watch);
     if (!monitor) return;
     bool ready = monitor->begin();
-    if (!ready && monitor->data.status == "IDLE") monitor->data.status = "UNAVAILABLE / BUSY";
+    if (!ready && monitor->data.status == "IDLE") monitor->data.status = MaliText::unavailable_busy_cc48f5;
     check(SelPress);
     returnToMenu = false;
     while (!returnToMenu && !check(EscPress)) {
@@ -122,7 +124,7 @@ void run(Module module, bool global, bool watch) {
             if (module == NRF && !nrfAvailable()) module = WIFI;
             monitor = create(module, false);
             ready = monitor && monitor->begin();
-            if (!ready && monitor->data.status == "IDLE") monitor->data.status = "UNAVAILABLE / BUSY";
+            if (!ready && monitor->data.status == "IDLE") monitor->data.status = MaliText::unavailable_busy_cc48f5;
             started = millis();
             page = 0;
         }
@@ -133,7 +135,7 @@ void run(Module module, bool global, bool watch) {
 }
 void rfMenu() {
     std::vector<Option> rows = {
-        {"Spectrum Monitor",   []() { run(RF); }             },
+        {MaliText::spectrum_monitor_242b93,   []() { run(RF); }             },
         {"Banda 315 MHz",
          []() {
              setSpectrumCenter(315.0f);
@@ -175,14 +177,14 @@ void rfMenu() {
 void open() {
     MaliLedStateGuard idle(MaliLedState::IDLE);
     std::vector<Option> rows = {
-        {"Dashboard",      dashboard                },
-        {"Global Monitor", []() { run(WIFI, true); }},
+        {MaliText::dashboard_d87f47,      dashboard                },
+        {MaliText::global_monitor_1cab77, []() { run(WIFI, true); }},
         {"Wi-Fi Counter",  []() { run(WIFI); }      },
         {"BLE Counter",    []() { run(BLE); }       },
         {"RF Counter",     rfMenu                   },
         {"NFC Counter",    []() { run(NFC); }       },
         {"IR Counter",     []() { run(IR); }        },
-        {"Event Log",      logMenu                  }
+        {MaliText::event_log_878e53,      logMenu                  }
     };
     if (nrfAvailable()) rows.push_back({"2.4G Counter", []() { run(NRF); }});
     rows.push_back({"Voltar", []() {}});

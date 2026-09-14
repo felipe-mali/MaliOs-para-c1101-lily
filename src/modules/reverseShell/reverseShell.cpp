@@ -1,3 +1,4 @@
+#include "core/ui/MaliUI.h"
 #if !defined(LITE_VERSION)
 #include "core/display.h"
 #include <DNSServer.h>
@@ -22,7 +23,7 @@ void ReverseShell() {
         switch (type) {
             case WS_EVT_CONNECT:
                 wsConnected = true;
-                client->text("Connected to BruceShell!\r\n");
+                client->text("Conectado ao BruceShell!\r\n");
                 break;
 
             case WS_EVT_DISCONNECT:
@@ -51,11 +52,11 @@ void ReverseShell() {
                         if (output.length() > 0) {
                             client->text(output);
                         } else {
-                            client->text("[Command executed, no output]\r\n");
+                            client->text("[Comando executado, sem saida]\r\n");
                         }
                     }
                 } else {
-                    client->text("Error: No shell connected.\r\n");
+                    client->text("Erro: nenhum shell conectado.\r\n");
                 }
                 break;
 
@@ -68,9 +69,9 @@ void ReverseShell() {
     // ── Setup ──────────────────────────────────────────────────
     tft.fillScreen(bruceConfig.bgColor);
     tft.setTextSize(FM);
-    tft.setTextColor(TFT_RED, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::ERROR, bruceConfig.bgColor);
     tft.drawCentreString("Shell reverso", tftWidth / 2, 10, 1);
-    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
     tft.setTextSize(FP);
     tft.setCursor(15, 33);
     tft.println("Por Fourier & Ninja-jr");
@@ -101,7 +102,7 @@ void ReverseShell() {
     webServer.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
         String html = R"rawliteral(
             <!DOCTYPE html>
-            <html>
+            <html lang="pt-BR">
             <head>
                 <title>BruceShell</title>
                 <style>
@@ -119,25 +120,25 @@ void ReverseShell() {
             </head>
             <body>
                 <div class="container">
-                    <h1>🔴 BruceShell <span id="statusDot" class="status offline"></span> <span id="statusText">Offline</span></h1>
-                    <p>IP: 192.168.4.1 | Port: 23</p>
+                    <h1>🔴 BruceShell <span id="statusDot" class="status offline"></span> <span id="statusText">Desconectado</span></h1>
+                    <p>IP: 192.168.4.1 | Porta: 23</p>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <input type="text" id="cmd" placeholder="Enter command..." onkeyup="if(event.keyCode==13) sendCommand();" autofocus>
-                        <button onclick="sendCommand();">Execute</button>
-                        <button onclick="clearOutput();">Clear</button>
+                        <input type="text" id="cmd" placeholder="Digite o comando..." onkeyup="if(event.keyCode==13) sendCommand();" autofocus>
+                        <button onclick="sendCommand();">Executar</button>
+                        <button onclick="clearOutput();">Limpar</button>
                     </div>
-                    <div id="output">~ BruceShell\n~ Connected: Waiting for shell...</div>
-                    <div class="footer">Connect via WebSocket ws://192.168.4.1/ws</div>
+                    <div id="output">~ BruceShell\n~ Conectado: aguardando shell...</div>
+                    <div class="footer">Conectar por WebSocket ws://192.168.4.1/ws</div>
                 </div>
                 <script>
                     var ws = new WebSocket('ws://192.168.4.1/ws');
                     ws.onopen = function() {
                         document.getElementById('statusDot').className = 'status online';
-                        document.getElementById('statusText').innerText = 'Online';
+                        document.getElementById('statusText').innerText = 'Conectado';
                     };
                     ws.onclose = function() {
                         document.getElementById('statusDot').className = 'status offline';
-                        document.getElementById('statusText').innerText = 'Offline';
+                        document.getElementById('statusText').innerText = 'Desconectado';
                     };
                     ws.onmessage = function(e) {
                         document.getElementById('output').innerText += e.data;

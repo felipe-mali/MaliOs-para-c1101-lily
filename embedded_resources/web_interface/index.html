@@ -13,70 +13,84 @@
       <div class="header">
         <div class="title" onclick="Dialog.show('info')">
           <span class="mali-brand">MALI OS</span>
-          <span class="mali-version">v<span class="malios-version">0.7</span></span>
+          <span class="mali-version">v<span class="malios-version">1.0</span></span>
         </div>
         <div class="left-part">
           <button class="btn-action act-oinput" data-action="serial">
-            Serial Cmd
+            Comando serial
           </button>
           <button class="btn-action act-navigation" onclick="openNavigator()">
-            Navigator
+            Navegador
           </button>
         </div>
         <div class="right-part">
           <button class="btn-action" onclick="Dialog.show('settings')">
-            Settings
+            Configurações
           </button>
           <button class="btn-action" onclick="window.location.href = '/logout'">
-            Log Out
+            Sair
           </button>
         </div>
       </div>
-      <nav class="webui-navigation mali-sidebar" aria-label="WebUI sections">
-        <a class="mali-sidebar-brand" href="#home" data-open-view="home"><svg class="mali-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M9 31V9L20 24L31 9V31M12 31V21M28 31V21"/></svg><span>MALI OS<small>Predatory Firmware</small></span></a>
-        <span class="mali-nav-label">DEVICE CONSOLE</span>
-        <button class="btn-action active" data-webui-target="home">Dashboard</button>
-        <button class="btn-action" data-webui-target="wifi">Network</button>
-        <button class="btn-action" data-webui-target="radio">Radio</button>
-        <button class="btn-action" data-webui-target="tools">Tools</button>
+      <nav class="webui-navigation mali-sidebar" aria-label="Seções da WebUI">
+        <a class="mali-sidebar-brand" href="#home" data-open-view="home"><svg class="mali-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M9 31V9L20 24L31 9V31M12 31V21M28 31V21"/></svg><span>MALI OS<small>Firmware Predador</small></span></a>
+        <span class="mali-nav-label">CONSOLE DO DISPOSITIVO</span>
+        <button class="btn-action active" data-webui-target="home">Painel</button>
+        <button class="btn-action" data-webui-target="wifi">Rede</button>
+        <button class="btn-action" data-webui-target="radio">Rádio</button>
+        <button class="btn-action" data-webui-target="tools">Ferramentas</button>
         <button class="btn-action" data-webui-target="counter">Counter</button>
-        <button class="btn-action" data-webui-target="files">Files</button>
-        <button class="btn-action" data-webui-target="system">System</button>
-        <span class="mali-nav-label">QUICK ACCESS</span>
+        <button class="btn-action" data-webui-target="files">Arquivos</button>
+        <button class="btn-action" data-webui-target="system">Sistema</button>
+        <span class="mali-nav-label">ACESSO RÁPIDO</span>
         <button class="btn-action" data-webui-target="keygauge">Key Gauge</button>
         <button class="btn-action" data-webui-target="qr">QR Studio</button>
         <button class="btn-action" data-webui-target="portal">Portal Studio</button>
         <button class="btn-action" data-webui-target="scripts">Scripts</button>
-        <span class="mali-sidebar-foot">LOCAL INTERFACE <span class="mali-status">READY</span></span>
+        <span class="mali-sidebar-foot">INTERFACE LOCAL <span class="mali-status">PRONTO</span></span>
       </nav>
       <section class="webui-view tools-view hidden" aria-labelledby="tools-title">
-        <div class="mali-hero"><div><span class="mali-kicker">MALI / TOOLS</span><h1 id="tools-title">Built for the device.</h1><p>Ferramentas locais, acesso direto e o mesmo estado do T-Embed.</p></div></div>
+        <div class="mali-hero"><div><span class="mali-kicker">MALI / FERRAMENTAS</span><h1 id="tools-title">Feito para o dispositivo.</h1><p>Ferramentas locais, acesso direto e o mesmo estado do T-Embed.</p></div></div>
         <div class="mali-card-grid">
-          <button class="mali-card" data-open-view="keygauge"><strong>Key Gauge</strong><span>Profile viewer / editor</span></button>
+          <button class="mali-card" data-open-view="keygauge"><strong>Key Gauge</strong><span>Visualizador e editor de perfis</span></button>
           <button class="mali-card" data-open-view="qr"><strong>QR Studio</strong><span>PIX / Wi-Fi / contato</span></button>
           <button class="mali-card" data-open-view="scripts"><strong>Scripts</strong><span>Arquivos e automação local</span></button>
           <button class="mali-card" onclick="openNavigator()"><strong>Pixel Paint / D20</strong><span>Abrir o navegador do dispositivo</span></button>
+          <button class="mali-card" onclick="openNavigator()"><strong>Chaves</strong><span>Plana, cruciforme, medidas e catálogo no dispositivo</span></button>
         </div>
+        <details class="mali-panel" id="mali-tools-help">
+          <summary>Ajuda das ferramentas</summary>
+          <h2>Chaves: identificar, medir e catalogar</h2>
+          <p>No dispositivo, abra <strong>Ferramentas → Mali Tools → Chaves</strong>. Escolha Chave Plana ou Chave Cruciforme. Em Medir Chave, informe as medidas de régua ou paquímetro em mm; zero significa não informado. O desenho é ilustrativo e não usa escala física 1:1.</p>
+          <p>Na cruciforme, gire durante a visualização para alternar as faces A, B, C e D. Na vista frontal, A fica acima, B à direita, C abaixo e D à esquerda. Meça cada braço do centro à borda e registre sua largura.</p>
+          <p>Em Editar dados, registre cabeça, orientação, perfil, fabricante informado e notas. O editor de texto oferece caracteres, Espaço, Apagar último e Concluir texto. Clique confirma; segurar cancela ou volta.</p>
+          <p>Salvar cria um registro em <code>/MaliKeys/</code>. No Catálogo, abra um registro para carregar, renomear ou excluir. Comparar abre dois registros e mostra diferenças como <strong>A − B</strong>. Alterações pendentes ficam marcadas com *. O passo de medição e as guias valem durante a sessão.</p>
+          <p>O módulo Chaves é operado pela tela ou pelo navegador do dispositivo. Os arquivos <code>.mkey</code> podem ser gerenciados em Arquivos. O KEY GAUGE anterior continua separado, com seus perfis <code>.mkg</code>, escalas visuais e editor Web.</p>
+          <h2>Counter, D20 e Pixel Paint</h2>
+          <p>Counter reúne simulação, observação e testes conforme o hardware disponível. Selecione modo e alvo, revise os parâmetros e use Parar para encerrar. Os modos ativos exigem autorização. A tela e a WebUI apresentam estado, métricas e histórico.</p>
+          <p>D20 permite escolher o dado, rolar e consultar o histórico. Pixel Paint mantém edição por pixels, modos, cores e salvamento. Abra ambos pelo navegador do dispositivo e consulte ? Ajuda em Ferramentas.</p>
+          <p>Na navegação MaliOS: girar escolhe, clicar abre e segurar volta. Nomes de protocolos, comandos, teclas e arquivos mantêm a grafia necessária para uso e compatibilidade.</p>
+        </details>
       </section>
       <section class="webui-view radio-view hidden" aria-labelledby="radio-title">
-        <div class="mali-hero"><div><span class="mali-kicker">MALI / RADIO</span><h1 id="radio-title">Observe. Measure.</h1><p>As tecnologias disponíveis acompanham a configuração do dispositivo.</p></div></div>
+        <div class="mali-hero"><div><span class="mali-kicker">MALI / RÁDIO</span><h1 id="radio-title">Observe. Meça.</h1><p>As tecnologias disponíveis acompanham a configuração do dispositivo.</p></div></div>
         <div class="mali-card-grid">
           <button class="mali-card" data-open-view="counter"><strong>Counter</strong><span>BLE / RF / IR / NFC — diagnóstico e laboratório</span></button>
-          <button class="mali-card" onclick="openNavigator()"><strong>Device navigator</strong><span>Controle das ferramentas existentes no T-Embed</span></button>
+          <button class="mali-card" onclick="openNavigator()"><strong>Navegador do dispositivo</strong><span>Controle das ferramentas existentes no T-Embed</span></button>
         </div>
       </section>
       <section class="webui-view home-view mali-home" aria-labelledby="mali-home-title">
         <div class="mali-hero">
           <div>
-            <span class="mali-kicker">MALI / DEVICE CONSOLE</span>
-            <h1 id="mali-home-title">Turn the system.</h1>
+            <span class="mali-kicker">MALI / CONSOLE DO DISPOSITIVO</span>
+            <h1 id="mali-home-title">Gire o sistema.</h1>
             <p>Ferramentas do T-Embed, arquivos e diagnostico em uma interface local.</p>
           </div>
           <span class="mali-online-dot">WEBUI ATIVO</span>
         </div>
         <div class="mali-rotary-deck mali-panel">
           <div class="mali-gear" aria-hidden="true"><svg viewBox="0 0 140 140"><circle class="mali-orbit" cx="70" cy="70" r="59"/><circle class="mali-orbit-inner" cx="70" cy="70" r="47"/><path class="mali-axis" d="M47 94V46L70 78L93 46V94M53 94V73M87 94V73"/><circle class="mali-position" cx="70" cy="11" r="4"/></svg></div>
-          <div><span class="mali-kicker">ROTARY ACCESS / 01—04</span><h2>One turn away.</h2><p>Selecione um módulo. O dispositivo continua no centro.</p><div class="mali-selector" role="group" aria-label="Atalhos do dispositivo"><button data-open-view="wifi" class="btn-action">Network</button><button data-open-view="tools" class="btn-action">Tools</button><button data-open-view="counter" class="btn-action">Counter</button><button data-open-view="system" class="btn-action">System</button></div></div>
+          <div><span class="mali-kicker">ACESSO ROTATIVO / 01—04</span><h2>Ao alcance de um giro.</h2><p>Selecione um módulo. O dispositivo continua no centro.</p><div class="mali-selector" role="group" aria-label="Atalhos do dispositivo"><button data-open-view="wifi" class="btn-action">Rede</button><button data-open-view="tools" class="btn-action">Ferramentas</button><button data-open-view="counter" class="btn-action">Counter</button><button data-open-view="system" class="btn-action">Sistema</button></div></div>
         </div>
         <div class="dashboard-summary" aria-live="polite">
           <div><span>MODELO</span><strong id="dashboard-model">--</strong></div>
@@ -87,7 +101,7 @@
         <p id="dashboard-status" class="mali-inline-status" role="status"></p>
         <div class="mali-card-grid">
           <button class="mali-card" data-open-view="counter"><strong>COUNTER</strong><span>Testes de Resiliência</span></button>
-          <button class="mali-card" type="button" data-open-view="keygauge"><strong>Mali Tools / KEY GAUGE</strong><span>Editor de perfis geometricos</span></button>
+          <button class="mali-card" type="button" data-open-view="keygauge"><strong>Ferramentas Mali / KEY GAUGE</strong><span>Editor de perfis geometricos</span></button>
           <button class="mali-card" type="button" data-open-view="files">
             <strong>Arquivos</strong><span>SD e LittleFS</span>
           </button>
@@ -101,7 +115,7 @@
             <strong>Portal Studio</strong><span>Templates do Mali Lab</span>
           </button>
           <button class="mali-card" type="button" data-open-view="scripts">
-            <strong>Scripts</strong><span>Gerencie JavaScript pelo File Manager</span>
+            <strong>Scripts</strong><span>Gerencie JavaScript pelos Arquivos</span>
           </button>
           <button class="mali-card" type="button" data-open-view="system">
             <strong>Sistema</strong><span>Firmware, memoria e hardware</span>
@@ -109,59 +123,59 @@
         </div>
       </section>
 <section class="webui-view counter-view hidden" aria-labelledby="counter-title">
- <div class="mali-hero"><div><span class="mali-kicker">MALI TOOLS</span><h1 id="counter-title">COUNTER</h1><p>Testes de Resiliência · LAB / AUTHORIZED TARGETS ONLY</p></div><strong id="ct-state">IDLE</strong></div>
+ <div class="mali-hero"><div><span class="mali-kicker">FERRAMENTAS MALI</span><h1 id="counter-title">COUNTER</h1><p>Testes de Resiliência · LAB / SOMENTE ALVOS AUTORIZADOS</p></div><strong id="ct-state">INATIVO</strong></div>
  <div class="ct-layout">
   <div class="ct-config">
-   <label for="ct-category">TECHNOLOGY</label><select id="ct-category"></select>
-   <button class="btn-action" id="ct-scan">SCAN</button>
-   <label for="ct-targets">SELECT (ate 32 alvos; validade 2 minutos)</label><select id="ct-targets" size="4"></select>
+   <label for="ct-category">TECNOLOGIA</label><select id="ct-category"></select>
+   <button class="btn-action" id="ct-scan">ESCANEAR</button>
+   <label for="ct-targets">SELECIONAR (até 32 alvos; validade de 2 minutos)</label><select id="ct-targets" size="4"></select>
    <p id="ct-target-info" class="kg-hint"></p>
-   <label for="ct-mode">MODE</label><select id="ct-mode"></select>
-   <label><input id="ct-simulation" type="checkbox" checked /> SIMULATION — sem operações externas</label>
+   <label for="ct-mode">MODO</label><select id="ct-mode"></select>
+   <label><input id="ct-simulation" type="checkbox" checked /> SIMULAÇÃO — sem operações externas</label>
    <p id="ct-mode-note" class="kg-hint"></p>
-   <label for="ct-target">TARGET / IPv4 HOST</label><input id="ct-target" maxlength="64" placeholder="Selecione um alvo ou informe IPv4 para ping" />
-   <label for="ct-password">Wi-Fi password (RAM only)</label><input id="ct-password" type="password" maxlength="64" autocomplete="off" />
-   <label for="ct-frequency">RF CENTER (MHz)</label><input id="ct-frequency" type="number" value="433.92" step="0.01" />
-   <label for="ct-duration">DURATION</label><select id="ct-duration"><option value="5">5 sec</option><option value="10">10 sec</option><option value="30" selected>30 sec</option><option value="60">60 sec</option><option value="0">Unlimited</option><option value="custom">Custom</option></select>
-   <input id="ct-custom-duration" type="number" min="1" max="3600" value="30" aria-label="Custom duration in seconds" hidden />
-   <label for="ct-intensity">INTENSITY</label><select id="ct-intensity"><option value="2000">LOW</option><option value="1000" selected>MEDIUM</option><option value="500">HIGH</option><option value="custom">CUSTOM</option></select>
-   <label for="ct-interval">Actual interval / polling (ms)</label><input id="ct-interval" type="number" min="100" max="60000" value="1000" />
-   <label><input id="ct-authorized" type="checkbox" /> LAB / AUTHORIZED TARGETS ONLY</label>
-   <button class="btn-action" id="ct-start">START</button>
+   <label for="ct-target">ALVO / HOST IPv4</label><input id="ct-target" maxlength="64" placeholder="Selecione um alvo ou informe IPv4 para ping" />
+   <label for="ct-password">Senha Wi-Fi (somente RAM)</label><input id="ct-password" type="password" maxlength="64" autocomplete="off" />
+   <label for="ct-frequency">CENTRO RF (MHz)</label><input id="ct-frequency" type="number" value="433.92" step="0.01" />
+   <label for="ct-duration">DURAÇÃO</label><select id="ct-duration"><option value="5">5 s</option><option value="10">10 s</option><option value="30" selected>30 s</option><option value="60">60 s</option><option value="0">Sem limite</option><option value="custom">Personalizado</option></select>
+   <input id="ct-custom-duration" type="number" min="1" max="3600" value="30" aria-label="Duração personalizada em segundos" hidden />
+   <label for="ct-intensity">INTENSIDADE</label><select id="ct-intensity"><option value="2000">BAIXA</option><option value="1000" selected>MÉDIA</option><option value="500">ALTA</option><option value="custom">PERSONALIZADO</option></select>
+   <label for="ct-interval">Intervalo real entre consultas (ms)</label><input id="ct-interval" type="number" min="100" max="60000" value="1000" />
+   <label><input id="ct-authorized" type="checkbox" /> LAB / SOMENTE ALVOS AUTORIZADOS</label>
+   <button class="btn-action" id="ct-start">INICIAR</button>
   </div>
   <div class="ct-live">
-   <div class="ct-stop-bar"><strong id="ct-live-mode">Ready</strong><button class="btn-action" id="ct-stop">STOP TEST</button></div>
-   <p id="ct-live-target">TARGET: —</p><div id="ct-metrics" class="ct-metrics"></div>
+   <div class="ct-stop-bar"><strong id="ct-live-mode">Pronto</strong><button class="btn-action" id="ct-stop">PARAR TESTE</button></div>
+   <p id="ct-live-target">ALVO: —</p><div id="ct-metrics" class="ct-metrics"></div>
    <canvas id="ct-chart" width="800" height="220" aria-label="Historico curto: RSSI, tempo ou eventos"></canvas>
    <p id="ct-message" role="status" aria-live="polite"></p>
-   <div class="kg-toolbar"><button class="btn-action" id="ct-again">RUN AGAIN</button><button class="btn-action" id="ct-save">SAVE RESULT</button></div>
-   <h2>SCAN / CHANNELS</h2><div id="ct-channels"></div>
-   <h2>HISTORY</h2><button class="btn-action" id="ct-history-refresh">Atualizar</button><div id="ct-history"></div>
-   <label for="ct-limit">History limit (1–50)</label><input id="ct-limit" type="number" min="1" max="50" value="20" /><button class="btn-action" id="ct-settings">APPLY SETTINGS</button>
+   <div class="kg-toolbar"><button class="btn-action" id="ct-again">REPETIR</button><button class="btn-action" id="ct-save">SALVAR RESULTADO</button></div>
+   <h2>BUSCA / CANAIS</h2><div id="ct-channels"></div>
+   <h2>HISTÓRICO</h2><button class="btn-action" id="ct-history-refresh">Atualizar</button><div id="ct-history"></div>
+   <label for="ct-limit">Limite do histórico (1–50)</label><input id="ct-limit" type="number" min="1" max="50" value="20" /><button class="btn-action" id="ct-settings">APLICAR CONFIGURAÇÕES</button>
   </div>
  </div>
 </section>
 
 <section class="webui-view keygauge-view hidden" aria-labelledby="kg-title">
-  <div class="mali-hero"><div><span class="mali-kicker">MALI TOOLS</span><h1 id="kg-title">KEY GAUGE</h1><p>Perfil geometrico manual · REFERENCE ONLY</p></div><strong id="kg-state">NOVO · NAO SALVO</strong></div>
+  <div class="mali-hero"><div><span class="mali-kicker">FERRAMENTAS MALI</span><h1 id="kg-title">KEY GAUGE</h1><p>Perfil geométrico manual · APENAS REFERÊNCIA</p></div><strong id="kg-state">NOVO · NAO SALVO</strong></div>
   <div class="kg-layout">
     <div class="kg-main">
-      <div class="kg-toolbar"><button class="btn-action" id="kg-new">NEW</button><button class="btn-action" id="kg-duplicate">DUPLICATE</button><button class="btn-action" id="kg-save">SAVE</button><button class="btn-action" id="kg-show">SHOW ON DEVICE</button></div>
+      <div class="kg-toolbar"><button class="btn-action" id="kg-new">NOVO</button><button class="btn-action" id="kg-duplicate">DUPLICAR</button><button class="btn-action" id="kg-save">SALVAR</button><button class="btn-action" id="kg-show">EXIBIR NO DISPOSITIVO</button></div>
       <div class="kg-drawing"><canvas id="kg-canvas" width="960" height="430" aria-label="Perfil: arraste os pontos verticalmente. Controles equivalentes abaixo."></canvas></div>
-      <p id="kg-active">P1 · LEVEL 0</p><p class="kg-hint">Arraste um marcador para ajustar o nivel. THICKNESS altera a base; PROFILE WIDTH altera o comprimento visual.</p>
+      <p id="kg-active">P1 · NÍVEL 0</p><p class="kg-hint">Arraste um marcador para ajustar o nível. ESPESSURA altera a base; LARGURA DO PERFIL altera o comprimento visual.</p>
       <div id="kg-levels" class="kg-levels" aria-label="Niveis dos pontos"></div>
     </div>
     <aside class="kg-controls" aria-label="Configuracao do perfil">
-      <label for="kg-name">PROFILE NAME</label><input id="kg-name" maxlength="31" pattern="[A-Za-z0-9_-]+" autocomplete="off" value="PROFILE_001" />
-      <label for="kg-points">POINTS</label><select id="kg-points"><option>4</option><option>5</option><option selected>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select>
-      <label for="kg-thickness">THICKNESS: <output id="kg-thickness-value">5</output></label><input id="kg-thickness" type="range" min="1" max="10" value="5" />
-      <label for="kg-width">PROFILE WIDTH: <output id="kg-width-value">90</output>%</label><input id="kg-width" type="range" min="50" max="100" value="90" />
-      <h2>PROFILES</h2><p class="kg-hint">Mesmo armazenamento do T-Embed.</p>
+      <label for="kg-name">NOME DO PERFIL</label><input id="kg-name" maxlength="31" pattern="[A-Za-z0-9_-]+" autocomplete="off" value="PROFILE_001" />
+      <label for="kg-points">PONTOS</label><select id="kg-points"><option>4</option><option>5</option><option selected>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select>
+      <label for="kg-thickness">ESPESSURA: <output id="kg-thickness-value">5</output></label><input id="kg-thickness" type="range" min="1" max="10" value="5" />
+      <label for="kg-width">LARGURA DO PERFIL: <output id="kg-width-value">90</output>%</label><input id="kg-width" type="range" min="50" max="100" value="90" />
+      <h2>PERFIS</h2><p class="kg-hint">Mesmo armazenamento do T-Embed.</p>
       <label for="kg-list">Perfis salvos</label><select id="kg-list" size="6" aria-label="Perfis salvos"></select>
-      <div class="kg-toolbar"><button class="btn-action" id="kg-load">LOAD</button><button class="btn-action" id="kg-delete">DELETE</button><button class="btn-action" id="kg-refresh">Atualizar</button></div>
+      <div class="kg-toolbar"><button class="btn-action" id="kg-load">CARREGAR</button><button class="btn-action" id="kg-delete">EXCLUIR</button><button class="btn-action" id="kg-refresh">Atualizar</button></div>
     </aside>
   </div>
-  <p id="kg-status" role="status" aria-live="polite">Ajustes ficam na memoria do navegador ate SAVE.</p>
+  <p id="kg-status" role="status" aria-live="polite">Os ajustes ficam na memória do navegador até SALVAR.</p>
 </section>
 
       <div class="webui-view free-space files-view hidden">
@@ -185,7 +199,7 @@
           <button
             class="icon-action"
             id="refresh-folder"
-            title="Refresh folder"
+            title="Atualizar pasta"
             onclick="fetchFiles(currentDrive, currentPath)"
           >
             <svg
@@ -241,7 +255,7 @@
             <input
               type="file"
               class="inp-uploader"
-              title="Upload files to current folder"
+              title="Enviar arquivos para a pasta atual"
               multiple
             />
             <svg
@@ -266,7 +280,7 @@
             <input
               type="file"
               class="inp-uploader"
-              title="Upload folder to current folder"
+              title="Enviar pasta para a pasta atual"
               webkitdirectory
               directory
               multiple
@@ -286,7 +300,7 @@
           <button
             class="icon-action act-oinput ml-10"
             data-action="createFile"
-            title="Create new file"
+            title="Criar arquivo"
           >
             <svg
               width="20"
@@ -310,7 +324,7 @@
           <button
             class="icon-action act-oinput"
             data-action="createFolder"
-            title="Create new folder"
+            title="Criar pasta"
           >
             <svg
               height="20"
@@ -338,9 +352,9 @@
         <table class="table explorer">
           <thead>
             <tr>
-              <th class="col-name">Name</th>
-              <th class="col-size">Size</th>
-              <th class="col-action">Action</th>
+              <th class="col-name">Nome</th>
+              <th class="col-size">Tamanho</th>
+              <th class="col-action">Ação</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -719,7 +733,7 @@
         <div class="scripts-layout">
           <section class="mali-panel">
             <div class="mali-panel-head"><h2>JavaScript no MaliOS</h2></div>
-            <p>Use o File Manager para enviar, editar e executar arquivos suportados pelo interpretador herdado do Bruce.</p>
+            <p>Use o gerenciador de arquivos para enviar, editar e executar os arquivos suportados pelo interpretador.</p>
             <p>Os scripts permanecem no SD ou LittleFS selecionado. Revise o conteudo antes de executar.</p>
           </section>
           <section class="mali-panel">
@@ -733,7 +747,7 @@
           <div><span class="mali-kicker">DIAGNOSTICO</span><h1 id="system-page-title">Sistema</h1></div>
           <button id="system-refresh" class="btn-action" type="button">ATUALIZAR</button>
         </div>
-        <p class="mali-page-note">Somente leitura. O Dashboard nao inicializa radios nem altera o modo USB.</p>
+        <p class="mali-page-note">Somente leitura. O painel não inicializa rádios nem altera o modo USB.</p>
         <div class="system-layout">
           <section class="mali-panel">
             <div class="mali-panel-head"><h2>Dispositivo</h2></div>
@@ -764,7 +778,7 @@
           <td class="col-name"></td>
           <td class="col-size"></td>
           <td class="col-action">
-            <button class="icon-action act-play" title="Run this file">
+            <button class="icon-action act-play" title="Executar este arquivo">
               <svg
                 version="1.1"
                 id="Layer_1"
@@ -782,7 +796,7 @@
                 ></path>
               </svg>
             </button>
-            <a class="icon-action act-download" title="Download">
+            <a class="icon-action act-download" title="Baixar">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -800,7 +814,7 @@
             <button
               class="icon-action act-oinput act-rename"
               data-action=""
-              title="Rename"
+              title="Renomear"
             >
               <svg
                 version="1.0"
@@ -821,7 +835,7 @@
                 </g>
               </svg>
             </button>
-            <button class="icon-action act-delete" title="Delete">
+            <button class="icon-action act-delete" title="Excluir">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 x="0px"
@@ -864,41 +878,40 @@
     </template>
     <div class="dialog-background hidden">
       <div class="dialog upload hidden">
-        <div class="dialog-head">Uploading</div>
+        <div class="dialog-head">Enviando</div>
         <div class="dialog-body"></div>
       </div>
       <div class="dialog settings hidden">
-        <div class="dialog-head">Settings</div>
+        <div class="dialog-head">Configurações</div>
         <div class="dialog-body">
           <button
             class="btn-action act-cred"
             onclick="Dialog.show('credential')"
           >
-            Change WebUI Credentials
+            Alterar credenciais da WebUI
           </button>
           <button class="btn-action act-hide-show-navigating"></button>
-          <button class="btn-action act-reboot">Reboot</button>
+          <button class="btn-action act-reboot">Reiniciar</button>
         </div>
         <div class="dialog-footer">
-          <button class="btn-action act-dialog-close act-escape">Close</button>
+          <button class="btn-action act-dialog-close act-escape">Fechar</button>
         </div>
       </div>
       <div class="dialog navigator-shortcut hidden">
-        <div class="dialog-head">Navigator Shortcut</div>
+        <div class="dialog-head">Atalho do navegador</div>
         <div class="dialog-body">
           <p>
-            You can use a keyboard for navigating instead of the on-screen
-            buttons
+            Você pode navegar com um teclado ou com os botões na tela
           </p>
           <ul>
-            <li>Navigating = Arrow Keys</li>
-            <li>Back = Backspace</li>
+            <li>Navegar = teclas de seta</li>
+            <li>Voltar = Backspace</li>
             <li>OK = Enter</li>
-            <li>Long Press = M</li>
-            <li>Page Up = Page Up</li>
-            <li>Page Down = Page Down</li>
-            <li>Close Navigator = Escape</li>
-            <li>Reload Screen = R</li>
+            <li>Pressão longa = M</li>
+            <li>Página anterior = Page Up</li>
+            <li>Próxima página = Page Down</li>
+            <li>Fechar navegador = Escape</li>
+            <li>Atualizar tela = R</li>
           </ul>
         </div>
         <div class="dialog-footer">
@@ -906,13 +919,13 @@
             class="btn-action act-escape"
             onclick="Dialog.show('navigator')"
           >
-            Close
+            Fechar
           </button>
         </div>
       </div>
       <div class="dialog navigator hidden">
         <div class="dialog-head">
-          <span>Device Navigator</span>
+          <span>Navegador do dispositivo</span>
           <div>
             <button id="force-reload" class="btn-action">
               <svg
@@ -931,17 +944,17 @@
               </svg>
             </button>
             <select id="navigator-auto-reload">
-              <option value="0">Reload After Navigate</option>
-              <option value="1000">Auto Reload: 1s</option>
-              <option value="2000">Auto Reload: 2s</option>
-              <option value="5000">Auto Reload: 5s</option>
-              <option value="10000">Auto Reload: 10s</option>
+              <option value="0">Atualizar após navegar</option>
+              <option value="1000">Atualização: 1s</option>
+              <option value="2000">Atualização: 2s</option>
+              <option value="5000">Atualização: 5s</option>
+              <option value="10000">Atualização: 10s</option>
             </select>
           </div>
         </div>
         <div class="dialog-body">
           <div id="wifi-warning" class="navigator-warning hidden">
-            ⚠️ WiFi features will stop the WebUI after configuration
+            ⚠️ As funções Wi-Fi encerram a WebUI após a configuração
           </div>
           <canvas id="navigator-screen"></canvas>
           <div class="navigator-canvas">
@@ -949,7 +962,7 @@
               <div
                 class="nav nav-page-up"
                 data-direction="NextPage"
-                title="Next Page"
+                title="Próxima página"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -977,7 +990,7 @@
                   />
                 </svg>
               </div>
-              <div class="nav nav-up" data-direction="Up" title="Up">
+              <div class="nav nav-up" data-direction="Up" title="Cima">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
@@ -993,7 +1006,7 @@
               <div
                 class="nav nav-menu"
                 data-direction="Menu"
-                title="Long Press"
+                title="Pressão longa"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -1037,7 +1050,7 @@
               </div>
             </div>
             <div class="p-mid">
-              <div class="nav nav-left" data-direction="Prev" title="Left">
+              <div class="nav nav-left" data-direction="Prev" title="Esquerda">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
@@ -1053,9 +1066,9 @@
               <div
                 class="nav nav-ok"
                 data-direction="Sel"
-                title="Select/OK"
+                title="Selecionar/OK"
               ></div>
-              <div class="nav nav-right" data-direction="Next" title="Right">
+              <div class="nav nav-right" data-direction="Next" title="Direita">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
@@ -1073,7 +1086,7 @@
               <div
                 class="nav nav-page-down"
                 data-direction="PrevPage"
-                title="Previous Page"
+                title="Página anterior"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -1101,7 +1114,7 @@
                   />
                 </svg>
               </div>
-              <div class="nav nav-down" data-direction="Down" title="Down">
+              <div class="nav nav-down" data-direction="Down" title="Baixo">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
@@ -1114,7 +1127,7 @@
                   />
                 </svg>
               </div>
-              <div class="nav" data-direction="Esc" title="Back">
+              <div class="nav" data-direction="Esc" title="Voltar">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -1137,39 +1150,36 @@
             class="btn-action"
             onclick="Dialog.show('navigator-shortcut')"
           >
-            Shortcut
+            Atalho
           </button>
-          <button class="btn-action act-dialog-close act-escape">Close</button>
+          <button class="btn-action act-dialog-close act-escape">Fechar</button>
         </div>
       </div>
       <div class="dialog info hidden">
-        <div class="dialog-head">Info</div>
+        <div class="dialog-head">Informações</div>
         <div class="dialog-body">
           <p>
-            Firmware for offensive pranks, pentest studies and analysis - for
-            educational purposes only. Do not use in environments where you are
-            not allowed. All responsibilities for irresponsible usage of this
-            firmware rest on your fin, sharky.
+            Firmware para estudos, testes de segurança e análise em ambientes autorizados. A base Bruce e seus autores permanecem creditados; o uso responsável é dever de quem opera o dispositivo.
           </p>
-          <p>Sincerely, Bruce.</p>
+          <p>MaliOS — baseado no Bruce Firmware.</p>
           <p>
-            You can help develop the WebUI interface using
+            Você pode contribuir com a WebUI usando
             <a
               href="https://github.com/pr3y/Bruce/wiki/Files#customizing-the-webui"
               target="_blank"
               >Custom&nbsp;WebUI</a
             >
-            or
+            ou
             <a
               href="https://github.com/lshaf/bruce-web-interface"
               target="_blank"
-              >Local Bruce WebUI</a
+              >WebUI local MaliOS</a
             >
-            by <a href="https://github.com/lshaf" target="_blank">lshaf</a>.
+            por <a href="https://github.com/lshaf" target="_blank">lshaf</a>.
           </p>
         </div>
         <div class="dialog-footer">
-          <button class="btn-action act-dialog-close act-escape">Close</button>
+          <button class="btn-action act-dialog-close act-escape">Fechar</button>
         </div>
       </div>
       <div class="dialog oinput hidden">
@@ -1183,37 +1193,37 @@
         </div>
         <div class="dialog-footer">
           <button class="btn-action btn-default act-save-oinput-file"></button>
-          <button class="btn-action act-dialog-close act-escape">Close</button>
+          <button class="btn-action act-dialog-close act-escape">Fechar</button>
         </div>
       </div>
       <div class="dialog credential hidden">
-        <div class="dialog-head">Change WebUI Credentials</div>
+        <div class="dialog-head">Alterar credenciais da WebUI</div>
         <div class="dialog-body">
-          <label for="cred-username" class="oinput-label">Username</label>
+          <label for="cred-username" class="oinput-label">Usuário</label>
           <input
             type="text"
             id="cred-username"
             class="oinput-text-submit"
             style="margin-bottom: 10px"
           />
-          <label for="cred-password" class="oinput-label">Password</label>
+          <label for="cred-password" class="oinput-label">Senha</label>
           <input type="text" id="cred-password" class="oinput-text-submit" />
         </div>
         <div class="dialog-footer">
           <button class="btn-action btn-default act-save-credential">
-            Save
+            Salvar
           </button>
           <button
             class="btn-action act-escape"
             onclick="Dialog.show('settings')"
           >
-            Close
+            Fechar
           </button>
         </div>
       </div>
       <div class="dialog editor hidden">
         <div class="dialog-head">
-          Edit: <span class="editor-file-name"></span>
+          Editar: <span class="editor-file-name"></span>
         </div>
         <div class="dialog-body">
           <div class="editor-container">
@@ -1223,12 +1233,12 @@
         </div>
         <div class="dialog-footer">
           <button class="btn-action act-save-edit-file" title="CTRL + S">
-            Save
+            Salvar
           </button>
           <button class="btn-action act-run-edit-file" title="ALT + ENTER">
-            Run
+            Executar
           </button>
-          <button class="btn-action act-dialog-close act-escape">Close</button>
+          <button class="btn-action act-dialog-close act-escape">Fechar</button>
         </div>
       </div>
     </div>

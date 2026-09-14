@@ -45,18 +45,18 @@ function asset(name){
   await page.selectOption('#ct-intensity','500');assert.equal(await page.inputValue('#ct-interval'),'2000');
   await page.selectOption('#ct-intensity','1000');
   assert.equal(await page.inputValue('#ct-interval'),'4000');await page.selectOption('#ct-duration','0');
-  await page.click('#ct-start');await page.waitForFunction(()=>document.getElementById('ct-state').textContent==='RUNNING');
+  await page.click('#ct-start');await page.waitForFunction(()=>document.getElementById('ct-state').textContent==='EXECUTANDO');
   assert.equal(requests.at(-1).simulation,true);assert.equal(requests.at(-1).duration,0);assert.equal(requests.at(-1).interval,4000);
   assert.ok(await page.locator('#ct-stop').isEnabled());await page.click('#ct-stop');
-  await page.waitForFunction(()=>document.getElementById('ct-state').textContent==='STOPPED');assert.equal(stopCalled,true);
+  await page.waitForFunction(()=>document.getElementById('ct-state').textContent==='PARADO');assert.equal(stopCalled,true);
   await page.selectOption('#ct-mode','6');assert.equal(await page.isChecked('#ct-simulation'),true);assert.equal(await page.isDisabled('#ct-simulation'),true);
   await page.selectOption('#ct-mode','0');await page.uncheck('#ct-simulation');await page.click('#ct-scan');
   await page.waitForFunction(()=>document.getElementById('ct-targets').options.length===1);await page.selectOption('#ct-targets','0');
-  assert.equal(await page.inputValue('#ct-target'),'02:11:22:33:44:55');assert.match(await page.textContent('#ct-target-info'),/connectable/);
+  assert.equal(await page.inputValue('#ct-target'),'02:11:22:33:44:55');assert.match(await page.textContent('#ct-target-info'),/conect\u00e1vel/);
   await page.selectOption('#ct-mode','4');await page.click('#ct-start');
-  await page.waitForFunction(()=>document.getElementById('ct-message').dataset.error==='true');assert.match(await page.textContent('#ct-message'),/AUTHORIZED/);
+  await page.waitForFunction(()=>document.getElementById('ct-message').dataset.error==='true');assert.match(await page.textContent('#ct-message'),/AUTORIZADOS/);
   assert.equal(requests.length,2,'unacknowledged active start rejected locally');
-  await page.check('#ct-simulation');await page.click('#ct-start');await page.waitForFunction(()=>document.getElementById('ct-state').textContent==='RUNNING');
+  await page.check('#ct-simulation');await page.click('#ct-start');await page.waitForFunction(()=>document.getElementById('ct-state').textContent==='EXECUTANDO');
   await page.evaluate(()=>window.scrollTo(0,0));
   await page.screenshot({path:`tests/counter_resilience/${mobile?'mobile':'desktop'}.png`,fullPage:true});
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'no horizontal overflow');
@@ -64,7 +64,7 @@ function asset(name){
   for(let i=0;i<30&&!statusBlocked;++i)await new Promise(resolve=>setTimeout(resolve,100));
   assert.equal(statusBlocked,true,'status request deliberately stalled');
   await page.click('#ct-stop');assert.equal(stopCalled,true,'STOP bypasses stalled status request');
-  await page.waitForFunction(()=>document.getElementById('ct-state').textContent==='STOPPED');
+  await page.waitForFunction(()=>document.getElementById('ct-state').textContent==='PARADO');
   assert.deepEqual(errors,[]);console.log(`${mobile?'mobile':'desktop'} PASS: capabilities, distinct intensities, simulation, scan/select, authorization, live status, STOP during stalled poll`);await context.close();
  }
 }finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

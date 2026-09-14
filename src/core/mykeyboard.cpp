@@ -1,3 +1,4 @@
+#include "core/ui/MaliUI.h"
 #include "mykeyboard.h"
 #include "core/utils.h"
 #include "core/wifi/webInterface.h"
@@ -226,7 +227,7 @@ struct box_t {
     void draw(void) {
         int ie = touch_id < 0 ? 4 : 8;
         for (int i = 0; i < ie; ++i) {
-            tft.drawRect(x, y, w, h, color);
+            MaliUI::drawRoundedBox(x, y, w, h, color);
             tft.setTextColor(color);
             tft.drawString(String(key), x + w / 2 - FM * LW / 2, y + h / 2 - FM * LH / 2);
         }
@@ -585,7 +586,7 @@ String generalKeyboard(
                 tft.fillRect(0, 1, tftWidth, KBLH + 2, bruceConfig.bgColor);
                 // Draw the buttons_strings borders
                 for (int i = 0; i < buttons_number; ++i) {
-                    tft.drawRect(
+                    MaliUI::drawRoundedBox(
                         btns_layout[i][0],
                         2,
                         btns_layout[i][1],
@@ -594,7 +595,7 @@ String generalKeyboard(
                     );
                 }
 
-                tft.drawRect(3, textbox_y, tftWidth - 3, KBLH, bruceConfig.priColor); // typed string border
+                MaliUI::drawRoundedBox(3, textbox_y, tftWidth - 3, KBLH, bruceConfig.priColor); // typed string border
 
                 /* Highlight the corresponding button when the user cursor is over it */
                 // OK
@@ -621,7 +622,7 @@ String generalKeyboard(
                     );
                 } else if (caps) {
                     tft.fillRect(btns_layout[1][0], 2, btns_layout[1][1], KBLH, TFT_DARKGREY);
-                    tft.setTextColor(getComplementaryColor2(bruceConfig.bgColor), TFT_DARKGREY);
+                    tft.setTextColor(getComplementaryColor2(bruceConfig.bgColor), MaliUI::TEXT_SECONDARY);
                 } else tft.setTextColor(getComplementaryColor2(bruceConfig.bgColor), bruceConfig.bgColor);
                 tft.drawString(caps ? "ab" : "A@", btns_layout[1][2], top_button_text_y);
                 // DEL
@@ -673,7 +674,7 @@ String generalKeyboard(
                     );
                 } else if (!direction) {
                     tft.fillRect(btns_layout[5][0], 2, btns_layout[5][1], KBLH, TFT_DARKGREY);
-                    tft.setTextColor(getComplementaryColor2(bruceConfig.bgColor), TFT_DARKGREY);
+                    tft.setTextColor(getComplementaryColor2(bruceConfig.bgColor), MaliUI::TEXT_SECONDARY);
                 } else tft.setTextColor(getComplementaryColor2(bruceConfig.bgColor), bruceConfig.bgColor);
                 tft.drawString(direction ? "R/D" : "L/U", btns_layout[5][2], top_button_text_y);
 #endif
@@ -739,7 +740,7 @@ String generalKeyboard(
                 );
             }
             // Draw the textbox border again(?)
-            tft.drawRect(3, textbox_y, tftWidth - 3, KBLH, bruceConfig.priColor); // typed string border
+            MaliUI::drawRoundedBox(3, textbox_y, tftWidth - 3, KBLH, bruceConfig.priColor); // typed string border
 
             tft.setTextColor(getComplementaryColor2(bruceConfig.bgColor), bruceConfig.bgColor);
             tft.setTextSize(FM);

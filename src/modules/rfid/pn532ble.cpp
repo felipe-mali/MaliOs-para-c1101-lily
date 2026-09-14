@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #ifndef LITE_VERSION
 #include "pn532ble.h"
 #include "apdu.h"
@@ -186,9 +187,9 @@ void Pn532ble::saveDumpMenu() {
 
 void Pn532ble::loadDumpMenu() {
     options = {
-        {"Load MFC",      [this]() { setMode(HF_MF_LOAD_DUMP_MODE); }      },
-        {"Load MFU",      [this]() { setMode(HF_MFU_LOAD_DUMP_MODE); }     },
-        {"Load ISO15693", [this]() { setMode(HF_ISO15693_LOAD_DUMP_MODE); }},
+        {MaliText::load_mfc_15f783,      [this]() { setMode(HF_MF_LOAD_DUMP_MODE); }      },
+        {MaliText::load_mfu_d71cf4,      [this]() { setMode(HF_MFU_LOAD_DUMP_MODE); }     },
+        {MaliText::load_iso15693_115603, [this]() { setMode(HF_ISO15693_LOAD_DUMP_MODE); }},
         {"Voltar",        [this]() { selectMode(); }                       },
     };
 
@@ -199,9 +200,9 @@ void Pn532ble::loadNdefEmulateMenu() {
     String prefix = "";
 
     options = {
-        {"Visit Bruce", [&]() { prefix = "https://bruce.computer"; }},
+        {MaliText::visit_bruce_a77485, [&]() { prefix = "https://bruce.computer"; }},
         {"Abrir URL",   [&]() { prefix = "https://"; }              },
-        {"Phone Call",  [&]() { prefix = "tel:"; }                  },
+        {MaliText::phone_call_7c2c6b,  [&]() { prefix = "tel:"; }                  },
         {"Enviar e-mail", [&]() { prefix = "mailto:"; }             },
         {"Personalizado", [&]() { prefix = ""; }                    },
         {"Voltar",      [&]() { selectMode(); }                     },
@@ -209,7 +210,7 @@ void Pn532ble::loadNdefEmulateMenu() {
     delay(200);
     loopOptions(options);
 
-    String ndef_data = keyboard(prefix, 255, "NDEF data:");
+    String ndef_data = keyboard(prefix, 255, MaliText::ndef_data_1e706b);
     if (ndef_data == "\x1B") return;
     ndef_data.trim();
     emulationNdefData = ndef_data;

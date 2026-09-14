@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 /**
  * @file srix_tool.cpp
  * @brief SRIX4K/SRIX512 Reader/Writer Tool v1.3
@@ -281,7 +282,7 @@ void SRIXTool::read_tag() {
 
     // Read 128 blocks
     padprintln("Lendo 128 blocos...");
-    padprint("Please Wait");
+    padprint(MaliText::please_wait_2cabc9);
     uint8_t block[4];
 
     for (uint8_t b = 0; b < 128; b++) {
@@ -373,7 +374,7 @@ void SRIXTool::write_tag() {
     padprintln("");
     padprintln("Gravando 128 blocos...");
     padprintln("");
-    padprint("Please Wait");
+    padprint(MaliText::please_wait_2cabc9);
 
     uint8_t block[4];
     uint8_t blocks_written = 0;

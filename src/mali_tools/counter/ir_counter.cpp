@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "core/display.h"
 #include "core/sd_functions.h"
 #include "counter_main.h"
@@ -52,31 +53,31 @@ public:
             rawLength = constrain(int(result.rawlen) - 1, 0, 1024);
             overflow = result.overflow;
             for (int i = 0; i < rawLength; ++i) raw[i] = result.rawbuf[i + 1];
-            parsed = "Protocol: " + typeToString(result.decode_type) +
-                     " address: " + String(result.address, HEX) + " command: " + String(result.command, HEX);
-            data.lines[0] = "Signals: " + String(signals) + " repeats: " + String(repeats);
-            data.lines[1] = "Protocol: " + typeToString(result.decode_type) + " bits: " + String(result.bits);
-            data.lines[2] = "Address: 0x" + String(result.address, HEX);
-            data.lines[3] = "Command: 0x" + String(result.command, HEX);
-            data.lines[4] = "Interval: " + String(interval) + " ms";
-            data.lines[6] = "Carrier: N/A (demodulated RX)";
-            data.lines[7] = "OK: Save Sample (raw timings)";
-            data.status = repeat ? "REPEATING SIGNAL" : "NORMAL";
-            if (!repeat) event(IR, typeToString(result.decode_type) + " signal");
+            parsed = MaliText::protocol_a57e91 + typeToString(result.decode_type) +
+                     MaliText::address_c0ea3e + String(result.address, HEX) + MaliText::command_7c603c + String(result.command, HEX);
+            data.lines[0] = MaliText::signals_4c3892 + String(signals) + MaliText::repeats_fd9d82 + String(repeats);
+            data.lines[1] = MaliText::protocol_a57e91 + typeToString(result.decode_type) + " bits: " + String(result.bits);
+            data.lines[2] = MaliText::address_0x_be81a9 + String(result.address, HEX);
+            data.lines[3] = MaliText::command_0x_3fcec2 + String(result.command, HEX);
+            data.lines[4] = MaliText::interval_e40a07 + String(interval) + " ms";
+            data.lines[6] = MaliText::carrier_n_a_demodulated_rx_02855b;
+            data.lines[7] = MaliText::ok_save_sample_raw_timings_cb5de1;
+            data.status = repeat ? MaliText::repeating_signal_b6d450 : "NORMAL";
+            if (!repeat) event(IR, typeToString(result.decode_type) + MaliText::signal_a7c495);
             receiver->resume();
         }
         if (now - window >= 1000) {
             for (int i = 0; i < 31; ++i) data.bars[i] = data.bars[i + 1];
             data.bars[31] = min(100, int(rate) * 5);
             if (rate > 20) {
-                data.status = "HIGH IR ACTIVITY";
+                data.status = MaliText::high_ir_activity_eb5f4e;
                 event(IR, data.status, true);
             } else if (now - last > 1000) data.status = "NORMAL";
             data.warning = rate > 20;
             rate = 0;
             window = now;
         }
-        data.lines[5] = signals ? "Last: " + String((now - last) / 1000.0f, 1) + " s ago" : "Last: --";
+        data.lines[5] = signals ? MaliText::last_4b243c + String((now - last) / 1000.0f, 1) + MaliText::s_ago_090b41 : MaliText::last_d01783;
     }
     void save() override {
         if (!rawLength) {
@@ -94,10 +95,10 @@ public:
             displayError("Falha ao salvar", true);
             return;
         }
-        size_t written = f.println("MaliOS received IR sample; carrier unknown");
+        size_t written = f.println(MaliText::malios_received_ir_sample_carrier_unknown_55d19c);
         written += f.println(parsed);
-        written += f.println(String("Truncated: ") + (overflow ? "yes" : "no"));
-        written += f.println("Alternating mark/space durations (us):");
+        written += f.println(String(MaliText::truncated_00e0dc) + (overflow ? "yes" : "no"));
+        written += f.println(MaliText::alternating_mark_space_durations_us_d4bcdf);
         for (int i = 0; i < rawLength; ++i) {
             written += f.print(uint32_t(raw[i]) * kRawTick);
             written += f.print(' ');

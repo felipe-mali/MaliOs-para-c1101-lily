@@ -18,7 +18,7 @@ void ConnectMenu::optionsMenu() {
     };
     addOptionToMainMenu();
 
-    loopOptions(options, MENU_TYPE_SUBMENU, getName().c_str());
+    loopOptions(options, MENU_TYPE_GEAR, getDisplayName().c_str());
 }
 
 void ConnectMenu::drawIcon(float scale) {

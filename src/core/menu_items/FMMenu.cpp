@@ -18,7 +18,7 @@ void FMMenu::optionsMenu() {
     addOptionToMainMenu();
     options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::FM_RADIO); }});
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "FM");
+    loopOptions(options, MENU_TYPE_GEAR, "FM");
 }
 
 void FMMenu::drawIcon(float scale) {

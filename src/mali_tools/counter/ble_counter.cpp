@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "core/radio_mem.h"
 #include "counter_main.h"
 #include "counter_metrics.h"
@@ -153,26 +154,26 @@ public:
         }
         memcpy(previousAddresses, addresses, sizeof(addresses));
         previousUsed = active;
-        String status = rate > 300 && active > 20          ? "BLE FLOOD SUSPECTED"
-                        : rate > 150                       ? "HIGH ADVERTISEMENT RATE"
-                        : previousActive > 0 && added > 10 ? "DEVICE SPIKE"
+        String status = rate > 300 && active > 20          ? MaliText::ble_flood_suspected_d2da64
+                        : rate > 150                       ? MaliText::high_advertisement_rate_b4b6a2
+                        : previousActive > 0 && added > 10 ? MaliText::device_spike_177c86
                                                            : "NORMAL";
         if (status != data.status && status != "NORMAL") event(BLE, status, true);
         data.status = status;
         data.warning = status != "NORMAL";
-        data.lines[0] = "Devices (10s): " + String(active) + " /64";
-        data.lines[1] = "New/gone: " + String(added) + " / " + String(gone);
+        data.lines[0] = MaliText::devices_10s_3dc35f + String(active) + " /64";
+        data.lines[1] = MaliText::new_gone_79e272 + String(added) + " / " + String(gone);
         data.lines[2] = "Adv/s: " + String(rate) + " total: " + String(count);
-        data.lines[3] = String("Strongest: ") + (strongest.name[0] ? strongest.name : strongest.address);
+        data.lines[3] = String(MaliText::strongest_1f9976) + (strongest.name[0] ? strongest.name : strongest.address);
         data.lines[4] = "RSSI: " + String(strongest.rssi) + " dBm";
         data.lines[5] = String("UUID: ") + strongest.uuid;
-        data.lines[6] = String("Maker: ") + (strongest.vendor == 0xffff   ? "N/A"
+        data.lines[6] = String(MaliText::maker_c1fe4c) + (strongest.vendor == 0xffff   ? "N/A"
                                              : strongest.vendor == 0x004c ? "Apple"
                                              : strongest.vendor == 0x0075 ? "Samsung"
                                              : strongest.vendor == 0x0006 ? "Microsoft"
                                                                           : String(strongest.vendor, HEX));
-        data.lines[7] = "Devices >50 adv/s: " + String(high);
-        data.lines[8] = "Overflow adv: " + String(lost);
+        data.lines[7] = MaliText::devices_50_adv_s_92d3bd + String(high);
+        data.lines[8] = MaliText::overflow_adv_270630 + String(lost);
         for (int u = 0; u < 3; ++u)
             data.lines[9 + u] = String("UUID sample ") + String(u + 1) + ": " + uuidList[u];
         at = now;

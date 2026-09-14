@@ -1,3 +1,4 @@
+#include "core/ui/SerialHelpPtBr.h"
 #include "util_commands.h"
 #include "core/main_menu.h"
 #include "core/sd_functions.h"
@@ -133,87 +134,16 @@ uint32_t infoCallback(cmd *c) {
 }
 
 uint32_t helpCallback(cmd *c) {
-    serialDevice->print("Bruce v");
-    serialDevice->print(BRUCE_VERSION);
-    serialDevice->print("\nThese shell commands are defined internally.\n");
-
-    serialDevice->println("\nWiFi Commands:");
-    serialDevice->println("  wifi off (Disconnects Wifi)");
-    serialDevice->println(
-        "  wifi on  (Connects to a known Wifi network. if there's no known network, starts in AP Mode)"
-    );
-    serialDevice->println("  wifi add \"SSID\" \"Password\" (adds a network to the list)");
-    serialDevice->println("  arp - Starts Scan Hosts ARP Scanner");
-    serialDevice->println("  listen   - Starts listening TCP default port");
-    serialDevice->println("  sniffer - Starts Raw Sniffer");
-    serialDevice->println("\nWebUI Commands:");
-    serialDevice->println("  webui      - WebUI Webserver start");
-    serialDevice->println("\nIR Commands:");
-    serialDevice->println("  ir rx <timeout>      - Read an IR signal and print the dump on serialDevice->");
-    serialDevice->println(
-        "  ir rx raw <timeout>  - Read an IR signal in RAW mode and print the dump on serialDevice->"
-    );
-    serialDevice->println("  ir tx <protocol> <address> <decoded_value>  - Send a custom decoded IR signal.");
-    serialDevice->println(
-        "  ir tx_from_file <ir file path> [hide default UI true/false] - Send an IR signal saved in "
-        "storage. Optionally hide the default UI."
-    );
-
-    serialDevice->println("\nRF Commands:");
-    serialDevice->println(
-        "  subghz rx <timeout>       - Read an RF signal and print the dump on serialDevice-> (alias: rf rx)"
-    );
-    serialDevice->println(
-        "  subghz rx raw <timeout>   - Read an RF signal in RAW mode and print the dump on serialDevice-> "
-        "(alias: "
-        "rf rx raw)"
-    );
-    serialDevice->println(
-        "  subghz tx <decoded_value> <frequency> <te> <count>  - Send a custom decoded RF signal. (alias: rf "
-        "tx)"
-    );
-    serialDevice->println(
-        "  subghz tx_from_file <sub file path> [hide default UI true/false] - Send an RF signal "
-        "saved in storage. Optionally hide the default UI."
-    );
-
-    serialDevice->println("\nAudio Commands:");
-    serialDevice->println("  music_player <audio file path>  - Play an audio file.");
-    serialDevice->println("  tone <frequency> <duration>  - Play a single squarewave audio tone.");
-    serialDevice->println("  say <text>   - Text-To-Speech (speaker required).");
-
-    serialDevice->println("\nUI Commands:");
-    serialDevice->println("  led <r/g/b> <0-255>    - Change the UI main color.");
-    serialDevice->println("  clock                 - Show the clock UI.");
-
-    serialDevice->println("\nPower Management:");
-    serialDevice->println("  power <off/reboot/sleep>  - General power management.");
-
-    serialDevice->println("\nGPIO Commands:");
-    serialDevice->println("  gpio mode <pin number> <0/1>  - Set GPIO pins mode (0=input, 1=output).");
-    serialDevice->println("  gpio set <pin number> <0/1>   - Direct GPIO pins control (0=off, 1=on).");
-
-    serialDevice->println("\nI2C and Storage:");
-    serialDevice->println("  i2c scan                - Scan for modules connected to the I2C bus.");
-    serialDevice->println(
-        "  storage <list/remove/mkdir/rename/read/write/copy/md5/crc32> <file path>  - Common file "
-        "management commands."
-    );
-    serialDevice->println("  ls - Same as storage list");
-
-    serialDevice->println("\nSettings:");
-    serialDevice->println("  settings                - View all the current settings.");
-    serialDevice->println("  settings <name>         - View a single setting value.");
-    serialDevice->println("  settings <name> <new value>  - Alter a single setting value.");
-    serialDevice->println("  factory_reset           - Reset to default configuration.");
-
+    serialDevice->print("MaliOS v");
+    serialDevice->print(MALIOS_VERSION);
+    serialDevice->print(MaliText::SerialHelp);
     return true;
 }
 
 void optionsList() {
     int i = 0;
-    Serial.println("\nActual Menu: " + menuOptionLabel);
-    Serial.println("Options available: ");
+    Serial.println("\nMenu atual: " + menuOptionLabel);
+    Serial.println("Opcoes disponiveis: ");
     for (auto opt : options) {
         String txt = (opt.hovered ? ">" : " ") + String(i) + " - " + opt.label;
         Serial.println(txt);
@@ -264,7 +194,7 @@ uint32_t navCallback(cmd *c) {
         var = &PrevPagePress;
     } else {
         serialDevice->println(
-            "Unknown command, use: \n\"nav Next\" or \n\"nav Prev\" or \n\"nav Esc\" or \n\"nav Select\" or "
+            "Comando desconhecido, use: \n\"nav Next\" or \n\"nav Prev\" or \n\"nav Esc\" or \n\"nav Select\" or "
             "\n\"nav Up\" or \n\"nav Down\" or \n\"nav NextPage\" or \n\"nav PrevPage\""
         );
         return false;
@@ -321,7 +251,7 @@ uint32_t displayCallback(cmd *c) {
         tft.startAsyncSerial();
         tft.getTftInfo();
     } else if (opt == "stop") {
-        serialDevice->println("Display: Stopped async serial");
+        serialDevice->println("Tela: envio serial assincrono encerrado");
         tft.stopAsyncSerial();
     } else if (opt == "status") {
         if (tft.getLogging()) serialDevice->println("Display: Logging tft is ACTIVATED");
@@ -342,12 +272,12 @@ uint32_t displayCallback(cmd *c) {
         serialDevice->println(TFT_WIDTH + String("x") + TFT_HEIGHT + String("x") + ROTATION);
     } else {
         serialDevice->println(
-            "Display command accept:\n"
-            "display start : Start Logging\n"
-            "display stop  : Stop Logging\n"
-            "display status: Get Logging state\n"
-            "display dump  : Dumps binary log"
-            "display info  : Get display info"
+            "Comandos da tela:\n"
+            "display start : Inicia o registro\n"
+            "display stop  : Encerra o registro\n"
+            "display status: Consulta o estado do registro\n"
+            "display dump  : Exporta o registro binario"
+            "display info  : Consulta informacoes da tela"
         );
         return false;
     }
@@ -394,15 +324,15 @@ uint32_t loaderCallback(cmd *c) {
                 return true;
             }
             // else no matching app name found
-            serialDevice->println("app not found: " + appname);
+            serialDevice->println("Aplicativo nao encontrado: " + appname);
             return false;
         }
 
     } else {
         serialDevice->println(
-            "Loader command accept:\n"
-            "loader list : Lists available applications\n"
-            "loader open appname  : Runs the entered application.\n"
+            "Comandos do carregador:\n"
+            "loader list : Lista aplicativos disponiveis\n"
+            "loader open appname  : Abre o aplicativo informado.\n"
         );
         return false;
     }

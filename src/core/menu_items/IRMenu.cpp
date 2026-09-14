@@ -30,7 +30,7 @@ void IRMenu::optionsMenu() {
     String txt = "Infravermelho";
     txt += " Tx: " + String(bruceConfigPins.irTx) + " Rx: " + String(bruceConfigPins.irRx) +
            " Repet: " + String(bruceConfigPins.irTxRepeats);
-    loopOptions(options, MENU_TYPE_SUBMENU, txt.c_str());
+    loopOptions(options, MENU_TYPE_GEAR, txt.c_str());
 #if defined(ARDUINO_M5STICK_S3)
     M5.Power.setExtOutput(prevPower);
 #endif
@@ -44,7 +44,7 @@ void IRMenu::configMenu() {
         {"Voltar", [this]() { optionsMenu(); }},
     };
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "Config. IR");
+    loopOptions(options, MENU_TYPE_GEAR, "Config. IR");
 }
 
 void IRMenu::drawIcon(float scale) {

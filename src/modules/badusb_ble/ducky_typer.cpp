@@ -1,3 +1,5 @@
+#include "core/ui/MaliUI.h"
+#include "core/ui/PtBr.h"
 #if !defined(LITE_VERSION)
 #include "ducky_typer.h"
 #include "core/display.h"
@@ -455,7 +457,7 @@ static void queueOrSendKey(
 ) {
     if (!queueRecording) {
         sendSingleKey(hid, key);
-        displayTextLine("Sent: " + keyLabel);
+        displayTextLine(MaliText::sent_71515a + keyLabel);
         return;
     }
 
@@ -470,7 +472,7 @@ static void queueOrSendKey(
     }
 
     queuedKeys.push_back({key, keyLabel});
-    displayTextLine("Queued: " + queueToString(queuedKeys));
+    displayTextLine(MaliText::queued_9554be + queueToString(queuedKeys));
 }
 
 static void getMenuKey(const KeyboardMenuKey *src, KeyboardMenuKey *dst) {
@@ -507,18 +509,18 @@ static void openKeySection(
 static void
 keyboardSectionAction(HIDInterface *hid, bool &queueRecording, std::vector<QueuedHIDKey> &queuedKeys) {
     if (queueRecording) {
-        String queuedChar = keyboard("", 1, "Queue character:");
+        String queuedChar = keyboard("", 1, MaliText::queue_character_2c82a0);
         if (queuedChar == "\x1B" || queuedChar.length() == 0 || isKeyboardInputCanceled(queuedChar)) return;
         String label = queuedChar.substring(0, 1);
         queueOrSendKey(hid, true, queuedKeys, label, static_cast<uint8_t>(queuedChar.charAt(0)));
         return;
     }
 
-    String typedText = keyboard("", 76, "Type your message:");
+    String typedText = keyboard("", 76, MaliText::type_your_message_0dab45);
     if (typedText == "\x1B" || typedText.length() == 0 || isKeyboardInputCanceled(typedText)) return;
 
     hid->print(typedText.c_str());
-    displayTextLine("Text sent");
+    displayTextLine(MaliText::text_sent_447cb7);
 }
 
 static void
@@ -827,7 +829,7 @@ void key_input(FS fs, const String &bad_script, HIDInterface *_hid) {
     tft.setTextSize(FP);
     tft.setTextColor(bruceConfig.priColor);
     tft.setCursor(BORDER_OFFSET_FROM_SCREEN_EDGE * 2, FP * 8 * 3 + 2 + STATUS_BAR_HEIGHT);
-    tft.print("Run Time:");
+    tft.print(MaliText::run_time_c6b43c);
     printDecimalTime(0);
 
     tft.drawLine(
@@ -839,7 +841,7 @@ void key_input(FS fs, const String &bad_script, HIDInterface *_hid) {
     );
     if (!bruceConfig.badUSBBLEShowOutput) {
         tft.setTextSize(FP);
-        tft.setTextColor(TFT_RED);
+        tft.setTextColor(MaliUI::ERROR);
         tft.setCursor(BORDER_OFFSET_FROM_SCREEN_EDGE * 2, tftHeight / 2);
         tft.print("Saida do script desativada");
     }
@@ -1027,8 +1029,8 @@ void ducky_keyboard(HIDInterface *&hid, bool ble) {
     tft.setTextSize(FP);
     drawMainBorder();
     tft.setCursor(10, 28);
-    if (ble) tft.println("BLE Keyboard:");
-    else tft.println("USB Keyboard:");
+    if (ble) tft.println(MaliText::ble_keyboard_50e973);
+    else tft.println(MaliText::usb_keyboard_e16572);
     tft.drawCentreString("> " + String(KB_HID_EXIT_MSG) + " <", tftWidth / 2, tftHeight - 20, 1);
     tft.setTextSize(FP);
 
@@ -1188,7 +1190,7 @@ void MediaCommands(HIDInterface *hid, bool ble) {
     safeCleanupDuckyBLE(hid);
     ducky_startKb(hid, true, 1); // functionId 1 = Media
 
-    displayTextLine("Pairing...");
+    displayTextLine(MaliText::pairing_53e709);
 
     while (!hid->isConnected() && !check(EscPress)) { delay(50); };
 
@@ -1199,20 +1201,20 @@ void MediaCommands(HIDInterface *hid, bool ble) {
 
     reMenu:
         options = {
-            {"ScreenShot", [=]() { hid->press(KEY_PRINT_SCREEN); }        },
-            {"Play/Pause", [=]() { hid->press(KEY_MEDIA_PLAY_PAUSE); }    },
+            {MaliText::screenshot_7534aa, [=]() { hid->press(KEY_PRINT_SCREEN); }        },
+            {MaliText::play_pause_ebb1e1, [=]() { hid->press(KEY_MEDIA_PLAY_PAUSE); }    },
             {"Parar",         [=]() { hid->press(KEY_MEDIA_STOP); }          },
             {"Proxima faixa", [=]() { hid->press(KEY_MEDIA_NEXT_TRACK); }    },
-            {"Prev Track", [=]() { hid->press(KEY_MEDIA_PREVIOUS_TRACK); }},
+            {MaliText::prev_track_fb247e, [=]() { hid->press(KEY_MEDIA_PREVIOUS_TRACK); }},
             {"Volume +",   [=]() { hid->press(KEY_MEDIA_VOLUME_UP); }     },
             {"Volume -",   [=]() { hid->press(KEY_MEDIA_VOLUME_DOWN); }   },
-            {"Hold Vol +",
+            {MaliText::hold_vol_be9665,
              [=]() {
                  hid->press(KEY_MEDIA_VOLUME_UP);
                  delay(1000);
                  hid->releaseAll();
              }                                                            },
-            {"Mute",       [=]() { hid->press(KEY_MEDIA_MUTE); }          },
+            {MaliText::mute_0f0973,       [=]() { hid->press(KEY_MEDIA_MUTE); }          },
         };
         addOptionToMainMenu();
         index = loopOptions(options, index);
@@ -1391,7 +1393,7 @@ void PresenterMode(HIDInterface *&hid, bool ble) {
     if (ble) safeCleanupDuckyBLE(hid);
     ducky_startKb(hid, ble, 3); // functionId 3 = Presenter
 
-    displayTextLine("Pairing...");
+    displayTextLine(MaliText::pairing_53e709);
 
     while (!hid->isConnected() && !check(EscPress)) { vTaskDelay(pdMS_TO_TICKS(1)); }
 
@@ -1414,24 +1416,24 @@ void PresenterMode(HIDInterface *&hid, bool ble) {
 
         tft.setTextSize(FM);
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-        tft.drawCentreString("PRESENTER", tftWidth / 2, 10, 1);
+        tft.drawCentreString(MaliText::presenter_86bed7, tftWidth / 2, 10, 1);
 
         tft.drawFastHLine(10, 35, tftWidth - 20, bruceConfig.priColor);
 
         tft.setTextSize(FM);
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-        tft.drawCentreString("Time", tftWidth / 2, tftHeight / 2 + 15, 1);
+        tft.drawCentreString(MaliText::time_6c82e6, tftWidth / 2, tftHeight / 2 + 15, 1);
 
         tft.setTextSize(1);
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-        tft.drawCentreString("<< PREV | SEL | NEXT >>", tftWidth / 2, tftHeight - 15, 1);
+        tft.drawCentreString(MaliText::prev_sel_next_988d7a, tftWidth / 2, tftHeight - 15, 1);
     };
 
     auto updateSlideDisplay = [&]() {
         tft.fillRect(0, tftHeight / 2 - 35, tftWidth, 40, bruceConfig.bgColor);
 
         tft.setTextSize(4);
-        tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+        tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
         String slideStr = "Slide " + String(currentSlide);
         tft.drawCentreString(slideStr, tftWidth / 2, tftHeight / 2 - 30, 1);
         lastDisplayedSlide = currentSlide;
@@ -1454,7 +1456,7 @@ void PresenterMode(HIDInterface *&hid, bool ble) {
 
         tft.fillRect(0, tftHeight / 2 + 30, tftWidth, 30, bruceConfig.bgColor);
         tft.setTextSize(3);
-        tft.setTextColor(timerStarted ? TFT_GREEN : TFT_DARKGREY, bruceConfig.bgColor);
+        tft.setTextColor(timerStarted ? MaliUI::SUCCESS : MaliUI::TEXT_SECONDARY, bruceConfig.bgColor);
         tft.drawCentreString(timeBuffer, tftWidth / 2, tftHeight / 2 + 35, 1);
 
         lastDisplayedSeconds = elapsed;

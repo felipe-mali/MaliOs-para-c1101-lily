@@ -48,7 +48,7 @@ void ConfigMenu::optionsMenu() {
         localOptions.push_back({"Sobre", showDeviceInfo});
         localOptions.push_back({"Menu Principal", []() {}});
 
-        int selected = loopOptions(localOptions, MENU_TYPE_SUBMENU, "Configuracoes");
+        int selected = loopOptions(localOptions, MENU_TYPE_GEAR, "Configuracoes");
 
         // Exit to Main Menu only if user pressed Back
         if (selected == -1 || selected == localOptions.size() - 1) { return; }
@@ -71,7 +71,7 @@ void ConfigMenu::displayUIMenu() {
             {"Voltar",            []() {}                                         },
         };
 
-        int selected = loopOptions(localOptions, MENU_TYPE_SUBMENU, "Tela e interface");
+        int selected = loopOptions(localOptions, MENU_TYPE_GEAR, "Tela e interface");
 
         // Exit only if user pressed Back or ESC
         if (selected == -1 || selected == localOptions.size() - 1) { return; }
@@ -116,7 +116,7 @@ void ConfigMenu::ledMenu() {
             {"Voltar",                                                             []() {}},
         };
 
-        int selected = loopOptions(localOptions, MENU_TYPE_SUBMENU, "Config. LED");
+        int selected = loopOptions(localOptions, MENU_TYPE_GEAR, "Config. LED");
 
         // Exit only if user pressed Back or ESC
         if (selected == -1 || selected == localOptions.size() - 1) { return; }
@@ -148,7 +148,7 @@ void ConfigMenu::audioMenu() {
             {"Voltar",                                                      []() {}                       },
         };
 
-        int selected = loopOptions(localOptions, MENU_TYPE_SUBMENU, "Config. audio");
+        int selected = loopOptions(localOptions, MENU_TYPE_GEAR, "Config. audio");
 
         // Exit only if user pressed Back or ESC
         if (selected == -1 || selected == localOptions.size() - 1) { return; }
@@ -183,7 +183,7 @@ void ConfigMenu::systemMenu() {
             {"Voltar",                                                              []() {}                              },
         };
 
-        int selected = loopOptions(localOptions, MENU_TYPE_SUBMENU, "Config. sistema");
+        int selected = loopOptions(localOptions, MENU_TYPE_GEAR, "Config. sistema");
 
         // Exit only if user pressed Back or ESC
         if (selected == -1 || selected == localOptions.size() - 1) { return; }
@@ -231,7 +231,7 @@ void ConfigMenu::advancedMenu() {
             {"Voltar",          []() {}                            },
         };
 
-        int selected = loopOptions(localOptions, MENU_TYPE_SUBMENU, "Avancado");
+        int selected = loopOptions(localOptions, MENU_TYPE_GEAR, "Avancado");
 
         // Exit to System Config menu
         if (selected == -1 || selected == localOptions.size() - 1) { return; }
@@ -259,7 +259,7 @@ void ConfigMenu::powerMenu() {
             {"Voltar",     []() {}                },
         };
 
-        int selected = loopOptions(localOptions, MENU_TYPE_SUBMENU, "Energia");
+        int selected = loopOptions(localOptions, MENU_TYPE_GEAR, "Energia");
 
         // Exit to Config menu
         if (selected == -1 || selected == localOptions.size() - 1) { return; }
@@ -280,7 +280,7 @@ void ConfigMenu::devMenu() {
             {"Voltar",           []() {}                                    },
         };
 
-        int selected = loopOptions(localOptions, MENU_TYPE_SUBMENU, "Modo dev");
+        int selected = loopOptions(localOptions, MENU_TYPE_GEAR, "Modo dev");
 
         // Check if "Disable DevMode" was pressed (second-to-last option)
         if (selected == localOptions.size() - 2) {
@@ -318,7 +318,7 @@ void ConfigMenu::pinsMenu() {
             {"Voltar",         []() {}                                                 },
         };
 
-        int selected = loopOptions(localOptions, MENU_TYPE_SUBMENU, "Config. de pinos");
+        int selected = loopOptions(localOptions, MENU_TYPE_GEAR, "Config. de pinos");
 
         // Exit to Config menu on Back or ESC
         if (selected == -1 || selected == localOptions.size() - 1) { return; }

@@ -1,3 +1,5 @@
+#include "core/ui/MaliUI.h"
+#include "core/ui/PtBr.h"
 #include "dice_app.h"
 
 #include "core/display.h"
@@ -28,35 +30,35 @@ void rememberRoll(int result) {
 }
 
 void drawRollScreen(int sides, int result, bool finalResult) {
-    drawMainBorderWithTitle("D" + String(sides));
-
-    tft.setTextColor(bruceConfig.secColor, bruceConfig.bgColor);
-    tft.setTextSize(FP);
-    tft.drawCentreString("Resultado", tftWidth / 3, 38, 1);
-
-    tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-    tft.setTextSize(4 * FP);
-    tft.drawCentreString(String(result), tftWidth / 3, 55, 1);
-    tft.setTextSize(FP);
-
-    const int historyX = (2 * tftWidth) / 3;
-    tft.setTextColor(bruceConfig.secColor, bruceConfig.bgColor);
-    tft.drawCentreString("Ultimas", historyX, 40, 1);
-    tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-    for (uint8_t i = 0; i < historyCount; ++i) {
-        tft.drawCentreString(String(history[i]), historyX, 57 + i * (LH + 4), 1);
-    }
-
+    const bool portrait = tftHeight > tftWidth;
+    const int resultW = portrait ? tftWidth - 16 : tftWidth * 3 / 5 - 12;
+    const int resultH = portrait ? 136 : tftHeight - 56;
+    const int historyX = portrait ? 8 : resultW + 16;
+    const int historyY = portrait ? 178 : 32;
+    const int historyW = portrait ? tftWidth - 16 : tftWidth - historyX - 8;
+    MaliUI::drawCard(8, 32, resultW, resultH, true);
+    MaliUI::drawCard(historyX, historyY, historyW, portrait ? tftHeight - 202 : resultH);
+    tft.setTextDatum(0);
+    tft.setTextSize(1);
+    tft.setTextColor(MaliUI::TEXT_SECONDARY, MaliUI::SURFACE);
+    tft.drawCentreString("Resultado", 8 + resultW / 2, 42, 1);
+    tft.drawCentreString("Ultimas", historyX + historyW / 2, historyY + 10, 1);
+    tft.setTextSize(4);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, MaliUI::SURFACE);
+    tft.drawCentreString(String(result), 8 + resultW / 2, 64, 1);
+    tft.setTextSize(1);
+    for (uint8_t i = 0; i < historyCount; ++i)
+        tft.drawCentreString(String(history[i]), historyX + historyW / 2, historyY + 28 + i * 16, 1);
     if (finalResult && sides == 20 && (result == 1 || result == 20)) {
-        tft.setTextColor(bruceConfig.secColor, bruceConfig.bgColor);
-        tft.drawCentreString(result == 20 ? "CRITICO!" : "FALHA CRITICA!", tftWidth / 3, 102, 1);
+        tft.setTextColor(result == 20 ? MaliUI::SUCCESS : MaliUI::ERROR, MaliUI::SURFACE);
+        tft.drawCentreString(result == 20 ? "CRITICO!" : "FALHA CRITICA!", 8 + resultW / 2, 32 + resultH - 18, 1);
     }
-
-    tft.setTextColor(bruceConfig.secColor, bruceConfig.bgColor);
-    tft.drawCentreString("SEL rola | BACK volta", tftWidth / 2, tftHeight - LH - 3, 1);
+    MaliUI::drawFooter("SEL: rolar  VOLTAR: menu");
 }
 
 bool animateRoll(int sides, int &result) {
+    tft.fillScreen(MaliUI::BACKGROUND);
+    MaliUI::drawHeader("D" + String(sides));
     for (uint8_t frame = 0; frame < 6; ++frame) {
         result = rollDie(sides);
         drawRollScreen(sides, result, false);
@@ -103,7 +105,7 @@ void dice_app() {
             {"Voltar", [&]() { leave = true; }},
         };
 
-        const int selected = loopOptions(diceOptions, MENU_TYPE_SUBMENU, "Dados");
+        const int selected = loopOptions(diceOptions, MENU_TYPE_GEAR, "Dados");
         if (selected < 0 || leave) return;
         if (selectedSides > 0) runDie(selectedSides);
     }

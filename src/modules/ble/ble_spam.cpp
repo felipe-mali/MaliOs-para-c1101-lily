@@ -1,3 +1,4 @@
+#include "core/ui/MaliUI.h"
 /**
  * ble_spam.cpp — BLE Spam Module for Bruce Firmware
  *
@@ -963,7 +964,7 @@ static void bleSpamRenderList(
     }
 
     if (footer != nullptr) {
-        tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
+        tft.setTextColor(MaliUI::TEXT_SECONDARY, bruceConfig.bgColor);
         tft.fillRect(8, metrics.footer_y, tftWidth - 16, FP * LH, bruceConfig.bgColor);
         tft.drawCentreString(footer, tftWidth / 2, metrics.footer_y + 2, 1);
     }
@@ -1752,7 +1753,7 @@ bleSpamConfigScreen(const BleSpamSelection &selection, BleSpamConfig &config, bo
             tft.setTextColor(startColor, bruceConfig.bgColor);
             tft.drawCentreString("[ Iniciar ]", tftWidth / 2, startRowY + 2, 1);
 
-            tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
+            tft.setTextColor(MaliUI::TEXT_SECONDARY, bruceConfig.bgColor);
             tft.fillRect(8, footerY, tftWidth - 16, footerH, bruceConfig.bgColor);
             tft.drawCentreString("Clique=Selecionar ESC=Voltar", tftWidth / 2, footerY + 2, 1);
 
@@ -1860,7 +1861,7 @@ static void bleSpamRenderRunningScreen(
         tft.drawFastHLine(8, statsY + rowH * 2 - 2, tftWidth - 16, bruceConfig.priColor);
         tft.drawFastHLine(8, configStartY + rowH * 4 - 2, tftWidth - 16, bruceConfig.priColor);
 
-        tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
+        tft.setTextColor(MaliUI::TEXT_SECONDARY, bruceConfig.bgColor);
         tft.fillRect(8, footerY, tftWidth - 16, footerH, bruceConfig.bgColor);
         tft.drawCentreString("Clique=Editar ESC=Parar", tftWidth / 2, footerY + 2, 1);
     }
@@ -1915,7 +1916,7 @@ static bool bleSpamStoppedPrompt(const BleSpamSelection &selection, uint32_t sen
                 tft.fillRect(10, statsY, tftWidth - 20, FP * LH + 6, bruceConfig.bgColor);
                 tft.drawString(buf, 12, statsY + 2, 1);
 
-                tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
+                tft.setTextColor(MaliUI::TEXT_SECONDARY, bruceConfig.bgColor);
                 int footerY = tftHeight - FP * LH - 12;
                 tft.fillRect(8, footerY, tftWidth - 16, FP * LH + 4, bruceConfig.bgColor);
                 tft.drawCentreString("Clique=Selecionar ESC=Voltar", tftWidth / 2, footerY + 2, 1);

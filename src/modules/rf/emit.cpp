@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "emit.h"
 #include "modules/rf/rf_utils.h" // for initRfModule
 #include <ELECHOUSE_CC1101_SRC_DRV.h>
@@ -20,7 +21,7 @@ void rf_raw_emit_draw(void *parameter) {
     tft.setCursor(20, 38);
     tft.setTextSize(FP);
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-    tft.print("Emitting: ");
+    tft.print(MaliText::emitting_b8904d);
     tft.print(frequency);
     tft.print(" MHz");
     tft.setTextColor(getColorVariation(bruceConfig.priColor), bruceConfig.bgColor);

@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #pragma once
 #include <Arduino.h>
 #include <ArduinoJson.h>
@@ -26,7 +27,8 @@ struct Status {
     uint8_t bars[64] = {}, barCount = 0;
     uint8_t channelCount[14] = {};
     int16_t channelRssi[14] = {};
-    char message[160] = "Ready";
+    char message[160] = {};
+    Status() { strlcpy(message, MaliText::ready_20c7c5, sizeof(message)); }
 };
 const char *categoryName(Category category);
 const char *modeName(Category category, uint8_t mode);

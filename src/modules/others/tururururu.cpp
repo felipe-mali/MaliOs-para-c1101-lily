@@ -1,3 +1,5 @@
+#include "core/ui/MaliUI.h"
+#include "core/ui/PtBr.h"
 #include "tururururu.h"
 #include "core/display.h"
 #include "core/mykeyboard.h"
@@ -119,10 +121,10 @@ void checkCollisions() {
 
 // Função para exibir a pontuação
 void displayScore() {
-    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
     tft.setTextSize(FM);
     tft.setCursor(0, 0);
-    tft.printf("Score: %d", score);
+    tft.printf(MaliText::score_d_ffa9ec, score);
 }
 
 void shark_setup() {
@@ -176,13 +178,13 @@ void shark_loop() {
             displaySuccess("So...");
             while (!check(SelPress)) { vTaskDelay(pdMS_TO_TICKS(1)); }
             while (check(SelPress)) { vTaskDelay(pdMS_TO_TICKS(1)); } // debounce
-            displaySuccess("you just found");
+            displaySuccess(MaliText::you_just_found_bf51c6);
             while (!check(SelPress)) { vTaskDelay(pdMS_TO_TICKS(1)); }
             while (check(SelPress)) { vTaskDelay(pdMS_TO_TICKS(1)); } // debounce
-            displayInfo("hidden credits!");
+            displayInfo(MaliText::hidden_credits_6e35bd);
             while (!check(SelPress)) { vTaskDelay(pdMS_TO_TICKS(1)); }
             while (check(SelPress)) { vTaskDelay(pdMS_TO_TICKS(1)); } // debounce
-            displayInfo("main devs:");
+            displayInfo(MaliText::main_devs_18b707);
             while (!check(SelPress)) { vTaskDelay(pdMS_TO_TICKS(1)); }
             while (check(SelPress)) { vTaskDelay(pdMS_TO_TICKS(1)); } // debounce
             options = {

@@ -1,3 +1,5 @@
+#include "core/ui/MaliUI.h"
+#include "core/ui/PtBr.h"
 #include "mic.h"
 #if defined(MIC_SPM1423) || defined(MIC_INMP441)
 #include "core/mykeyboard.h"
@@ -235,7 +237,7 @@ void mic_test_one_task() {
     }
 
     // Border around the spectrogram
-    tft.drawRect(displayX - 2, displayY - 2, displayWidth + 4, displayHeight + 4, bruceConfig.priColor);
+    MaliUI::drawRoundedBox(displayX - 2, displayY - 2, displayWidth + 4, displayHeight + 4, bruceConfig.priColor);
 
     while (1) {
         fft_config_t *plan = fft_init(FFT_SIZE, FFT_REAL, FFT_FORWARD, NULL, NULL);
@@ -582,7 +584,7 @@ void mic_record_app() {
         switch (itemIndex) {
             case ITEM_TIME: {
                 tft.setCursor(MARGIN + 2, contentY);
-                tft.print("Time:");
+                tft.print(MaliText::time_179578);
 
                 int unitX = tftWidth - MARGIN - rightMargin;
 
@@ -590,7 +592,7 @@ void mic_record_app() {
                     const char *infText = (tftWidth > 200) ? "Unlim" : "INF";
                     int textWidth = strlen(infText) * 6 * TEXT_SIZE_LARGE;
                     tft.setCursor(unitX + 6 * TEXT_SIZE_LARGE - textWidth, contentY);
-                    if (isEdit && isSelected) tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+                    if (isEdit && isSelected) tft.setTextColor(MaliUI::WARNING, bruceConfig.bgColor);
                     tft.print(infText);
                 } else {
                     char timeStr[8];
@@ -604,7 +606,7 @@ void mic_record_app() {
             }
             case ITEM_GAIN: {
                 tft.setCursor(MARGIN + 2, contentY);
-                tft.print("Gain:");
+                tft.print(MaliText::gain_3b6556);
                 tft.setCursor(tftWidth - MARGIN - 50, contentY);
                 tft.print(gain_value, 1);
                 tft.print("x");
@@ -612,15 +614,15 @@ void mic_record_app() {
             }
             case ITEM_STEALTH: {
                 tft.setCursor(MARGIN + 2, contentY);
-                tft.print("Stealth:");
+                tft.print(MaliText::stealth_b9beae);
                 tft.setCursor(tftWidth - MARGIN - 35, contentY);
-                tft.print(stealth_enabled ? "ON" : "OFF");
+                tft.print(stealth_enabled ? MaliText::on_387d7a : MaliText::off_ad5048);
                 break;
             }
             case ITEM_START: {
                 uint16_t btnColor = isSelected ? TFT_RED : TFT_DARKGREY;
                 tft.fillRoundRect(MARGIN, yPos, tftWidth - 2 * MARGIN, BUTTON_HEIGHT, 8, btnColor);
-                tft.setTextColor(TFT_WHITE, btnColor);
+                tft.setTextColor(MaliUI::TEXT_PRIMARY, btnColor);
                 const char *btnText = (tftWidth > 200) ? "INICIAR GRAV." : "INICIAR";
                 int textWidth = strlen(btnText) * 6 * TEXT_SIZE_LARGE;
                 tft.setCursor((tftWidth - textWidth) / 2, yPos + (BUTTON_HEIGHT - TEXT_SIZE_LARGE * 8) / 2);
@@ -638,7 +640,7 @@ void mic_record_app() {
     tft.setTextColor(bruceConfig.bgColor, bruceConfig.priColor);
     tft.setTextSize(TEXT_SIZE_LARGE);
     tft.setCursor(MARGIN, (HEADER_HEIGHT - (TEXT_SIZE_LARGE * 8)) / 2);
-    tft.println("MIC RECORDER");
+    tft.println(MaliText::mic_recorder_8e6fee);
 
     // Footer Instructions (Static)
     if (tftHeight > 200) {
@@ -770,7 +772,7 @@ void mic_record_app() {
         if (stealth_enabled) {
             setBrightness(10, false);
             tft.fillScreen(TFT_BLACK);
-            tft.setTextColor(TFT_RED);
+            tft.setTextColor(MaliUI::ERROR);
             tft.setTextSize(1);
             tft.setCursor(5, 5);
             tft.print(".");
@@ -782,7 +784,7 @@ void mic_record_app() {
             const int REC_HEADER_HEIGHT = (tftHeight > 200) ? 40 : 30;
             tft.fillRect(0, 0, tftWidth, REC_HEADER_HEIGHT, TFT_RED);
             tft.setTextSize((tftWidth > 200) ? 2 : 1);
-            tft.setTextColor(TFT_WHITE, TFT_RED);
+            tft.setTextColor(MaliUI::TEXT_PRIMARY, MaliUI::ERROR);
 
             const char *headerText = (tftWidth > 200) ? "● RECORDING" : "● REC";
             int headerWidth = strlen(headerText) * 6 * ((tftWidth > 200) ? 2 : 1);
@@ -796,7 +798,7 @@ void mic_record_app() {
 
             // Gain
             tft.setCursor(MARGIN, INFO_START_Y);
-            tft.print("Gain: ");
+            tft.print(MaliText::gain_ab468d);
             tft.print(gain_value, 1);
             tft.print("x");
 
@@ -863,7 +865,7 @@ void mic_record_app() {
                         tft.fillRect(0, TIMER_Y - 5, tftWidth, TIMER_SIZE * 8 + 10, bruceConfig.bgColor);
 
                         tft.setTextSize(TIMER_SIZE);
-                        tft.setTextColor(TFT_RED, bruceConfig.bgColor);
+                        tft.setTextColor(MaliUI::ERROR, bruceConfig.bgColor);
                         int timerWidth = strlen(timerStr) * 6 * TIMER_SIZE;
                         tft.setCursor((tftWidth - timerWidth) / 2, TIMER_Y);
                         tft.print(timerStr);
@@ -894,7 +896,7 @@ void mic_record_app() {
                 tft.fillScreen(bruceConfig.bgColor);
 
                 tft.fillRect(0, 0, tftWidth, HEADER_HEIGHT, TFT_DARKGREEN);
-                tft.setTextColor(TFT_WHITE, TFT_DARKGREEN);
+                tft.setTextColor(MaliUI::TEXT_PRIMARY, TFT_DARKGREEN);
                 tft.setTextSize(TEXT_SIZE_LARGE);
                 const char *successText = "SALVO";
                 int successWidth = strlen(successText) * 6 * TEXT_SIZE_LARGE;
@@ -924,7 +926,7 @@ void mic_record_app() {
                 }
 
                 tft.setCursor(MARGIN, infoY + 30);
-                tft.print("Duration: ");
+                tft.print(MaliText::duration_acad9a);
                 unsigned long totalMs = millis() - startRecTime;
                 int finalSec = (int)(totalMs / 1000);
                 char durStr[16];

@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "FileMenu.h"
 #include "core/display.h"
 #include "core/massStorage.h"
@@ -9,7 +10,7 @@
 
 void FileMenu::optionsMenu() {
     options.clear();
-    if (setupSdCard()) options.push_back({"SD Card", [=]() { loopSD(SD); }});
+    if (setupSdCard()) options.push_back({MaliText::sd_card_14cdf0, [=]() { loopSD(SD); }});
     options.push_back({"LittleFS", [=]() { loopSD(LittleFS); }});
 
 #if !defined(LITE_VERSION)
@@ -21,17 +22,17 @@ void FileMenu::optionsMenu() {
             {"Receber comandos", [=]() { EspSerialCmd().receiveCommands(); }},
             {"Voltar",           [=]() { optionsMenu(); }                   }
         };
-        loopOptions(connectOpts, MENU_TYPE_SUBMENU, "Conectar");
+        loopOptions(connectOpts, MENU_TYPE_GEAR, "Conectar");
     }});
 #endif
 
 #if defined(SOC_USB_OTG_SUPPORTED)
-    options.push_back({"USB Mass Storage", [=]() { MassStorage(); }});
+    options.push_back({MaliText::usb_mass_storage_53b6c0, [=]() { MassStorage(); }});
 #endif
     addOptionToMainMenu();
     options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::FILES); }});
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "Arquivos");
+    loopOptions(options, MENU_TYPE_GEAR, "Arquivos");
 }
 void FileMenu::drawIcon(float scale) {
     clearIconArea();

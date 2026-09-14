@@ -1,3 +1,5 @@
+#include "core/ui/MaliUI.h"
+#include "core/ui/PtBr.h"
 /**
  * @file timer.cpp
  * @author Aleksei Gor (https://github.com/AlekseiGor) - Reviewed and optimized by Senape3000
@@ -207,12 +209,12 @@ void Timer::playAlarmPattern() {
     drawMainBorderWithTitle("Temporizador concluido!", false);
 
     tft.setTextSize(2);
-    tft.setTextColor(TFT_RED, bruceConfig.bgColor);
-    tft.drawCentreString("TIME'S UP!", timerX, timerY - LH, 1);
+    tft.setTextColor(MaliUI::ERROR, bruceConfig.bgColor);
+    tft.drawCentreString(MaliText::time_s_up_7441e6, timerX, timerY - LH, 1);
 
     tft.setTextSize(1);
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-    tft.drawCentreString("SEL ou BACK para parar", timerX, timerY + (2 * LH), 1);
+    tft.drawCentreString(MaliText::sel_ou_back_para_parar_6f48b0, timerX, timerY + (2 * LH), 1);
 
     // Alarm pattern loop - continues until user stops it
     while (true) {

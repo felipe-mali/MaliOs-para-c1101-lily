@@ -1,3 +1,4 @@
+#include "core/ui/TextLayout.h"
 #include "core/ui/MaliUI.h"
 #include "mali_tools/counter/CounterLab.h"
 #include "display.h"
@@ -147,26 +148,11 @@ std::vector<String> wrapText(const String &text, int maxCharsPerLine) {
     std::vector<String> lines;
     if (maxCharsPerLine <= 0) return lines;
 
-    String remaining = text;
-    while (remaining.length() > 0) {
-        if (remaining.length() <= maxCharsPerLine) {
-            lines.push_back(remaining);
-            break;
-        }
-        // Find last space within maxCharsPerLine
-        int splitPos = -1;
-        for (int i = maxCharsPerLine - 1; i >= 0; i--) {
-            if (remaining[i] == ' ' || remaining[i] == '-' || remaining[i] == '_') {
-                splitPos = i;
-                break;
-            }
-        }
-        if (splitPos <= 0) {
-            // No word boundary found, force split at max
-            splitPos = maxCharsPerLine;
-        }
-        lines.push_back(remaining.substring(0, splitPos));
-        remaining = remaining.substring(splitPos + 1);
+    size_t start = 0;
+    while (start < text.length()) {
+        auto part = MaliUI::textBreak(text.c_str() + start, text.length() - start, maxCharsPerLine);
+        lines.push_back(text.substring(start, start + part.length));
+        start += part.next;
     }
     return lines;
 }
@@ -190,8 +176,10 @@ void drawButton(
         tft.fillRoundRect(x, y, w, h, MaliUI::MALI_RADIUS_MEDIUM, MaliUI::SURFACE);
         tft.drawRoundRect(x, y, w, h, MaliUI::MALI_RADIUS_MEDIUM, color);
     }
-    tft.setTextColor(inverted ? MaliUI::TEXT_PRIMARY : color);
-    tft.drawString(text, x + w / 2, y + h);
+    tft.setTextDatum(MC_DATUM);
+    tft.setTextSize(1);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, inverted ? MaliUI::SURFACE_ALT : MaliUI::SURFACE);
+    tft.drawString(MaliUI::fitText(text, w - 8), x + w / 2, y + h / 2);
 }
 
 int8_t displayMessage(
@@ -204,23 +192,12 @@ int8_t displayMessage(
 
     MaliUI::drawCard(6,30,tftWidth-12,max(30,tftHeight-60));
 
-    tft.setTextColor(color);
-    tft.setTextSize(FM);
-    tft.setTextDatum(TC_DATUM);
-
-    // Handle newline characters in message
-    String msg = String(message);
-    int y = tftHeight / 2 - 20;
-    int start = 0;
-    int end = msg.indexOf('\n');
-
-    while (end != -1) {
-        tft.drawString(msg.substring(start, end), tftWidth / 2, y);
-        y += FM * 8;
-        start = end + 1;
-        end = msg.indexOf('\n', start);
-    }
-    tft.drawString(msg.substring(start), tftWidth / 2, y);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, MaliUI::SURFACE);
+    tft.setTextSize(1);
+    tft.setTextDatum(TL_DATUM);
+    auto lines = wrapText(message, max(1, (tftWidth - 32) / 6));
+    for (size_t i = 0; i < lines.size() && 42 + int(i) * 12 < tftHeight - 40; ++i)
+        tft.drawString(lines[i], 16, 42 + i * 12, 1);
 
     tft.setTextDatum(BC_DATUM);
     int16_t buttonHeight = 20;
@@ -228,6 +205,7 @@ int8_t displayMessage(
     int16_t buttonWidth = tftWidth / 3 - 10;
 
     int8_t totalButtons = (leftButton ? 1 : 0) + (centerButton ? 1 : 0) + (rightButton ? 1 : 0);
+    if (totalButtons == 0) return -1;
     int8_t selected = 0; // Start at first available button
     bool redraw = true;
 

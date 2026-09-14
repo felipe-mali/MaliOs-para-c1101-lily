@@ -1,8 +1,11 @@
+#include "core/ui/PtBr.h"
 #include "modules/others/pixel_paint_app.h"
 #include "modules/others/dice_app.h"
 #include "mali_tools/counter/counter_main.h"
 #include "mali_tools/counter/CounterLab.h"
 #include "mali_tools/key_gauge/KeyGauge.h"
+#include "mali_tools/keys/MaliKeys.h"
+#include "core/ui/KeysPtBr.h"
 #include "MaliToolsMenu.h"
 
 #include "core/main_menu.h"
@@ -18,8 +21,9 @@ void MaliToolsMenu::optionsMenu() {
             {"PIXEL PAINT", pixel_paint_app},
             {"D20", dice_app},
             {"COUNTER", CounterLab::open},
-            {"UTILITIES", [](){mainMenu.othersMenu.optionsMenu();}},
+            {MaliText::utilities_17562b, [](){mainMenu.othersMenu.optionsMenu();}},
             {"Counter Suite", CounterSuite::open},
+            {MaliText::Keys::Title, MaliKeys::open},
             {"KEY GAUGE", KeyGauge::open},
             {"Info. do Sistema", MaliSystemInfo::showSystemInfo   },
             {"Status do Hardware", MaliSystemInfo::showHardwareStatus},
@@ -31,7 +35,7 @@ void MaliToolsMenu::optionsMenu() {
             {"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::MALI_TOOLS); }},
         };
 
-        int selected = loopOptions(maliOptions, MENU_TYPE_GEAR, "TOOLS");
+        int selected = loopOptions(maliOptions, MENU_TYPE_GEAR, MaliText::tools_9d0e51);
         if (selected < 0) break;
     }
 }
@@ -49,7 +53,7 @@ void MaliToolsMenu::quickAccessMenu() {
         {"Voltar", []() {}                                      },
     };
 
-    loopOptions(quickOptions, MENU_TYPE_SUBMENU, "Acesso Rapido");
+    loopOptions(quickOptions, MENU_TYPE_GEAR, "Acesso Rapido");
 }
 
 void MaliToolsMenu::drawIcon(float scale) {

@@ -1,3 +1,6 @@
+// PT-BR presentation labels; API states and metric IDs remain stable.
+const maliStatusLabels = {"IDLE": "INATIVO", "SCANNING": "ESCANEANDO", "CONFIGURING": "CONFIGURANDO", "RUNNING": "EXECUTANDO", "STOPPING": "PARANDO", "COMPLETE": "CONCLUIDO", "STOPPED": "PARADO", "ERROR": "ERRO", "QUEUED": "NA FILA", "TIME": "TEMPO", "EVENTS": "EVENTOS", "SUCCESS": "SUCESSO", "FAIL": "FALHAS", "RETRIES": "REPETICOES", "RATE": "TAXA", "ATTEMPTS": "TENTATIVAS", "AVG TIME": "TEMPO MEDIO", "MIN": "MIN", "MAX": "MAX", "SENT": "ENVIADOS", "RECEIVED": "RECEBIDOS", "LOST": "PERDIDOS", "LOSS %": "PERDA %", "SUCCESS %": "SUCESSO %", "RSSI AVG": "RSSI MEDIO", "RSSI MIN": "RSSI MIN", "RSSI MAX": "RSSI MAX", "SAMPLES": "AMOSTRAS"};
+const maliStatusLabel = value => maliStatusLabels[value] || value;
 function $(s) {
   return document.querySelector(s);
 }
@@ -63,7 +66,7 @@ const Dialog = {
   loading: {
     show: function (message) {
       $(".loading-area").classList.remove("hidden");
-      $(".loading-area .text").textContent = message || "Loading...";
+      $(".loading-area .text").textContent = message || "Carregando...";
     },
     hide: function () {
       $(".loading-area").classList.add("hidden");
@@ -72,36 +75,36 @@ const Dialog = {
   showOneInput: function (name, inputVal, data) {
     const dbForm = {
       renameFolder: {
-        title: "Rename Folder: " + inputVal,
-        label: `New Folder Name:`,
-        action: "Rename",
+        title: "Renomear pasta: " + inputVal,
+        label: `Novo nome da pasta:`,
+        action: "Renomear",
       },
       renameFile: {
-        title: "Rename File: " + inputVal,
-        label: `New File Name:`,
-        action: "Rename",
+        title: "Renomear arquivo: " + inputVal,
+        label: `Novo nome do arquivo:`,
+        action: "Renomear",
       },
       createFolder: {
-        title: "Create Folder",
-        label: `Folder Name:`,
-        action: "Create Folder",
+        title: "Criar pasta",
+        label: `Nome da pasta:`,
+        action: "Criar pasta",
       },
       createFile: {
-        title: "Create File",
-        label: `File Name:`,
-        action: "Create File",
+        title: "Criar arquivo",
+        label: `Nome do arquivo:`,
+        action: "Criar arquivo",
       },
       serial: {
-        title: "Serial Command",
-        label: `Command:`,
-        action: "Run",
+        title: "Comando serial",
+        label: `Comando:`,
+        action: "Executar",
       },
     };
 
     let config = dbForm[name];
     if (!config) {
-      alert("Invalid dialog name: " + name);
-      console.error("Dialog.showOneInput: Invalid dialog name", name);
+      alert("Diálogo inválido: " + name);
+      console.error("Dialog.showOneInput: Nome de dialogo invalido", name);
       return;
     }
 
@@ -120,7 +123,7 @@ const Dialog = {
 function handleAuthError() {
   if (
     confirm(
-      "Session expired or unauthorized. Would you like to go to the login page?",
+      "Sessão expirada ou acesso não autorizado. Deseja abrir a página de acesso?",
     )
   ) {
     window.location.href = "/";
@@ -144,13 +147,13 @@ async function requestGet(url, data) {
         resolve(req.responseText);
       } else if (req.status === 401) {
         handleAuthError();
-        reject(new Error(`Unauthorized access (401)`));
+        reject(new Error(`Acesso não autorizado (401)`));
       } else {
-        reject(new Error(`Request failed with status ${req.status}`));
+        reject(new Error(`A solicitação falhou com status ${req.status}`));
       }
     };
     req.onerror = () => {
-      reject(new Error("Network error"));
+      reject(new Error("Erro de rede"));
     };
     req.send();
   });
@@ -172,12 +175,12 @@ async function requestPost(url, data) {
         resolve(req.responseText);
       } else if (req.status === 401) {
         handleAuthError();
-        reject(new Error(`Unauthorized access (401)`));
+        reject(new Error(`Acesso não autorizado (401)`));
       } else {
-        reject(new Error(`Request failed with status ${req.status}`));
+        reject(new Error(`A solicitação falhou com status ${req.status}`));
       }
     };
-    req.onerror = () => reject(new Error("Network error"));
+    req.onerror = () => reject(new Error("Erro de rede"));
     req.send(fd);
   });
 }
@@ -281,11 +284,11 @@ async function uploadFile() {
 }
 
 async function runCommand(cmd) {
-  Dialog.loading.show("Running command...");
+  Dialog.loading.show("Executando comando...");
   try {
     await requestPost("/cm", { cmnd: cmd });
   } catch (error) {
-    alert("Failed to run command: " + error.message);
+    alert("Falha ao executar comando: " + error.message);
   } finally {
     Dialog.loading.hide();
   }
@@ -442,7 +445,7 @@ function getURLParams() {
 async function fetchFiles(drive, path) {
   btnRefreshFolder.classList.add("reloading");
   $("table.explorer tbody").innerHTML =
-    '<tr><td colspan="3" style="text-align:center">Loading...</td></tr>';
+    '<tr><td colspan="3" style="text-align:center">Carregando...</td></tr>';
   currentDrive = drive;
   currentPath = path;
 
@@ -462,7 +465,7 @@ async function fetchFiles(drive, path) {
 }
 
 async function fetchSystemInfo() {
-  Dialog.loading.show("Fetching system info...");
+  Dialog.loading.show("Consultando o sistema...");
   let req = await requestGet("/systeminfo");
   let info = JSON.parse(req);
   $(".malios-version").textContent = info.MALIOS_VERSION;
@@ -475,7 +478,7 @@ async function fetchSystemInfo() {
 }
 
 async function saveEditorFile(runFile = false) {
-  Dialog.loading.show("Saving...");
+  Dialog.loading.show("Salvando...");
   let editor = $(".dialog.editor .file-content");
   let filename = $(".dialog.editor .editor-file-name").textContent.trim();
   if (isModified(editor)) {
@@ -518,7 +521,7 @@ async function runNavigation(direction) {
     await requestPost("/cm", { cmnd: `nav ${direction.toLowerCase()}` });
     await reloadScreen();
   } catch (error) {
-    alert("Failed to run command: " + error.message);
+    alert("Falha ao executar comando: " + error.message);
     console.error(error);
   } finally {
     SCREEN_NAVIGATING = false;
@@ -537,8 +540,8 @@ async function reloadScreen() {
     let screenData = new Uint8Array(arrayBuffer);
     await renderTFT(screenData);
   } catch (error) {
-    console.error("Failed to reload screen:", error);
-    alert("Failed to reload screen: " + error.message);
+    console.error("Falha ao atualizar a tela:", error);
+    alert("Falha ao atualizar a tela: " + error.message);
   } finally {
     btnForceReload.classList.remove("reloading");
     SCREEN_RELOAD = false;
@@ -659,7 +662,7 @@ async function renderTFT(data) {
       10: ["x", "y", "rx", "ry", "fg"], // FILLELLIPSE
       11: ["x", "y", "x1", "y1", "fg"], // DRAWLINE
       12: ["x", "y", "r", "ir", "startAngle", "endAngle", "fg", "bg"], // DRAWARC
-      13: ["x", "y", "bx", "by", "wd", "fg", "bg"], // DRAWWIDELINE
+      13: ["x", "y", "bx", "por", "wd", "fg", "bg"], // DRAWWIDELINE
       14: ["x", "y", "size", "fg", "bg", "txt"], // DRAWCENTRESTRING
       15: ["x", "y", "size", "fg", "bg", "txt"], // DRAWRIGHTSTRING
       16: ["x", "y", "size", "fg", "bg", "txt"], // DRAWSTRING
@@ -696,7 +699,7 @@ async function renderTFT(data) {
   while (offset < data.length) {
     ctx.beginPath();
     if (data[offset] !== 0xaa) {
-      console.warn("Invalid header at offset", offset);
+      console.warn("Cabecalho invalido na posicao", offset);
       break;
     }
 
@@ -893,7 +896,7 @@ function drawCanvasLoading() {
   ctx.fillRect(0, 0, width, height);
   ctx.globalAlpha = 1.0;
 
-  // Draw "Loading" text in the center
+  // Draw "Carregando" text in the center
   ctx.fillStyle = "#fff";
   ctx.font = "bold 14px 'DejaVu Sans Mono', Consolas, Menlo";
   ctx.textAlign = "center";
@@ -978,7 +981,7 @@ $(".container").addEventListener("click", async (e) => {
     editor.value = "";
 
     // Load file content
-    Dialog.loading.show("Fetching content...");
+    Dialog.loading.show("Carregando conteudo...");
     let r = await requestGet(
       `/file?fs=${currentDrive}&name=${encodeURIComponent(file)}&action=edit`,
     );
@@ -1042,12 +1045,12 @@ $(".container").addEventListener("click", async (e) => {
 
     if (
       !confirm(
-        `Are you sure you want to DELETE ${file}?\n\nTHIS ACTION CANNOT BE UNDONE!`,
+        `Deseja EXCLUIR ${file}?\n\nESTA AÇÃO NÃO PODE SER DESFEITA!`,
       )
     )
       return;
 
-    Dialog.loading.show("Deleting...");
+    Dialog.loading.show("Excluindo...");
     await requestGet("/file", {
       fs: currentDrive,
       action: "delete",
@@ -1084,26 +1087,26 @@ $(".act-save-oinput-file").addEventListener("click", async (e) => {
   let fileInput = $("#oinput-input");
   let fileName = fileInput.value.trim();
   if (!fileName) {
-    alert("Filename cannot be empty.");
+    alert("O nome do arquivo nao pode ficar vazio.");
     return;
   }
   let action = dialog.getAttribute("data-cache");
   if (!action) {
-    alert("No action specified.");
+    alert("Nenhuma acao informada.");
     return;
   }
 
   let refreshList = true;
   let [actionType, path] = action.split("|");
   if (actionType.startsWith("rename")) {
-    Dialog.loading.show("Renaming...");
+    Dialog.loading.show("Renomeando...");
     await requestPost("/rename", {
       fs: currentDrive,
       filePath: path,
       fileName: fileName,
     });
   } else if (actionType === "createFolder") {
-    Dialog.loading.show("Creating Folder...");
+    Dialog.loading.show("Criando pasta...");
     let urlQuery = new URLSearchParams({
       fs: currentDrive,
       action: "create",
@@ -1111,7 +1114,7 @@ $(".act-save-oinput-file").addEventListener("click", async (e) => {
     });
     await requestGet("/file?" + urlQuery.toString());
   } else if (actionType === "createFile") {
-    Dialog.loading.show("Creating File...");
+    Dialog.loading.show("Criando arquivo...");
     let urlQuery = new URLSearchParams({
       fs: currentDrive,
       action: "createfile",
@@ -1119,7 +1122,7 @@ $(".act-save-oinput-file").addEventListener("click", async (e) => {
     });
     await requestGet("/file?" + urlQuery.toString());
   } else if (actionType === "serial") {
-    Dialog.loading.show("Running Serial Command...");
+    Dialog.loading.show("Executando comando serial...");
     await runCommand(fileName);
     refreshList = false; // No need to refresh file list for serial commands
   }
@@ -1132,17 +1135,17 @@ $(".act-save-credential").addEventListener("click", async (e) => {
   let username = $("#cred-username").value.trim();
   let password = $("#cred-password").value.trim();
   if (!username || !password) {
-    alert("Username and password cannot be empty.");
+    alert("Usuario e senha nao podem ficar vazios.");
     return;
   }
 
-  Dialog.loading.show("Saving WiFi Credentials...");
+  Dialog.loading.show("Salvando credenciais Wi-Fi...");
   await requestPost("/wifi", {
     usr: username,
     pwd: password,
   });
   Dialog.loading.hide();
-  alert("Credentials saved successfully!");
+  alert("Credenciais salvas com sucesso!");
 });
 
 $(".act-save-edit-file").addEventListener("click", async (e) => {
@@ -1173,8 +1176,8 @@ function updateShowHideNavigatingButton() {
 
 $(".act-reboot").addEventListener("click", async (e) => {
   e.preventDefault();
-  if (!confirm("Are you sure you want to REBOOT the device?")) return;
-  Dialog.loading.show("Rebooting...");
+  if (!confirm("Deseja REINICIAR o dispositivo?")) return;
+  Dialog.loading.show("Reiniciando...");
   await requestGet("/reboot");
   setTimeout(() => {
     location.reload();
@@ -1212,8 +1215,8 @@ window.addEventListener("keydown", async (e) => {
 
   if ($(".dialog.navigator:not(.hidden)")) {
     const map_navigator = {
-      arrowup: "Up",
-      arrowdown: "Down",
+      arrowup: "Cima",
+      arrowdown: "Baixo",
       arrowleft: "Prev",
       arrowright: "Next",
       enter: "Sel",
@@ -1245,7 +1248,7 @@ window.addEventListener("keydown", async (e) => {
       let editor = $(".dialog.editor .file-content");
       if (isModified(editor)) {
         if (
-          !confirm("You have unsaved changes. Do you want to discard them?")
+          !confirm("Há alterações não salvas. Deseja descartá-las?")
         ) {
           return;
         }
@@ -1593,7 +1596,7 @@ window.addEventListener("popstate", (event) => {
             event.state.editFile;
           editor.value = "";
 
-          Dialog.loading.show("Fetching content...");
+          Dialog.loading.show("Carregando conteudo...");
           let r = await requestGet(
             `/file?fs=${event.state.drive}&name=${encodeURIComponent(event.state.editFile)}&action=edit`,
           );
@@ -1615,7 +1618,7 @@ window.addEventListener("popstate", (event) => {
           Dialog.loading.hide();
           Dialog.show("editor");
         } catch (error) {
-          console.error("Failed to restore file editor:", error);
+          console.error("Falha ao restaurar o editor de arquivos:", error);
         }
       }, 100);
     }
@@ -1635,7 +1638,7 @@ window.addEventListener("popstate", (event) => {
             urlParams.editFile;
           editor.value = "";
 
-          Dialog.loading.show("Fetching content...");
+          Dialog.loading.show("Carregando conteudo...");
           let r = await requestGet(
             `/file?fs=${drive}&name=${encodeURIComponent(urlParams.editFile)}&action=edit`,
           );
@@ -1657,7 +1660,7 @@ window.addEventListener("popstate", (event) => {
           Dialog.loading.hide();
           Dialog.show("editor");
         } catch (error) {
-          console.error("Failed to restore file editor from URL:", error);
+          console.error("Falha ao restaurar o editor pela URL:", error);
           updateURL(drive, path, null);
         }
       }, 100);
@@ -2116,7 +2119,7 @@ const KeyGaugeWeb = (() => {
   function status(message, error = false) { el('status').textContent = message; el('status').dataset.error = error; }
   function state() {
     el('state').textContent = dirty ? 'ALTERADO · NAO SALVO' : savedName ? 'SALVO' : 'NOVO · NAO SALVO';
-    el('active').textContent = `P${active + 1} · LEVEL ${profile.levels[active]}`;
+    el('active').textContent = `P${active + 1} · NÍVEL ${profile.levels[active]}`;
     el('thickness-value').textContent = profile.thickness;
     el('width-value').textContent = profile.profileWidth;
     el('levels').querySelectorAll('.kg-level').forEach((node,i) => {
@@ -2161,7 +2164,7 @@ const KeyGaugeWeb = (() => {
       const box=document.createElement('div');box.className='kg-level';
       const label=document.createElement('label');label.htmlFor=`kg-level-${i}`;label.append(`P${i+1}: `);
       const value=document.createElement('output');value.textContent=v;label.append(value);
-      const input=document.createElement('input');input.id=`kg-level-${i}`;input.type='range';input.min=0;input.max=9;input.value=v;input.setAttribute('aria-label',`P${i+1} level`);
+      const input=document.createElement('input');input.id=`kg-level-${i}`;input.type='range';input.min=0;input.max=9;input.value=v;input.setAttribute('aria-label',`Nível de P${i+1}`);
       input.addEventListener('input',()=>{if(busy)return;active=i;profile.levels[i]=+input.value;changed();});
       input.addEventListener('focus',()=>{active=i;draw();});box.append(label,input);el('levels').append(box);
     });
@@ -2176,7 +2179,7 @@ const KeyGaugeWeb = (() => {
       let result;try{result=await response.json();}catch{throw new Error(response.status===401?'Sessao expirada. Entre novamente.':'Resposta invalida do dispositivo.');}
       if(!response.ok)throw new Error(result.error||`Erro HTTP ${response.status}`);
       return result;
-    } catch(error) { if(error.name==='AbortError')throw new Error('Tempo esgotado. Atualize a lista para verificar o resultado antes de repetir SAVE.');throw error; }
+    } catch(error) { if(error.name==='AbortError')throw new Error('Tempo esgotado. Atualize a lista para verificar o resultado antes de repetir SALVAR.');throw error; }
     finally {clearTimeout(timeout);}
   }
   function nextName(){for(let i=1;i<=9999;i++){const n=`PROFILE_${String(i).padStart(3,'0')}`;if(!names.includes(n)&&n!==profile.name)return n;}throw new Error('Limite de nomes atingido.');}
@@ -2193,7 +2196,7 @@ const KeyGaugeWeb = (() => {
   async function run(action){if(busy)return;busy=true;endDrag();document.querySelectorAll('.keygauge-view button, .keygauge-view input, .keygauge-view select').forEach(n=>n.disabled=true);
     try{await action();}catch(error){status(error.message,true);}finally{busy=false;document.querySelectorAll('.keygauge-view button, .keygauge-view input, .keygauge-view select').forEach(n=>n.disabled=false);}}
   function discard(){return !dirty||window.confirm('Descartar os ajustes ainda nao salvos?');}
-  el('new').onclick=()=>run(async()=>{if(!discard())return;await refresh();profile=fresh(nextName());savedName='';dirty=false;active=0;render();status('Novo perfil em memoria. Use SAVE para gravar.');});
+  el('new').onclick=()=>run(async()=>{if(!discard())return;await refresh();profile=fresh(nextName());savedName='';dirty=false;active=0;render();status('Novo perfil em memória. Use SALVAR para gravar.');});
   el('duplicate').onclick=()=>run(async()=>{await refresh();profile={...clone(profile),name:nextName()};savedName='';dirty=true;render();status('Copia em memoria. O original foi preservado.');});
   el('refresh').onclick=()=>run(async()=>{await refresh();status('Lista atualizada. Ajustes em memoria preservados.');});
   el('load').onclick=()=>run(async()=>{const name=el('list').value;if(!name)throw new Error('Selecione um perfil.');if(!discard())return;
@@ -2203,7 +2206,7 @@ const KeyGaugeWeb = (() => {
     const replacing=savedName===profile.name;
     if(replacing&&!window.confirm(`Salvar alteracoes em ${savedName}?`))return;
     const sent=clone(profile);const result=await request('profile','POST',{profile:JSON.stringify(sent),replace:replacing?'1':'0'});
-    if(!valid(result))throw new Error('Resposta de SAVE invalida; atualize a lista para conferir.');
+    if(!valid(result))throw new Error('Resposta ao salvar inválida; atualize a lista para conferir.');
     savedName=sent.name;dirty=false;state();status(`Salvo: ${savedName}`);await refresh();el('list').value=savedName;});
   el('delete').onclick=()=>run(async()=>{const name=el('list').value;if(!name)throw new Error('Selecione um perfil salvo.');
     if(!window.confirm(`Excluir ${name}?${name===savedName&&dirty?' Os ajustes deste perfil tambem serao descartados.':''}`))return;
@@ -2248,7 +2251,7 @@ const CounterWeb = (() => {
  function limits(){const m=mode();if(!m)return;
   if(m.simulationOnly)el('simulation').checked=true;
   el('simulation').disabled=m.simulationOnly;
-  el('mode-note').textContent=m.simulationOnly?'SIMULATION ONLY: requer adaptador de laboratorio configurado e cancelavel.':'Leitura passiva ou conexao iniciada pelo proprio T-Embed.';
+  el('mode-note').textContent=m.simulationOnly?'SOMENTE SIMULAÇÃO: requer adaptador de laboratório configurado e cancelável.':'Leitura passiva ou conexao iniciada pelo proprio T-Embed.';
   const min=m.minInterval;el('interval').min=min;
   if(el('intensity').value!=='custom')el('interval').value=Math.min(60000,min*(+el('intensity').value/500));
   else el('interval').value=Math.max(min,+el('interval').value);
@@ -2264,14 +2267,14 @@ const CounterWeb = (() => {
  }
  async function loadTargets(){const data=await api('targets');if(!Array.isArray(data.items))throw new Error('Lista de alvos invalida.');targets=data.items;el('targets').replaceChildren();
   targets.forEach((t,i)=>el('targets').add(new Option(`${t.name||t.address} · ${t.rssi} dBm · ${t.address}`,i)));
-  if(data.category===0){el('channels').replaceChildren();for(let ch=1;ch<=14;ch++){const list=targets.filter(t=>t.channel===ch),p=document.createElement('p');p.textContent=`CH ${ch} · NETWORK COUNT ${list.length} · AVG RSSI ${list.length?Math.round(list.reduce((n,t)=>n+t.rssi,0)/list.length)+' dBm':'—'} · ACTIVITY: visibilidade passiva`;el('channels').append(p);}}
+  if(data.category===0){el('channels').replaceChildren();for(let ch=1;ch<=14;ch++){const list=targets.filter(t=>t.channel===ch),p=document.createElement('p');p.textContent=`CH ${ch} · REDES ${list.length} · RSSI MÉDIO ${list.length?Math.round(list.reduce((n,t)=>n+t.rssi,0)/list.length)+' dBm':'—'} · ATIVIDADE: visibilidade passiva`;el('channels').append(p);}}
  }
  function chart(s){const canvas=el('chart'),ctx=canvas.getContext('2d'),g=Array.isArray(s.graph)?s.graph.filter(Number.isFinite):[];
-  if(Array.isArray(s.bars)&&s.bars.length){ctx.clearRect(0,0,800,220);ctx.fillStyle='#aa9da3';ctx.font='14px monospace';ctx.fillText(s.category===0?'CH 1..14 / AP visibility':'CC1101 center +/-0.2 MHz',12,18);ctx.fillStyle='#bd81ed';const step=776/s.bars.length;s.bars.forEach((v,i)=>ctx.fillRect(12+i*step,205-170*v/100,Math.max(1,step-2),170*v/100));return;}
-  ctx.clearRect(0,0,800,220);ctx.fillStyle='#aa9da3';ctx.font='14px monospace';ctx.fillText(s.rssiSamples?'RSSI dBm':'Time / sample (ms)',12,18);if(g.length<2)return;
+  if(Array.isArray(s.bars)&&s.bars.length){ctx.clearRect(0,0,800,220);ctx.fillStyle='#aa9da3';ctx.font='14px monospace';ctx.fillText(s.category===0?'Canais 1..14 / visibilidade dos APs':'Centro CC1101 +/-0,2 MHz',12,18);ctx.fillStyle='#bd81ed';const step=776/s.bars.length;s.bars.forEach((v,i)=>ctx.fillRect(12+i*step,205-170*v/100,Math.max(1,step-2),170*v/100));return;}
+  ctx.clearRect(0,0,800,220);ctx.fillStyle='#aa9da3';ctx.font='14px monospace';ctx.fillText(s.rssiSamples?'RSSI dBm':'Tempo / amostra (ms)',12,18);if(g.length<2)return;
   const lo=Math.min(...g),hi=Math.max(...g);ctx.fillText(`${lo} .. ${hi}`,12,40);ctx.strokeStyle='#bd81ed';ctx.lineWidth=2;ctx.beginPath();g.forEach((v,i)=>{const x=12+776*i/59,y=205-(v-lo)*150/Math.max(1,hi-lo);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
  }
- function render(s){state=s;el('state').textContent=s.pending?'QUEUED':s.state;el('live-mode').textContent=`${s.simulation?'SIMULATION · ':''}${s.modeName||'COUNTER'}`;el('live-target').textContent=`TARGET: ${s.target||'local / receiver'}`;
+ function render(s){state=s;el('state').textContent=maliStatusLabel(s.pending?'QUEUED':s.state);el('live-mode').textContent=`${s.simulation?'SIMULAÇÃO · ':''}${s.modeName||'COUNTER'}`;el('live-target').textContent=`ALVO: ${s.target||'local / receptor'}`;
   const metrics={TIME:`${((s.elapsed||0)/1000).toFixed(1)}s`,EVENTS:s.events,SUCCESS:s.success,FAIL:s.failures,TX:s.tx,RX:s.rx,RETRIES:s.retries,RATE:`${Number(s.rate||0).toFixed(1)}/s`,ATTEMPTS:s.attempts,'AVG TIME':`${Number(s.avgTime||0).toFixed(1)}ms`,MIN:`${s.minTime||0}ms`,MAX:`${s.maxTime||0}ms`};
   if(s.hasTx===false)delete metrics.TX;
   if(s.hasOutcomes===false){delete metrics.SUCCESS;delete metrics.FAIL;delete metrics.ATTEMPTS;delete metrics.RETRIES;}
@@ -2279,26 +2282,26 @@ const CounterWeb = (() => {
   if(s.category===0&&(s.mode===3||s.mode===4)){metrics.SENT=s.tx;metrics.RECEIVED=s.rx;metrics.LOST=s.failures;metrics['LOSS %']=`${s.tx?(100*s.failures/s.tx).toFixed(1):'0'}%`;}
   if(s.hasOutcomes!==false)metrics['SUCCESS %']=`${Number(s.successRate||0).toFixed(1)}%`;
   if(s.rssiSamples){metrics.RSSI=`${s.rssi}dBm`;metrics['RSSI AVG']=`${Number(s.rssiAvg).toFixed(1)}dBm`;metrics['RSSI MIN']=s.rssiMin;metrics['RSSI MAX']=s.rssiMax;metrics.SAMPLES=s.rssiSamples;}
-  if(Array.isArray(s.channels)){el('channels').replaceChildren();s.channels.forEach(ch=>{const p=document.createElement('p');p.textContent=`CH ${ch.channel} | NETWORK COUNT ${ch.count} | AVG RSSI ${ch.count?ch.rssi+' dBm':'--'} | ACTIVITY: AP visibility (max 32)`;el('channels').append(p);});}
-  el('metrics').replaceChildren();Object.entries(metrics).forEach(([name,value])=>{const box=document.createElement('div'),label=document.createElement('span'),number=document.createElement('strong');label.textContent=name;number.textContent=value??'—';box.dataset.metric=name;box.append(label,number);el('metrics').append(box);});chart(s);
+  if(Array.isArray(s.channels)){el('channels').replaceChildren();s.channels.forEach(ch=>{const p=document.createElement('p');p.textContent=`CH ${ch.channel} | REDES ${ch.count} | RSSI MÉDIO ${ch.count?ch.rssi+' dBm':'--'} | ATIVIDADE: visibilidade dos APs (máx. 32)`;el('channels').append(p);});}
+  el('metrics').replaceChildren();Object.entries(metrics).forEach(([name,value])=>{const box=document.createElement('div'),label=document.createElement('span'),number=document.createElement('strong');label.textContent=maliStatusLabel(name);number.textContent=value??'—';box.dataset.metric=name;box.append(label,number);el('metrics').append(box);});chart(s);
   const running=s.pending||['RUNNING','SCANNING','STOPPING'].includes(s.state);el('start').disabled=running;el('again').disabled=running||!lastConfig;el('save').disabled=!['COMPLETE','STOPPED'].includes(s.state);
-  message(s.message||'Ready',s.state==='ERROR');
+  message(s.message||'Pronto',s.state==='ERROR');
  }
  async function poll(){if(polling||!visible)return;polling=true;
   try{const s=await api('status');render(s);if(s.state==='CONFIGURING'&&!s.pending&&s.sequence!==scanSequence){scanSequence=s.sequence;await loadTargets();}}
-  catch(e){message(`Conexao interrompida: ${e.message}. Use BACK/encoder no dispositivo para STOP.`,true);}finally{polling=false;}
+  catch(e){message(`Conexao interrompida: ${e.message}. Use VOLTAR/encoder no dispositivo para PARAR.`,true);}finally{polling=false;}
  }
  async function start(scan=false,again=false){try{const c=again?{...lastConfig,password:el('password').value}:config();if(scan){c.mode=0;c.duration=10;c.interval=Math.max(c.interval,current().modes[0].minInterval);}
-  if(!c.simulation&&!scan&&!c.authorized)throw new Error('Confirme LAB / AUTHORIZED TARGETS ONLY.');
+  if(!c.simulation&&!scan&&!c.authorized)throw new Error('Confirme LAB / SOMENTE ALVOS AUTORIZADOS.');
   el('start').disabled=true;const result=await api(scan?'scan':'start','POST',{config:JSON.stringify(c)});if(!scan){lastConfig={...c,password:''};}el('password').value='';message(result.message);await poll();
  }catch(e){message(e.message,true);el('start').disabled=false;}}
- async function history(){try{const data=await api('history');el('history').replaceChildren();for(const h of data.items||[]){const p=document.createElement('p');p.textContent=`${h.simulation?'SIMULATION · ':''}${h.modeName} · ${h.state} · ${(h.elapsed/1000).toFixed(1)}s · ${h.events} events · OK ${h.success} / FAIL ${h.failures}`;el('history').append(p);}}catch(e){message(e.message,true);}}
+ async function history(){try{const data=await api('history');el('history').replaceChildren();for(const h of data.items||[]){const p=document.createElement('p');p.textContent=`${h.simulation?'SIMULAÇÃO · ':''}${h.modeName} · ${maliStatusLabel(h.state)} · ${(h.elapsed/1000).toFixed(1)}s · ${h.events} eventos · OK ${h.success} / FALHAS ${h.failures}`;el('history').append(p);}}catch(e){message(e.message,true);}}
  el('category').onchange=()=>{targets=[];el('targets').replaceChildren();el('target').value='';categories();};el('mode').onchange=limits;el('intensity').onchange=limits;
- el('targets').onchange=()=>{const t=targets[+el('targets').value];if(!t)return;el('target').value=t.address;el('target-info').textContent=`${t.address} · RSSI ${t.rssi} · CH ${t.channel??"—"} · ${t.securityOrService||''} · ADV ${t.advType} · ${t.connectable?'connectable':'not connectable'}`;};
+ el('targets').onchange=()=>{const t=targets[+el('targets').value];if(!t)return;el('target').value=t.address;el('target-info').textContent=`${t.address} · RSSI ${t.rssi} · CH ${t.channel??"—"} · ${t.securityOrService||''} · ADV ${t.advType} · ${t.connectable?'conectável':'não conectável'}`;};
  el('duration').onchange=()=>{el('custom-duration').hidden=el('duration').value!=='custom';};
  el('start').onclick=()=>start();el('scan').onclick=()=>start(true);el('again').onclick=()=>start(false,true);
  // STOP has its own request path and never waits for a status/START request.
- el('stop').onclick=async()=>{message('STOP solicitado...');try{await api('stop','POST');await poll();}catch(e){message(`STOP sem confirmacao: ${e.message}. Use BACK/encoder no dispositivo.`,true);}};
+ el('stop').onclick=async()=>{message('Parada solicitada...');try{await api('stop','POST');await poll();}catch(e){message(`Parada sem confirmação: ${e.message}. Use VOLTAR/encoder no dispositivo.`,true);}};
  el('save').onclick=async()=>{try{const r=await api('save','POST');message(r.message);await history();}catch(e){message(e.message,true);}};
  el('history-refresh').onclick=history;el('settings').onclick=async()=>{try{const r=await api('settings','POST',{historyLimit:el('limit').value});message(r.message);}catch(e){message(e.message,true);}};
  setInterval(()=>{visible=!document.querySelector('.counter-view').classList.contains('hidden');if(visible)poll();},1000);
@@ -2749,7 +2752,7 @@ async function maliSystemLoad() {
       systemStatus.classList.remove("error");
     }
   } catch (error) {
-    const message = error.message || "Nao foi possivel carregar o Dashboard.";
+    const message = error.message || "Não foi possível carregar o painel.";
     if (dashboardStatus) dashboardStatus.textContent = message;
     if (systemStatus) {
       systemStatus.textContent = message;
@@ -2898,7 +2901,7 @@ showWebuiView(window.location.hash.replace("#", "") || "home");
         editor.value = "";
 
         // Load file content
-        Dialog.loading.show("Fetching content...");
+        Dialog.loading.show("Carregando conteudo...");
         let r = await requestGet(
           `/file?fs=${currentDrive}&name=${encodeURIComponent(editFile)}&action=edit`,
         );
@@ -2920,7 +2923,7 @@ showWebuiView(window.location.hash.replace("#", "") || "home");
         Dialog.loading.hide();
         Dialog.show("editor");
       } catch (error) {
-        console.error("Failed to open file for editing:", error);
+        console.error("Falha ao abrir arquivo para edicao:", error);
         // Remove edit parameter from URL if file loading fails
         updateURL(currentDrive, currentPath, null);
       }

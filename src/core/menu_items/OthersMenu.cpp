@@ -39,7 +39,7 @@ void OthersMenu::optionsMenu() {
 
     addOptionToMainMenu();
     options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::OTHERS); }});
-    loopOptions(options, MENU_TYPE_SUBMENU, "Ferramentas");
+    loopOptions(options, MENU_TYPE_GEAR, "Ferramentas");
 }
 
 void OthersMenu::appsMenu() {
@@ -52,7 +52,7 @@ void OthersMenu::appsMenu() {
             {"Voltar",           [&]() { leave = true; }    },
         };
 
-        const int selected = loopOptions(appOptions, MENU_TYPE_SUBMENU, "Aplicativos");
+        const int selected = loopOptions(appOptions, MENU_TYPE_GEAR, "Aplicativos");
         if (selected < 0 || leave) return;
         if (selectedApp == 0) dice_app();
         else if (selectedApp == 1) pixel_paint_app();
@@ -75,7 +75,7 @@ void OthersMenu::badUsbHidMenu() {
         {"? Ajuda",      []() { MaliWiki::open(MaliWiki::Category::USB_HID); }},
     };
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "BadUSB & HID");
+    loopOptions(options, MENU_TYPE_GEAR, "BadUSB & HID");
 }
 
 void OthersMenu::micMenu() {
@@ -87,7 +87,7 @@ void OthersMenu::micMenu() {
         {"Voltar",   [this]() { optionsMenu(); }},
     };
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "Microfone");
+    loopOptions(options, MENU_TYPE_GEAR, "Microfone");
 }
 
 void OthersMenu::drawIcon(float scale) {

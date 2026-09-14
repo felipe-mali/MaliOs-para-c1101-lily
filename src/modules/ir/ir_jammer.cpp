@@ -1,3 +1,5 @@
+#include "core/ui/MaliUI.h"
+#include "core/ui/PtBr.h"
 /**
  * Advanced IR Jammer Implementation
  *
@@ -123,9 +125,9 @@ void renderModeSettings(JammerState &state, int &curY, int ySpacing) {
             curY += ySpacing;
             tft.setCursor(10, curY);
             tft.setTextColor(
-                (state.settingIndex == 3) ? TFT_YELLOW : bruceConfig.priColor, bruceConfig.bgColor
+                (state.settingIndex == 3) ? MaliUI::WARNING : bruceConfig.priColor, bruceConfig.bgColor
             );
-            padprint("TIMING: ");
+            padprint(MaliText::timing_37065f);
             tft.print(String(state.markTiming));
             tft.println(" us    ");
             break;
@@ -135,27 +137,27 @@ void renderModeSettings(JammerState &state, int &curY, int ySpacing) {
             curY += ySpacing;
             tft.setCursor(10, curY);
             tft.setTextColor(
-                (state.settingIndex == 3) ? TFT_YELLOW : bruceConfig.priColor, bruceConfig.bgColor
+                (state.settingIndex == 3) ? MaliUI::WARNING : bruceConfig.priColor, bruceConfig.bgColor
             );
-            padprint("MARK: ");
+            padprint(MaliText::mark_7f6465);
             tft.print(String(state.markTiming));
             tft.println(" us    ");
 
             curY += ySpacing;
             tft.setCursor(10, curY);
             tft.setTextColor(
-                (state.settingIndex == 4) ? TFT_YELLOW : bruceConfig.priColor, bruceConfig.bgColor
+                (state.settingIndex == 4) ? MaliUI::WARNING : bruceConfig.priColor, bruceConfig.bgColor
             );
-            padprint("SPACE: ");
+            padprint(MaliText::space_a0cb97);
             tft.print(String(state.spaceTiming));
             tft.println(" us    ");
 
             curY += ySpacing;
             tft.setCursor(10, curY);
             tft.setTextColor(
-                (state.settingIndex == 5) ? TFT_YELLOW : bruceConfig.priColor, bruceConfig.bgColor
+                (state.settingIndex == 5) ? MaliUI::WARNING : bruceConfig.priColor, bruceConfig.bgColor
             );
-            padprint("POWER: ");
+            padprint(MaliText::power_491f00);
             tft.println(String(state.jamDensity));
             break;
 
@@ -164,7 +166,7 @@ void renderModeSettings(JammerState &state, int &curY, int ySpacing) {
             curY += ySpacing;
             tft.setCursor(10, curY);
             tft.setTextColor(
-                (state.settingIndex == 3) ? TFT_YELLOW : bruceConfig.priColor, bruceConfig.bgColor
+                (state.settingIndex == 3) ? MaliUI::WARNING : bruceConfig.priColor, bruceConfig.bgColor
             );
             padprint("MIN: ");
             tft.print(String(state.minTiming));
@@ -173,7 +175,7 @@ void renderModeSettings(JammerState &state, int &curY, int ySpacing) {
             curY += ySpacing;
             tft.setCursor(10, curY);
             tft.setTextColor(
-                (state.settingIndex == 4) ? TFT_YELLOW : bruceConfig.priColor, bruceConfig.bgColor
+                (state.settingIndex == 4) ? MaliUI::WARNING : bruceConfig.priColor, bruceConfig.bgColor
             );
             padprint("MAX: ");
             tft.print(String(state.maxTiming));
@@ -182,17 +184,17 @@ void renderModeSettings(JammerState &state, int &curY, int ySpacing) {
             curY += ySpacing;
             tft.setCursor(10, curY);
             tft.setTextColor(
-                (state.settingIndex == 5) ? TFT_YELLOW : bruceConfig.priColor, bruceConfig.bgColor
+                (state.settingIndex == 5) ? MaliUI::WARNING : bruceConfig.priColor, bruceConfig.bgColor
             );
-            padprint("SPEED: ");
+            padprint(MaliText::speed_d3def2);
             tft.println(String(state.sweepSpeed));
 
             curY += ySpacing;
             tft.setCursor(10, curY);
             tft.setTextColor(
-                (state.settingIndex == 6) ? TFT_YELLOW : bruceConfig.priColor, bruceConfig.bgColor
+                (state.settingIndex == 6) ? MaliUI::WARNING : bruceConfig.priColor, bruceConfig.bgColor
             );
-            padprint("POWER: ");
+            padprint(MaliText::power_491f00);
             tft.println(String(state.jamDensity));
             break;
 
@@ -202,9 +204,9 @@ void renderModeSettings(JammerState &state, int &curY, int ySpacing) {
             curY += ySpacing;
             tft.setCursor(10, curY);
             tft.setTextColor(
-                (state.settingIndex == 3) ? TFT_YELLOW : bruceConfig.priColor, bruceConfig.bgColor
+                (state.settingIndex == 3) ? MaliUI::WARNING : bruceConfig.priColor, bruceConfig.bgColor
             );
-            padprint("POWER: ");
+            padprint(MaliText::power_491f00);
             tft.println(String(state.jamDensity));
             break;
     }
@@ -222,7 +224,7 @@ void displayStats(JammerState &state, int x, int y) {
     // Set text properties for the stats display
     tft.setTextSize(FP);
     tft.setCursor(tftWidth / 2, tftHeight / 2);
-    tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
 
     // Calculate running time in seconds
     uint32_t runtime = (millis() - state.startTime) / 1000;
@@ -239,7 +241,7 @@ void displayStats(JammerState &state, int x, int y) {
 
     // Display runtime in MM:SS format
     tft.setCursor(tftWidth / 2, tft.getCursorY() + 5);
-    tft.printf("Time : %02d:%02d", state.runtime / 60, state.runtime % 60);
+    tft.printf(MaliText::time_02d_02d_5925f7, state.runtime / 60, state.runtime % 60);
 
     // Display efficiency metric
     tft.setCursor(tftWidth / 2, tft.getCursorY() + 12);
@@ -413,7 +415,7 @@ void renderJammerUI(JammerState &state) {
         // Draw title
         tft.setCursor(10, yStart);
         tft.setTextSize(FM);
-        tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
+        tft.setTextColor(MaliUI::ACCENT, bruceConfig.bgColor);
         padprint("IR Jammer");
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     }
@@ -432,15 +434,15 @@ void renderJammerUI(JammerState &state) {
     int curY = yStart + 20;
     tft.setCursor(10, curY);
     tft.setTextSize(FP);
-    tft.setTextColor((state.settingIndex == 0) ? TFT_YELLOW : bruceConfig.priColor, bruceConfig.bgColor);
+    tft.setTextColor((state.settingIndex == 0) ? MaliUI::WARNING : bruceConfig.priColor, bruceConfig.bgColor);
     padprint("STATUS: ");
-    tft.setTextColor(state.jamming_active ? TFT_RED : TFT_WHITE, bruceConfig.bgColor);
-    tft.println(state.jamming_active ? "ACTIVE " : "PAUSED ");
+    tft.setTextColor(state.jamming_active ? MaliUI::ERROR : MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
+    tft.println(state.jamming_active ? MaliText::active_867bea : MaliText::paused_fa1702);
 
     // Display frequency setting
     curY += ySpacing + 10;
     tft.setCursor(10, curY);
-    tft.setTextColor((state.settingIndex == 1) ? TFT_YELLOW : bruceConfig.priColor, bruceConfig.bgColor);
+    tft.setTextColor((state.settingIndex == 1) ? MaliUI::WARNING : bruceConfig.priColor, bruceConfig.bgColor);
     padprint("FREQ: ");
     tft.print(String(getFrequency(state.current_freq_idx) / 1000));
     tft.println(" kHz    ");
@@ -448,7 +450,7 @@ void renderJammerUI(JammerState &state) {
     // Display mode selection
     curY += ySpacing;
     tft.setCursor(10, curY);
-    tft.setTextColor((state.settingIndex == 2) ? TFT_YELLOW : bruceConfig.priColor, bruceConfig.bgColor);
+    tft.setTextColor((state.settingIndex == 2) ? MaliUI::WARNING : bruceConfig.priColor, bruceConfig.bgColor);
     padprint("MODO: ");
     tft.println(getModeName(state.currentMode));
 
@@ -466,7 +468,7 @@ void renderJammerUI(JammerState &state) {
     padprintln("[SEL] troca conjunto | [NEXT/PREV] ajusta valor");
 
     // Display exit instruction in top-right corner
-    tft.setTextColor(TFT_RED, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::ERROR, bruceConfig.bgColor);
     tft.setCursor(tftWidth - 70, 30);
     tft.print("[ESC] Sair");
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
@@ -685,7 +687,7 @@ void cleanupJammer(IRsend &irsend) {
     digitalWrite(bruceConfigPins.irTx, LOW);
 
     // Display exit message
-    displayRedStripe("IR Jamming Stopped");
+    displayRedStripe(MaliText::ir_jamming_stopped_d9481a);
 
     // Short delay for user to see the message
     delay(1000);

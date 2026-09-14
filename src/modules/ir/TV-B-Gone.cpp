@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 /*
 Last Updated: 05/07/2026
 By: Ninja-Jr
@@ -182,7 +183,7 @@ void sendParsedCodeBatch(const IrCode *const *codes, uint8_t count, IRsend &irse
 
         if (check(SelPress)) {
             while (check(SelPress)) vTaskDelay(10 / portTICK_PERIOD_MS);
-            displayTextLine("Paused");
+            displayTextLine(MaliText::paused_c7dfb6);
             while (!check(SelPress)) {
                 if (check(EscPress)) { returnToMenu = true; return; }
                 vTaskDelay(10 / portTICK_PERIOD_MS);
@@ -223,7 +224,7 @@ void sendRawCodeBatch(const RawIrCode *const *codes, uint8_t count, IRsend &irse
 
         if (check(SelPress)) {
             while (check(SelPress)) vTaskDelay(10 / portTICK_PERIOD_MS);
-            displayTextLine("Paused");
+            displayTextLine(MaliText::paused_c7dfb6);
             while (!check(SelPress)) {
                 if (check(EscPress)) { returnToMenu = true; return; }
                 vTaskDelay(10 / portTICK_PERIOD_MS);
@@ -237,7 +238,7 @@ void sendRawCodeBatch(const RawIrCode *const *codes, uint8_t count, IRsend &irse
 
 void StartTvBGone() {
     if (!init_ir_tx_mutex()) {
-        displayRedStripe("Mutex init failed");
+        displayRedStripe(MaliText::mutex_init_failed_df61a4);
         delay(2000);
         return;
     }
@@ -253,8 +254,8 @@ void StartTvBGone() {
 
     // determine region
     options = {
-        {"Region NA", [&]() { region = NA; }},
-        {"Region EU", [&]() { region = EU; }},
+        {MaliText::region_na_a71530, [&]() { region = NA; }},
+        {MaliText::region_eu_eebb04, [&]() { region = EU; }},
     };
     addOptionToMainMenu();
 
@@ -290,11 +291,11 @@ void StartTvBGone() {
         progressHandler(1, 1);
 
         if (!returnToMenu) {
-            displayTextLine("All codes sent!");
+            displayTextLine(MaliText::all_codes_sent_e4a215);
             delay_ten_us(MAX_WAIT_TIME);
             delay_ten_us(MAX_WAIT_TIME);
         } else {
-            displayRedStripe("User Stopped");
+            displayRedStripe(MaliText::user_stopped_2c9908);
             delay(2000);
         }
 

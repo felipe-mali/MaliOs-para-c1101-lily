@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #ifndef COLOR_STORAGE_H
 #define COLOR_STORAGE_H
 
@@ -5,7 +6,7 @@
 
 #define UI_COLOR_DEFAULT_PRI DEFAULT_PRICOLOR
 #define UI_COLOR_DEFAULT_SEC DEFAULT_SECCOLOR
-#define UI_COLOR_DEFAULT_BG 0x0
+#define UI_COLOR_DEFAULT_BG MaliUI::BACKGROUND
 #define UI_COLOR_WHITE_PRI 0xFFFF
 #define UI_COLOR_WHITE_SEC 0xCE79
 #define UI_COLOR_WHITE_BG 0x0
@@ -57,21 +58,21 @@ struct ColorEntry {
 };
 
 static constexpr ColorEntry UI_COLORS[] = {
-    {"Default",       UI_COLOR_DEFAULT_PRI,       UI_COLOR_DEFAULT_SEC,       UI_COLOR_DEFAULT_BG      },
-    {"White",         UI_COLOR_WHITE_PRI,         UI_COLOR_WHITE_SEC,         UI_COLOR_WHITE_BG        },
-    {"Dark Gray",     UI_COLOR_DARK_GRAY_PRI,     UI_COLOR_DARK_GRAY_SEC,     UI_COLOR_DARK_GRAY_BG    },
-    {"Red",           UI_COLOR_RED_PRI,           UI_COLOR_RED_SEC,           UI_COLOR_RED_BG          },
-    {"Orange",        UI_COLOR_ORANGE_PRI,        UI_COLOR_ORANGE_SEC,        UI_COLOR_ORANGE_BG       },
-    {"Yellow",        UI_COLOR_YELLOW_PRI,        UI_COLOR_YELLOW_SEC,        UI_COLOR_YELLOW_BG       },
-    {"Lime Green",    UI_COLOR_LIME_GREEN_PRI,    UI_COLOR_LIME_GREEN_SEC,    UI_COLOR_LIME_GREEN_BG   },
-    {"Green",         UI_COLOR_GREEN_PRI,         UI_COLOR_GREEN_SEC,         UI_COLOR_GREEN_BG        },
-    {"Dark Green",    UI_COLOR_DARK_GREEN_PRI,    UI_COLOR_DARK_GREEN_SEC,    UI_COLOR_DARK_GREEN_BG   },
-    {"Light Blue",    UI_COLOR_LIGHT_BLUE_PRI,    UI_COLOR_LIGHT_BLUE_SEC,    UI_COLOR_LIGHT_BLUE_BG   },
-    {"Blue",          UI_COLOR_BLUE_PRI,          UI_COLOR_BLUE_SEC,          UI_COLOR_BLUE_BG         },
-    {"Midnight Blue", UI_COLOR_MIDNIGHT_BLUE_PRI, UI_COLOR_MIDNIGHT_BLUE_SEC, UI_COLOR_MIDNIGHT_BLUE_BG},
-    {"Purple",        UI_COLOR_PURPLE_PRI,        UI_COLOR_PURPLE_SEC,        UI_COLOR_PURPLE_BG       },
+    {MaliText::default_808d7d,       UI_COLOR_DEFAULT_PRI,       UI_COLOR_DEFAULT_SEC,       UI_COLOR_DEFAULT_BG      },
+    {MaliText::white_37619f,         UI_COLOR_WHITE_PRI,         UI_COLOR_WHITE_SEC,         UI_COLOR_WHITE_BG        },
+    {MaliText::dark_gray_076862,     UI_COLOR_DARK_GRAY_PRI,     UI_COLOR_DARK_GRAY_SEC,     UI_COLOR_DARK_GRAY_BG    },
+    {MaliText::red_cc9db3,           UI_COLOR_RED_PRI,           UI_COLOR_RED_SEC,           UI_COLOR_RED_BG          },
+    {MaliText::orange_09fb6a,        UI_COLOR_ORANGE_PRI,        UI_COLOR_ORANGE_SEC,        UI_COLOR_ORANGE_BG       },
+    {MaliText::yellow_3526f6,        UI_COLOR_YELLOW_PRI,        UI_COLOR_YELLOW_SEC,        UI_COLOR_YELLOW_BG       },
+    {MaliText::lime_green_3c08dc,    UI_COLOR_LIME_GREEN_PRI,    UI_COLOR_LIME_GREEN_SEC,    UI_COLOR_LIME_GREEN_BG   },
+    {MaliText::green_933bf2,         UI_COLOR_GREEN_PRI,         UI_COLOR_GREEN_SEC,         UI_COLOR_GREEN_BG        },
+    {MaliText::dark_green_f9c07e,    UI_COLOR_DARK_GREEN_PRI,    UI_COLOR_DARK_GREEN_SEC,    UI_COLOR_DARK_GREEN_BG   },
+    {MaliText::light_blue_b69267,    UI_COLOR_LIGHT_BLUE_PRI,    UI_COLOR_LIGHT_BLUE_SEC,    UI_COLOR_LIGHT_BLUE_BG   },
+    {MaliText::blue_7d44bc,          UI_COLOR_BLUE_PRI,          UI_COLOR_BLUE_SEC,          UI_COLOR_BLUE_BG         },
+    {MaliText::midnight_blue_8b39a0, UI_COLOR_MIDNIGHT_BLUE_PRI, UI_COLOR_MIDNIGHT_BLUE_SEC, UI_COLOR_MIDNIGHT_BLUE_BG},
+    {MaliText::purple_32576f,        UI_COLOR_PURPLE_PRI,        UI_COLOR_PURPLE_SEC,        UI_COLOR_PURPLE_BG       },
     {"Magenta",       UI_COLOR_MAGENTA_PRI,       UI_COLOR_MAGENTA_SEC,       UI_COLOR_MAGENTA_BG      },
-    {"Shocking Pink", UI_COLOR_SHOCKING_PINK_PRI, UI_COLOR_SHOCKING_PINK_SEC, UI_COLOR_SHOCKING_PINK_BG},
+    {MaliText::shocking_pink_1688b5, UI_COLOR_SHOCKING_PINK_PRI, UI_COLOR_SHOCKING_PINK_SEC, UI_COLOR_SHOCKING_PINK_BG},
 };
 
 static constexpr int UI_COLOR_COUNT = sizeof(UI_COLORS) / sizeof(UI_COLORS[0]);

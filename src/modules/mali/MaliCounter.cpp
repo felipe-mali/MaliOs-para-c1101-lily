@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "MaliCounter.h"
 
 #include "core/display.h"
@@ -727,7 +728,7 @@ private:
         else drawSub();
 
         tft.setTextColor(bruceConfig.secColor, bruceConfig.bgColor);
-        tft.drawCentreString("NEXT/PREV: tela  ESC: sair", tftWidth / 2, tftHeight - 16, 1);
+        tft.drawCentreString(MaliText::next_prev_tela_esc_sair_2417c5, tftWidth / 2, tftHeight - 16, 1);
     }
 
     const char *pageTitle() const {

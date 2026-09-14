@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 /**
  * @file tag_o_matic.cpp
  * @author Rennan Cockles (https://github.com/rennancockles)
@@ -171,7 +172,7 @@ void TagOMatic::set_state(RFID_State state) {
             // ignores emuMode and always serves NDEF over ISO-DEP regardless.
             _rfid->emuMode = "t4t";
             padprintln("Escolha o NDEF e aguarde o leitor.");
-            padprintln("[BACK] para parar.");
+            padprintln(MaliText::back_para_parar_e06fbe);
             padprintln("");
             break;
         case EMULATE_MODE:
@@ -187,7 +188,7 @@ void TagOMatic::set_state(RFID_State state) {
                 if (caveat.length() > 0) padprintln("[!] " + caveat);
             }
             padprintln("Aguardando leitor NFC...");
-            padprintln("[BACK] para parar.");
+            padprintln(MaliText::back_para_parar_e06fbe);
             padprintln("");
             break;
         case SAVE_MODE:
@@ -383,7 +384,7 @@ void TagOMatic::emulate_ndef_data() {
         String caveat = _rfid->emulationCaveat();
         if (caveat.length() > 0) padprintln("[!] " + caveat);
         padprintln("Aguardando um leitor NFC...");
-        padprintln("[BACK] para parar.");
+        padprintln(MaliText::back_para_parar_e06fbe);
         padprintln("");
     }
 
@@ -494,7 +495,7 @@ void TagOMatic::write_ndef_data() {
 
 void TagOMatic::create_ndef_message() {
     options = {
-        {"Text",         [this]() { create_ndef_text(); }},
+        {MaliText::text_c3328c,         [this]() { create_ndef_text(); }},
         {"URL",          [this]() { create_ndef_url(); } },
         {"Rede Wi-Fi",     [this]() { create_ndef_wifi(); }},
         {"Links salvos",   [this]() { create_ndef_link(); }},
@@ -563,7 +564,7 @@ void TagOMatic::buildWifiNdef(const String &ssid, const String &password) {
 }
 
 void TagOMatic::create_ndef_text() {
-    String ndef_data = keyboard("", NDEF_DATA_SIZE, "NDEF data:");
+    String ndef_data = keyboard("", NDEF_DATA_SIZE, MaliText::ndef_data_1e706b);
     if (ndef_data == "\x1B") return;
     build_ndef_text_payload(ndef_data);
 }
@@ -578,12 +579,12 @@ void TagOMatic::create_ndef_url() {
         {"https://",     [&]() { prefix = "https://"; }    },
         {"tel:",         [&]() { prefix = "tel:"; }        },
         {"mailto:",      [&]() { prefix = "mailto:"; }     },
-        {"None",         [&]() { prefix = ""; }            },
+        {MaliText::none_6eef66,         [&]() { prefix = ""; }            },
     };
 
     loopOptions(options);
 
-    String ndef_data = keyboard(prefix, NDEF_DATA_SIZE, "NDEF data:");
+    String ndef_data = keyboard(prefix, NDEF_DATA_SIZE, MaliText::ndef_data_1e706b);
     if (ndef_data == "\x1B") return;
 
     build_ndef_url_payload(ndef_data);
@@ -603,7 +604,7 @@ void TagOMatic::create_ndef_wifi() {
     options.emplace_back("Entrada manual", [this]() {
         String ssid = keyboard("", 32, "SSID:");
         if (ssid == "\x1B") return;
-        String pwd = keyboard("", 63, "Password:", true);
+        String pwd = keyboard("", 63, MaliText::password_be81ab, true);
         if (pwd == "\x1B") return;
         buildWifiNdef(ssid, pwd);
     });

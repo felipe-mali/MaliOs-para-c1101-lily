@@ -1,3 +1,4 @@
+#include "core/ui/MaliUI.h"
 #include "ble_common.h"
 #include "core/mykeyboard.h"
 #include "core/radio_mem.h"
@@ -349,7 +350,7 @@ void disPlayBLESend() {
                 tft.fillRect(10, 26, tftWidth - 20, tftHeight - 36, TFT_BLACK);
                 tft.setTextSize(FM);
                 tft.setCursor(12, 50);
-                tft.setTextColor(TFT_RED);
+                tft.setTextColor(MaliUI::ERROR);
                 tft.printf("BLE desconectado\n");
                 tft.setCursor(12, 75);
                 tft.setTextColor(tft.color565(18, 150, 219));
@@ -364,7 +365,7 @@ void disPlayBLESend() {
         vTaskDelay(pdMS_TO_TICKS(1));
     }
 
-    tft.setTextColor(TFT_WHITE);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY);
     pServer->getAdvertising()->stop();
     BLEConnected = false;
 }

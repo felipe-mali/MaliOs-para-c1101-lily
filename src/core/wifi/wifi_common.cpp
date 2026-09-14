@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "core/wifi/wifi_common.h"
 #include "core/display.h"
 #include "core/mykeyboard.h"
@@ -62,7 +63,7 @@ bool _wifiConnect(const String &ssid, int encryption) {
         wakeUpScreen();
 
         options = {
-            {"Retry",  [&]() { retry = true; } },
+            {MaliText::retry_9f5cd8,  [&]() { retry = true; } },
             {"Cancelar", [&]() { retry = false; }},
         };
         loopOptions(options);

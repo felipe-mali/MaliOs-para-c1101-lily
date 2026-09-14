@@ -20,7 +20,7 @@ void ScriptsMenu::optionsMenu() {
     addOptionToMainMenu();
     options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::SCRIPTS); }});
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "Scripts");
+    loopOptions(options, MENU_TYPE_GEAR, "Scripts");
 #endif
 }
 

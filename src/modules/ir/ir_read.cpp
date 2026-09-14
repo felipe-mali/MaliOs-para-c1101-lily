@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 /**
  * @file ir_read.cpp
  * @author @im.nix (https://github.com/Niximkk)
@@ -111,25 +112,25 @@ void IrRead::setup() {
              begin();
              return loop();
          }                     },
-        {"SOUND",
+        {MaliText::sound_955c8b,
          [&]() {
              quickButtons = quickButtonsSOUND;
              begin();
              return loop();
          }                     },
-        {"LED STRIP", [&]() {
+        {MaliText::led_strip_580663, [&]() {
              quickButtons = quickButtonsLED;
              begin();
              return loop();
          }},
     };
     options = {
-        {"Custom Read",
+        {MaliText::custom_read_aed6b3,
          [&]() {
              begin();
              return loop();
          }                            },
-        {"Quick Remote Setup  ",
+        {MaliText::quick_remote_setup_4219ca,
          [&]() {
              quickloop = true;
              loopOptions(quickRemoteOptions);
@@ -251,7 +252,7 @@ void IrRead::read_signal() {
         padprintln("Bits: " + String(results.bits));
     }
 
-    padprint("RAW Data Captured:");
+    padprint(MaliText::raw_data_captured_cd02d1);
     String raw_signal = parse_raw_signal();
     _captured_raw_signal = raw_signal;
     tft.println(raw_signal.substring(0, 45) + (raw_signal.length() > 45 ? "..." : ""));
@@ -305,7 +306,7 @@ void IrRead::emulate_signal() {
 void IrRead::save_signal() {
     if (!_read_signal) return;
     if (!quickloop) {
-        String btn_name = keyboard("Btn" + String(signals_read), 30, "Btn name:");
+        String btn_name = keyboard("Btn" + String(signals_read), 30, MaliText::btn_name_47c673);
         if (btn_name == "\x1B") return;
         append_to_file_str(btn_name);
     } else {
@@ -418,7 +419,7 @@ void IrRead::save_device() {
 
     if (sdCardAvailable && littleFsAvailable) {
         options = {
-            {"SD Card",  [&]() { fs = &SD; }      },
+            {MaliText::sd_card_14cdf0,  [&]() { fs = &SD; }      },
             {"LittleFS", [&]() { fs = &LittleFS; }},
         };
 
@@ -492,9 +493,9 @@ bool IrRead::write_file(String filename, FS *fs) {
         display_banner();
 
         options = {
-            {"Append number", [&]() { ch = 1; }},
-            {"Overwrite ",    [&]() { ch = 2; }},
-            {"Change name",   [&]() { ch = 3; }},
+            {MaliText::append_number_a84799, [&]() { ch = 1; }},
+            {MaliText::overwrite_941a6a,    [&]() { ch = 2; }},
+            {MaliText::change_name_e46692,   [&]() { ch = 3; }},
         };
 
         loopOptions(options);

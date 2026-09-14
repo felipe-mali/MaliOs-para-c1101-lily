@@ -1,3 +1,5 @@
+#include "core/ui/MaliUI.h"
+#include "core/ui/PtBr.h"
 bool isConnectedWireguard = false;
 #ifndef LITE_VERSION
 #include "wg.h"
@@ -130,19 +132,19 @@ void wg_setup() {
     printSubtitle("Conectado");
     tft.setTextSize(FP);
     padprintln("");
-    tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
     padprintln("Status: Conectado");
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     padprintln("");
     padprintln("IP do tunel:");
-    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
     padprintln(local_ip.toString());
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     padprintln("");
     padprintln("Destino: " + String(endpoint_address));
     padprintln("Porta: " + String(endpoint_port));
     padprintln("");
-    printFootnote("Press any key to return");
+    printFootnote(MaliText::press_any_key_to_return_f3437b);
 
     isConnectedWireguard = true;
 

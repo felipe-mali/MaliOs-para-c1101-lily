@@ -1,6 +1,8 @@
 #include "MaliWiki.h"
 
 #include "core/display.h"
+#include "core/ui/MaliInput.h"
+#include "core/ui/KeysPtBr.h"
 #include <globals.h>
 
 #include <Arduino.h>
@@ -43,7 +45,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
         "Conectar ao Wi-Fi",
         "Abre a selecao de redes e conecta o MaliOS como estacao Wi-Fi.",
         "Permite usar ferramentas que dependem da rede local ou da Internet.",
-        "Conectar ao roteador do seu laboratorio antes de abrir o WebUI.",
+        "Conectar ao roteador do seu laboratorio antes de abrir a WebUI.",
         "Radio Wi-Fi integrado do ESP32-S3.",
         NO_WARNING
     ),
@@ -70,7 +72,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
         "Info do AP",
         "Mostra SSID, senha salva, RSSI, IP, gateway, canal, BSSID e seguranca da conexao.",
         "Ajuda a conferir a rede e os parametros recebidos pelo MaliOS.",
-        "Confirmar o IP antes de acessar o WebUI.",
+        "Confirmar o IP antes de acessar a WebUI.",
         "Wi-Fi do ESP32-S3 e tela.",
         "A senha salva pode aparecer na tela. Evite exibi-la diante de terceiros."
     ),
@@ -121,7 +123,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
     ),
     WIKI_ENTRY(
         WIFI,
-        "Flood de deauth",
+        "Inundacao de deauth",
         "Percorre APs detectados e transmite quadros de deautenticacao repetidamente.",
         "Testa protecoes e monitoramento contra desconexoes forjadas.",
         "Validar PMF em uma rede de laboratorio sem outros usuarios.",
@@ -140,10 +142,10 @@ const WikiEntry wikiEntries[] PROGMEM = {
     WIKI_ENTRY(
         WIFI,
         "Mali Portal",
-        "Inicia o portal cativo de laboratorio com o template seguro selecionado no Portal Studio do WebUI.",
+        "Inicia o portal cativo de laboratorio com o modelo seguro selecionado no Portal Studio da WebUI.",
         "Permite demonstrar navegacao cativa com dados ficticios, sem depender de servicos externos.",
         "Abrir o Mali Lab em aparelhos proprios de uma bancada de treinamento.",
-        "Wi-Fi ESP32-S3 e LittleFS para os templates.",
+        "Wi-Fi ESP32-S3 e LittleFS para os modelos.",
         "Use somente em aparelhos e redes proprios ou em laboratorio autorizado. O Mali Lab nao solicita senhas reais."
     ),
     WIKI_ENTRY(
@@ -184,7 +186,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
     ),
     WIKI_ENTRY(
         WIFI,
-        "SOCKS4 Proxy",
+        "Proxy SOCKS4",
         "Inicia um proxy SOCKS4 e SOCKS4a TCP na porta 1080, sem autenticacao implementada.",
         "Encaminha trafego TCP de um cliente da rede por meio do MaliOS.",
         "Testar um cliente SOCKS em uma LAN isolada.",
@@ -197,7 +199,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
         "Cliente Telnet interativo para host e porta escolhidos, com log opcional.",
         "Administra ou testa um servico Telnet legado autorizado.",
         "Acessar um equipamento de bancada com credenciais de teste.",
-        "Wi-Fi integrado do ESP32-S3; storage quando o log esta ativo.",
+        "Wi-Fi integrado do ESP32-S3; armazenamento quando o log esta ativo.",
         "Telnet nao cifra senha nem comandos. Use apenas servidor autorizado e rede protegida."
     ),
     WIKI_ENTRY(
@@ -206,7 +208,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
         "Cliente SSH interativo que solicita host, porta, usuario e senha e roda em tarefa propria.",
         "Permite administrar um servidor autorizado pelo T-Embed.",
         "Consultar um servidor Linux do laboratorio.",
-        "Wi-Fi integrado do ESP32-S3; storage se o log estiver ativo.",
+        "Wi-Fi integrado do ESP32-S3; armazenamento se o log estiver ativo.",
         "Use apenas contas e servidores autorizados e proteja os registros de sessao."
     ),
     WIKI_ENTRY(
@@ -278,7 +280,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
         "Envia respostas ARP falsas entre alvo e gateway e tenta restaurar a tabela ao parar.",
         "Avalia deteccao e isolamento contra ARP spoofing.",
         "Testar dois hosts proprios em uma LAN fisicamente isolada.",
-        "Wi-Fi ou W5500 conforme a origem; storage para PCAP.",
+        "Wi-Fi ou W5500 conforme a origem; armazenamento para PCAP.",
         WARN_AUTH_NETWORK
     ),
     WIKI_ENTRY(
@@ -406,7 +408,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
         "Reune perfil, conexoes, writes, fuzzing, HID, FastPair, HFP, testes de indisponibilidade e captura.",
         "Centraliza ensaios experimentais de seguranca BLE em alvos controlados.",
         "Criar um plano de teste para um periferico proprio e executar um modulo por vez.",
-        "BLE ESP32-S3; nRF24 em uma rotina; storage para captura.",
+        "BLE ESP32-S3; nRF24 em uma rotina; armazenamento para captura.",
         "Os resultados sao experimentais e as rotinas podem travar ou alterar o alvo. Somente laboratorio autorizado."
     ),
     WIKI_ENTRY(
@@ -460,7 +462,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
         "Reune conexao, envio de teclas, DuckyScript e rotinas HID experimentais por sistema.",
         "Testa controles de pareamento e entrada de um host de laboratorio.",
         "Executar uma sequencia inofensiva em um computador descartavel proprio.",
-        "Bluetooth LE ESP32-S3; storage para scripts.",
+        "Bluetooth LE ESP32-S3; armazenamento para scripts.",
         WARN_HID
     ),
     WIKI_ENTRY(
@@ -483,11 +485,11 @@ const WikiEntry wikiEntries[] PROGMEM = {
     ),
     WIKI_ENTRY(
         BLE,
-        "Payload Delivery",
+        "Entrega de payload",
         "Agrupa DuckyScript e tentativas experimentais relacionadas a PIN e autenticacao.",
         "Avalia controles de entrada e autorizacao de um host BLE proprio.",
         "Testar um fluxo preparado em uma maquina descartavel do laboratorio.",
-        "Bluetooth LE ESP32-S3 e storage para scripts.",
+        "Bluetooth LE ESP32-S3 e armazenamento para scripts.",
         WARN_HID
     ),
     WIKI_ENTRY(
@@ -828,7 +830,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
     ),
     WIKI_ENTRY(
         ETHERNET,
-        "Flood de MAC",
+        "Inundacao MAC",
         "Envia quadros com MAC e IP aleatorios para pressionar a tabela CAM do switch.",
         "Testa limites e alertas de um switch controlado.",
         "Ensaiar um switch de bancada sem outros clientes.",
@@ -863,7 +865,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
         "Le tipo, UID, ATQA, SAK e dados disponiveis e oferece verificar, salvar, clonar, gravar ou emular conforme suporte.",
         "Inspeciona uma tag propria e prepara operacoes compativeis.",
         "Identificar uma tag de laboratorio e salvar seu backup.",
-        "Modulo RFID selecionado; padrao PN532 I2C integrado; storage.",
+        "Modulo RFID selecionado; padrao PN532 I2C integrado; armazenamento.",
         "UIDs e dumps podem ser credenciais. Use somente tags proprias ou autorizadas."
     ),
     WIKI_ENTRY(
@@ -872,7 +874,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
         "Consulta dados contactless disponiveis, como AID, emissor, PAN e datas, e pode salvar o resultado.",
         "Demonstra quais dados um cartao EMV proprio expoe por aproximacao.",
         "Verificar seu cartao de teste sem realizar transacao.",
-        "PN532 por I2C ou SPI e storage.",
+        "PN532 por I2C ou SPI e armazenamento.",
         "Dados financeiros sao sensiveis. Use somente cartao proprio e com consentimento."
     ),
     WIKI_ENTRY(
@@ -886,7 +888,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
     ),
     WIKI_ENTRY(
         RFID,
-        "SRIX Tool",
+        "Ferramenta SRIX",
         "Le UID e dump de SRIX4K ou SRIX512, salva e carrega .srix e pode escrever ou clonar o dump.",
         "Faz manutencao e pesquisa de tags SRIX compativeis.",
         "Salvar backup de uma tag de laboratorio antes de testar escrita.",
@@ -899,7 +901,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
         "Registra continuamente UIDs unicos encontrados e salva o resultado ao sair.",
         "Cria um inventario rapido de tags presentes numa bancada.",
         "Contar as etiquetas de um kit de laboratorio.",
-        "Modulo RFID selecionado e storage.",
+        "Modulo RFID selecionado e armazenamento.",
         "Inventarie apenas tags proprias ou autorizadas."
     ),
     WIKI_ENTRY(
@@ -944,7 +946,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
         "Conecta por BLE ao Amiibolink, envia dump NTAG215 valido e ajusta o modo de UID.",
         "Gerencia um acessorio Amiibolink externo com backups compativeis.",
         "Carregar no acessorio um dump legitimo criado pelo usuario.",
-        "BLE ESP32-S3, Amiibolink externo e storage.",
+        "BLE ESP32-S3, Amiibolink externo e armazenamento.",
         "Use somente backups proprios e respeite licencas, regras e direitos aplicaveis."
     ),
     WIKI_ENTRY(
@@ -953,7 +955,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
         "Controla Chameleon Ultra por BLE para ler, buscar, salvar, gravar e emular tags HF ou LF.",
         "Centraliza operacoes de laboratorio com o periferico Chameleon.",
         "Ler e salvar uma tag de teste antes de uma alteracao.",
-        "BLE ESP32-S3, Chameleon Ultra externo e storage.",
+        "BLE ESP32-S3, Chameleon Ultra externo e armazenamento.",
         "Clonar, gravar ou emular somente tags proprias ou autorizadas. Reset de fabrica apaga dados."
     ),
     WIKI_ENTRY(
@@ -971,14 +973,14 @@ const WikiEntry wikiEntries[] PROGMEM = {
         "Controla PN532 ou PN532Killer por UART; no Killer inclui emulacao, sniffers e pontes BLE/TCP/UDP.",
         "Opera e diagnostica um leitor NFC serial externo.",
         "Buscar o UID de uma tag propria pelo modulo conectado.",
-        "UART, PN532 externo e opcionalmente BLE, Wi-Fi e storage.",
+        "UART, PN532 externo e opcionalmente BLE, Wi-Fi e armazenamento.",
         "Sniffing, ponte e emulacao apenas em laboratorio proprio; nao exponha a ponte a redes nao confiaveis."
     ),
 
     // Arquivos e compartilhamento
     WIKI_ENTRY(
         FILES,
-        "SD Card",
+        "Cartao SD",
         "Abre o gerenciador do microSD para navegar, ver informacoes, renomear, copiar, excluir e abrir arquivos suportados.",
         "Gerencia arquivos grandes e dados removiveis usados pelas ferramentas.",
         "Copiar uma captura propria para outra pasta antes de analisa-la.",
@@ -1006,7 +1008,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
     WIKI_ENTRY(
         FILES,
         "Receber arquivo",
-        "Aguarda transferencia ESP-NOW e grava o arquivo no storage escolhido sem substituir nome existente.",
+        "Aguarda transferencia ESP-NOW e grava o arquivo no armazenamento escolhido sem substituir nome existente.",
         "Recebe dados de outro dispositivo Bruce ou MaliOS.",
         "Receber um script conhecido da sua segunda placa.",
         "Wi-Fi ESP32-S3, microSD ou LittleFS.",
@@ -1032,7 +1034,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
     ),
     WIKI_ENTRY(
         FILES,
-        "USB Mass Storage",
+        "Armazenamento USB",
         "Usa a implementacao original do Bruce para expor os setores brutos do microSD ao computador por USB MSC.",
         "Permite copiar arquivos do cartao como em uma unidade USB; nao expoe LittleFS nesta build.",
         "Conectar ao PC, copiar um arquivo e ejetar a unidade antes de sair.",
@@ -1157,7 +1159,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
     ),
     WIKI_ENTRY(
         USB_HID,
-        "Clicker USB",
+        "Clicador USB",
         "Emula mouse USB e gera cliques com intervalo, quantidade e botao configuraveis.",
         "Automatiza um ensaio repetitivo de interface em host proprio.",
         "Testar um botao de um aplicativo desenvolvido por voce.",
@@ -1178,7 +1180,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
     WIKI_ENTRY(
         MALI_TOOLS,
         "Info. do Sistema",
-        "Mostra versoes, chip, revisao, CPU, flash, heap, PSRAM, uptime, MAC e dados do build.",
+        "Mostra versoes, chip, revisao, CPU, flash, heap, PSRAM, tempo ligado, MAC e dados da compilacao.",
         "Ajuda a identificar firmware e recursos disponiveis para diagnostico.",
         "Conferir memoria livre antes de relatar um problema.",
         "ESP32-S3 e tela.",
@@ -1196,7 +1198,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
     WIKI_ENTRY(
         MALI_TOOLS,
         "Energia",
-        "Mostra bateria, tensao, carga e uptime usando as leituras disponiveis.",
+        "Mostra bateria, tensao, carga e tempo ligado usando as leituras disponiveis.",
         "Ajuda a acompanhar a alimentacao durante testes.",
         "Conferir a tensao antes de iniciar uma sessao longa.",
         "Fuel gauge BQ27220 por I2C e ESP32-S3.",
@@ -1205,22 +1207,133 @@ const WikiEntry wikiEntries[] PROGMEM = {
     WIKI_ENTRY(
         MALI_TOOLS,
         "Sobre o MaliOS",
-        "Mostra versao, creditos, dados do build e modelo do dispositivo.",
+        "Mostra versao, creditos, dados da compilacao e modelo do dispositivo.",
         "Identifica a distribuicao instalada e reconhece os projetos de origem.",
         "Consultar a versao ao abrir um relato de erro.",
         "Tela e informacoes compiladas no firmware.",
         NO_WARNING
     ),
 
+    WIKI_ENTRY(
+        MALI_TOOLS, "Chaves",
+        "Catalogo de referencias de chaves planas e cruciformes, com medidas manuais em mm e quatro faces independentes.",
+        "Identificar, visualizar e comparar geometrias sem calcular profundidades de corte.",
+        "Abrir Ferramentas > Mali Tools > Chaves. Escolher um tipo, medir, editar dados e salvar no catalogo.",
+        "Tela, encoder e SD ou LittleFS. Regua ou paquimetro externo para medir.",
+        "O desenho e ilustrativo, sem escala fisica 1:1. Fabricante e um dado informado, nao uma identificacao automatica."
+    ),
+    WIKI_ENTRY(
+        MALI_TOOLS, "KEY GAUGE",
+        "Mantem o editor geometrico anterior, separado do novo catalogo Chaves e de seus registros.",
+        "Consultar e editar os perfis relativos ja existentes, inclusive pela WebUI.",
+        "Abrir KEY GAUGE; ajustar pontos, espessura de 1 a 10 e largura visual de 50 a 100 por cento. Salvar explicitamente.",
+        "Tela e armazenamento em /MaliTools/KeyGauge. Wi-Fi para a WebUI.",
+        "Espessura e largura sao escalas visuais independentes dos niveis. Previa Web usa RAM; nao grava automaticamente."
+    ),
+    WIKI_ENTRY(
+        MALI_TOOLS, "Testes de resiliencia / Counter",
+        "Abre o laboratorio Counter com configuracao, simulacao, observacao, metricas e historico conforme cada modulo.",
+        "Acompanhar ensaios controlados e comparar resultados no aparelho ou na WebUI.",
+        "Escolher o modulo e o modo, revisar intensidade e alvo, iniciar e usar Parar para encerrar.",
+        "Wi-Fi/BLE integrados; CC1101, nRF24, IR ou NFC conforme a capacidade informada.",
+        "Modos ativos exigem a confirmacao de autorizacao. A simulacao nao equivale a uma transmissao real."
+    ),
+    WIKI_ENTRY(
+        MALI_TOOLS, "Navegacao MaliOS",
+        "Organiza o menu em Rede, Radio, Ferramentas, Counter, Arquivos e Sistema com cartoes e vizinhos visiveis.",
+        "Manter o acesso as ferramentas anteriores usando o encoder.",
+        "Girar escolhe a opcao; clicar abre; segurar volta. Listas longas continuam compactas e rolaveis.",
+        "Tela e encoder do T-Embed.",
+        "Menus ocultados nas configuracoes continuam ocultos ate serem reativados."
+    ),
+    WIKI_ENTRY(
+        MALI_TOOLS, "D20 e Pixel Paint",
+        "D20 rola dados com historico. Pixel Paint edita uma grade de pixels com painel adaptado a orientacao da tela.",
+        "Usar os aplicativos locais com a identidade visual MaliOS.",
+        "Em D20, selecionar o dado e clicar para rolar. No Pixel Paint, abrir as acoes para trocar modo, cor ou salvar.",
+        "Tela e encoder; armazenamento para desenhos salvos.", WARN_STORAGE
+    ),
+    WIKI_ENTRY(
+        MALI_KEYS, "Chave Plana",
+        "Registra comprimento total e util, largura, espessura, posicoes aproximadas, lado, orientacao, cabeca e canaletas.",
+        "Catalogar uma chave vista de lado, com fabricante informado, tipo de perfil e observacoes.",
+        "Escolher Chave Plana > Medir Chave; depois Editar dados, Visualizar e Salvar. Retomar pelo item Continuar rascunho.",
+        "Tela, encoder e regua ou paquimetro.",
+        "A faixa hachurada marca a regiao serrilhada. Nao ha tabela de profundidades nem perfil de corte para fabricar."
+    ),
+    WIKI_ENTRY(
+        MALI_KEYS, "Chave Cruciforme",
+        "Mostra uma haste e sua secao frontal em cruz, identificando as faces A, B, C e D.",
+        "Registrar por face posicoes, espacamento visual, comprimento, braco, largura, orientacao e notas.",
+        "Em Visualizar, girar alterna a face destacada. Na vista frontal A fica acima, B a direita, C abaixo e D a esquerda.",
+        "Tela e encoder; medicao manual de cada braco.",
+        "Braco significa distancia do centro ate a borda externa. Espacamento de 50 a 150 por cento e apenas visual."
+    ),
+    WIKI_ENTRY(
+        MALI_KEYS, "Medir Chave",
+        "Recebe medidas manuais em milimetros. Zero representa uma medida ainda nao informada.",
+        "Manter grandezas separadas e coerentes: comprimento util nao supera o total; comprimento da face nao supera o util.",
+        "Medir com paquimetro; girar altera o valor, clicar confirma e segurar cancela. Ajustar passo em Configuracoes.",
+        "Regua ou paquimetro externo. O aparelho nao mede automaticamente.",
+        "A precisao exibida e de 0,01 mm; ela nao aumenta a precisao do instrumento nem torna a tela uma regua calibrada."
+    ),
+    WIKI_ENTRY(
+        MALI_KEYS, "Catalogo: salvar e carregar",
+        "Salva registros pequenos em /MaliKeys/, no SD disponivel ao entrar ou no armazenamento interno.",
+        "Consultar dados depois de reiniciar, mantendo Chaves separado dos arquivos antigos .mkg.",
+        "Salvar solicita nome. No Catalogo, selecionar um registro e Visualizar para carregar seus dados. Salvar como cria uma copia.",
+        "SD ou LittleFS; formato .mkey com versao e verificacao de integridade.",
+        "Limite de 256 registros. Nomes aceitam letras, numeros, espacos internos, - e _. Gravar usa arquivo temporario e copia de recuperacao."
+    ),
+    WIKI_ENTRY(
+        MALI_KEYS, "Renomear e excluir",
+        "O menu de cada registro oferece Renomear e Excluir. Excluir exige confirmacao e nomes existentes nao sao sobrescritos ao renomear.",
+        "Organizar referencias sem alterar suas medidas ou os perfis do KEY GAUGE.",
+        "Abrir Catalogo, escolher o registro, selecionar a acao e confirmar. Segurar cancela ou volta.",
+        "O mesmo armazenamento escolhido ao entrar em Chaves.", WARN_STORAGE
+    ),
+    WIKI_ENTRY(
+        MALI_KEYS, "Comparar",
+        "Abre dois registros salvos e apresenta diferencas de comprimento, largura, espessura, posicoes, cabeca e tipo.",
+        "Comparar geometria informada, incluindo dimensoes de cada face quando ambos sao cruciformes.",
+        "Catalogo > Comparar: escolher Perfil A e Perfil B. Os deltas usam A menos B; medidas ausentes aparecem como nao informadas.",
+        "Dois registros salvos em /MaliKeys/.",
+        "Semelhante indica igualdade de uma categoria informada; nao indica compatibilidade com fechaduras."
+    ),
+    WIKI_ENTRY(
+        MALI_KEYS, "Texto, data e configuracoes",
+        "O editor de texto usa o encoder para escolher caracteres, Espaco, Apagar ultimo e Concluir texto.",
+        "Editar nome, fabricante, perfil, notas e data sem teclado externo.",
+        "Girar escolhe, clicar insere, segurar cancela. Data aceita AAAA-MM-DD ou vazio. Passo e guias valem durante a sessao.",
+        "Tela e encoder. Data inicial usa o relogio do sistema quando disponivel.",
+        "Alteracoes pendentes sao sinalizadas com *. Voltar ao menu Chaves mantem o rascunho; sair solicita confirmar descarte."
+    ),
+
     // Mali Counter
     WIKI_ENTRY(
+        MALI_COUNTER, "Counter Suite",
+        "Reune monitores de Wi-Fi, BLE, RF, NFC, IR e 2,4 GHz, com painel de ultimo estado e registro de eventos.",
+        "Observar atividade dos receptores disponiveis e consultar resultados sem confundir eventos com dispositivos unicos.",
+        "Abrir Counter Suite, escolher um monitor e girar para mudar a pagina. Em IR, clicar permite salvar; em RF, reinicia o pico.",
+        "Radios integrados e perifericos conforme a configuracao e disponibilidade.",
+        "A ferramenta informa quando o hardware esta indisponivel. Contagens dependem do periodo observado."
+    ),
+    WIKI_ENTRY(
+        MALI_COUNTER, "Testes de resiliencia",
+        "O item Testes de resiliencia da categoria Counter abre o laboratorio com modos, intensidade, simulacao e metricas ao vivo.",
+        "Comparar ensaios controlados no dispositivo ou na WebUI.",
+        "Selecionar o modulo, revisar modo e alvo, iniciar e usar Parar para encerrar. Consultar o historico ao terminar.",
+        "Os modos disponiveis acompanham as capacidades do hardware.",
+        "Simulacao nao transmite. Modos ativos exigem confirmar autorizacao e podem afetar o alvo de laboratorio."
+    ),
+    WIKI_ENTRY(
         MALI_COUNTER,
-        "Painel / Full Scan",
-        "Executa ciclos controlados de scan Wi-Fi, BLE, nRF24 e RSSI CC1101 e mostra contagens no painel.",
+        "Painel / Varredura completa",
+        "Executa ciclos controlados de varredura Wi-Fi, BLE, nRF24 e RSSI CC1101 e mostra contagens no painel.",
         "Compara atividade observada pelos radios sem tratar eventos como dispositivos unicos.",
         "Observar a mudanca do painel ao ligar um sensor proprio na bancada.",
         "Wi-Fi e BLE ESP32-S3, CC1101 integrado e nRF24 externo via SPI.",
-        "Scans sao de observacao. Contagens sao eventos, nao dispositivos; respeite privacidade e regras locais."
+        "Varreduras sao de observacao. Contagens sao eventos, nao dispositivos; respeite privacidade e regras locais."
     ),
 };
 
@@ -1229,7 +1342,7 @@ const WikiEntry wikiEntries[] PROGMEM = {
 constexpr size_t WIKI_ENTRY_COUNT = sizeof(wikiEntries) / sizeof(wikiEntries[0]);
 constexpr int16_t LIST_TOP = 42;
 constexpr int16_t LIST_ROW_HEIGHT = 16;
-constexpr int16_t TOPIC_TOP = 25;
+constexpr int16_t TOPIC_TOP = 32;
 constexpr int16_t TOPIC_LINE_HEIGHT = LH + 2;
 constexpr int16_t FOOTER_HEIGHT = 18;
 
@@ -1340,13 +1453,13 @@ void emitSection(
     TopicRenderState &state, const char *heading, const char *text, uint16_t bodyColor, size_t maxChars
 ) {
     if (text == nullptr || text[0] == '\0') return;
-    emitLine(state, heading, bruceConfig.secColor);
+    emitLine(state, heading, MaliUI::ACCENT);
     emitWrapped(state, text, bodyColor, maxChars);
     emitLine(state, "", bodyColor);
 }
 
 uint16_t drawTopic(const WikiEntry &entry, uint16_t scrollLine) {
-    drawMainBorderWithTitle("MALI WIKI", true);
+    MaliUI::drawHeader("Ajuda MaliOS");
     tft.fillRect(5, TOPIC_TOP - 2, tftWidth - 10, tftHeight - TOPIC_TOP - FOOTER_HEIGHT, bruceConfig.bgColor);
     tft.setTextSize(FP);
 
@@ -1356,38 +1469,36 @@ uint16_t drawTopic(const WikiEntry &entry, uint16_t scrollLine) {
 
     emitWrapped(state, entry.name, bruceConfig.priColor, maxChars);
     emitLine(state, "", bruceConfig.priColor);
-    emitSection(state, "O QUE E", entry.what, bruceConfig.priColor, maxChars);
-    emitSection(state, "PARA QUE SERVE", entry.purpose, bruceConfig.priColor, maxChars);
-    emitSection(state, "EXEMPLO", entry.example, bruceConfig.priColor, maxChars);
-    emitSection(state, "HARDWARE", entry.hardware, bruceConfig.priColor, maxChars);
-    emitSection(state, "AVISO", entry.warning, TFT_ORANGE, maxChars);
+    emitSection(state, "O QUE E", entry.what, MaliUI::TEXT_PRIMARY, maxChars);
+    emitSection(state, "PARA QUE SERVE", entry.purpose, MaliUI::TEXT_PRIMARY, maxChars);
+    emitSection(state, "EXEMPLO", entry.example, MaliUI::TEXT_PRIMARY, maxChars);
+    emitSection(state, "HARDWARE", entry.hardware, MaliUI::TEXT_PRIMARY, maxChars);
+    emitSection(state, "AVISO", entry.warning, MaliUI::WARNING, maxChars);
 
     tft.setTextColor(bruceConfig.secColor, bruceConfig.bgColor);
     if (scrollLine > 0) tft.drawString("^", tftWidth - 14, TOPIC_TOP, 1);
     if (scrollLine + visibleLines < state.logicalLine) {
         tft.drawString("v", tftWidth - 14, tftHeight - FOOTER_HEIGHT - TOPIC_LINE_HEIGHT, 1);
     }
-    tft.drawCentreString("ENC: rolar  VOLTAR: lista", tftWidth / 2, tftHeight - 15, 1);
+    MaliUI::drawFooter("Girar:rolar Seg:voltar");
     return state.logicalLine;
 }
 
 void openTopic(const WikiEntry &entry) {
+    tft.fillScreen(MaliUI::BACKGROUND);
     uint16_t scrollLine = 0;
     uint16_t totalLines = drawTopic(entry, scrollLine);
     const uint8_t visibleLines = max(1, (tftHeight - TOPIC_TOP - FOOTER_HEIGHT) / TOPIC_LINE_HEIGHT);
 
-    delay(120);
-    check(SelPress);
-    check(NextPress);
-    check(PrevPress);
-    while (true) {
-        if (check(EscPress)) return;
-        if (check(NextPress)) {
-            if (scrollLine + visibleLines < totalLines) ++scrollLine;
-            totalLines = drawTopic(entry, scrollLine);
-        } else if (check(PrevPress)) {
-            if (scrollLine > 0) --scrollLine;
-            totalLines = drawTopic(entry, scrollLine);
+    MaliUI::Input input;
+    while (!returnToMenu) {
+        auto e = input.read();
+        if (e.back || e.select) return;
+        if (e.steps) {
+            int64_t next=int64_t(scrollLine)+e.steps;
+            int maximum=max(0,int(totalLines)-visibleLines);
+            uint16_t bounded=next<0?0:next>maximum?maximum:next;
+            if(bounded!=scrollLine){scrollLine=bounded;totalLines=drawTopic(entry,scrollLine);}
         }
         vTaskDelay(pdMS_TO_TICKS(10));
     }
@@ -1396,8 +1507,8 @@ void openTopic(const WikiEntry &entry) {
 uint8_t visibleListRows() { return max(1, (tftHeight - LIST_TOP - FOOTER_HEIGHT) / LIST_ROW_HEIGHT); }
 
 void drawCategory(Category category, size_t selected, size_t count) {
-    drawMainBorderWithTitle("MALI WIKI", true);
-    tft.fillRect(5, 23, tftWidth - 10, tftHeight - 23 - FOOTER_HEIGHT, bruceConfig.bgColor);
+    MaliUI::drawHeader("Ajuda MaliOS");
+    tft.fillRect(5, 25, tftWidth - 10, tftHeight - 25 - FOOTER_HEIGHT, bruceConfig.bgColor);
     tft.setTextSize(FP);
     tft.setTextColor(bruceConfig.secColor, bruceConfig.bgColor);
     tft.drawString(MaliWiki::categoryName(category), 8, 25, 1);
@@ -1414,9 +1525,10 @@ void drawCategory(Category category, size_t selected, size_t count) {
         if (entry == nullptr) break;
         const int16_t y = LIST_TOP + row * LIST_ROW_HEIGHT;
         const bool active = ordinal == selected;
-        const uint16_t background = active ? bruceConfig.priColor : bruceConfig.bgColor;
-        const uint16_t foreground = active ? bruceConfig.bgColor : bruceConfig.priColor;
-        tft.fillRect(6, y, tftWidth - 12, LIST_ROW_HEIGHT - 1, background);
+        const uint16_t background = active ? MaliUI::SURFACE_ALT : bruceConfig.bgColor;
+        const uint16_t foreground = active ? MaliUI::TEXT_PRIMARY : MaliUI::TEXT_SECONDARY;
+        MaliUI::drawRoundedFill(6,y,tftWidth-12,LIST_ROW_HEIGHT-1,background);
+        if(active)MaliUI::drawRoundedBox(6,y,tftWidth-12,LIST_ROW_HEIGHT-1,MaliUI::ACCENT);
         tft.setTextColor(foreground, background);
 
         char label[72];
@@ -1428,7 +1540,7 @@ void drawCategory(Category category, size_t selected, size_t count) {
     tft.setTextColor(bruceConfig.secColor, bruceConfig.bgColor);
     if (first > 0) tft.drawString("^", tftWidth - 14, LIST_TOP, 1);
     if (first + rows < count) tft.drawString("v", tftWidth - 14, tftHeight - FOOTER_HEIGHT - 10, 1);
-    tft.drawCentreString("ENC: mover/abrir  VOLTAR", tftWidth / 2, tftHeight - 15, 1);
+    MaliUI::drawFooter("Girar OK:abrir Seg:voltar");
 }
 } // namespace
 
@@ -1450,10 +1562,11 @@ const char *categoryName(Category category) {
         case Category::CLOCK: return "RELOGIO";
         case Category::OTHERS: return "FERRAMENTAS";
         case Category::USB_HID: return "USB / HID";
-        case Category::MALI_TOOLS: return "MALI TOOLS";
+        case Category::MALI_TOOLS: return "FERRAMENTAS MALI";
         case Category::MALI_COUNTER: return "MALI COUNTER";
+        case Category::MALI_KEYS: return "CHAVES";
     }
-    return "MALI WIKI";
+    return "AJUDA MALIOS";
 }
 
 size_t documentedToolCount() { return WIKI_ENTRY_COUNT; }
@@ -1466,25 +1579,20 @@ void open(Category category) {
     }
 
     size_t selected = 0;
+    tft.fillScreen(MaliUI::BACKGROUND);
     drawCategory(category, selected, count);
-    delay(120);
-    check(SelPress);
-    check(NextPress);
-    check(PrevPress);
-
-    while (true) {
-        if (check(EscPress)) return;
-        if (check(NextPress)) {
-            selected = (selected + 1) % count;
-            drawCategory(category, selected, count);
-        } else if (check(PrevPress)) {
-            selected = selected == 0 ? count - 1 : selected - 1;
-            drawCategory(category, selected, count);
-        } else if (check(SelPress)) {
+    MaliUI::Input input;
+    while (!returnToMenu) {
+        auto e=input.read();
+        if(e.back)return;
+        if(e.steps) {
+            selected=MaliUI::wrap(int64_t(selected)+e.steps,int(count));
+            drawCategory(category,selected,count);
+        } else if(e.select) {
             const WikiEntry *entry = entryAt(category, selected);
             if (entry != nullptr) openTopic(*entry);
+            input=MaliUI::Input();
             drawCategory(category, selected, count);
-            delay(100);
         }
         vTaskDelay(pdMS_TO_TICKS(10));
     }

@@ -1,3 +1,4 @@
+#include "core/ui/MaliUI.h"
 #include "settings.h"
 #include "core/led_control.h"
 #include "core/wifi/wifi_common.h"
@@ -995,7 +996,7 @@ void runClockLoop(bool showMenuHint) {
             Serial.print("Current time: ");
             Serial.println(timeStr);
             tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-            tft.drawRect(
+            MaliUI::drawRoundedBox(
                 BORDER_PAD_X,
                 BORDER_PAD_X,
                 tftWidth - 2 * BORDER_PAD_X,

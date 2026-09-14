@@ -48,7 +48,7 @@ void BleMenu::optionsMenu() {
     addOptionToMainMenu();
     options.push_back({"? Ajuda", []() { MaliWiki::open(MaliWiki::Category::BLE); }});
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "Bluetooth", 0, false);
+    loopOptions(options, MENU_TYPE_GEAR, "Bluetooth", 0, false);
 }
 
 void BleMenu::drawIcon(float scale) {

@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #include "core/bus_HAL.h"
 #include "counter_main.h"
 #include "modules/rfid/PN532.h"
@@ -72,26 +73,26 @@ public:
             lastUid = text;
             present = true;
             lastSeen = now;
-            data.status = "SIGNAL";
+            data.status = MaliText::signal_289e7c;
         } else {
             if (now - lastSeen > 750) present = false;
-            data.status = present ? "SIGNAL" : "IDLE";
+            data.status = present ? MaliText::signal_289e7c : "IDLE";
         }
         if (now - window >= 3000) {
             window = now;
             burst = 0;
         }
         if (burst >= 5) {
-            if (!data.warning) event(NFC, "RAPID NFC ACTIVITY", true);
-            data.status = "RAPID NFC ACTIVITY";
+            if (!data.warning) event(NFC, MaliText::rapid_nfc_activity_a568b9, true);
+            data.status = MaliText::rapid_nfc_activity_a568b9;
         }
         data.warning = burst >= 5;
-        data.lines[0] = "Scans: " + String(scans) + " Tags: " + String(tags);
-        data.lines[1] = "Unique: " + String(unique) + (unique == 64 ? "+ (limite)" : "");
-        data.lines[2] = "Last type: " + String(tags ? reader->printableUID.picc_type : "--");
+        data.lines[0] = MaliText::scans_c5e645 + String(scans) + " Tags: " + String(tags);
+        data.lines[1] = MaliText::unique_191b3e + String(unique) + (unique == 64 ? "+ (limite)" : "");
+        data.lines[2] = MaliText::last_type_3a3f92 + String(tags ? reader->printableUID.picc_type : "--");
         data.lines[3] = "UID: " + lastUid;
-        data.lines[4] = "Interval: " + String(interval) + " ms";
-        data.lines[5] = tags ? "Last: up " + String(last / 1000) + " s" : "Last: --";
+        data.lines[4] = MaliText::interval_e40a07 + String(interval) + " ms";
+        data.lines[5] = tags ? MaliText::last_up_21b81c + String(last / 1000) + " s" : MaliText::last_d01783;
         data.lines[6] = "PN532: consulta UID, sem escrita";
         data.lines[7] = "Tag parada conta uma presenca";
     }

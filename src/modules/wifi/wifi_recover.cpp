@@ -1,3 +1,4 @@
+#include "core/ui/MaliUI.h"
 #ifndef LITE_VERSION
 // --- wifi_recover.cpp ---
 /*
@@ -1086,7 +1087,7 @@ void wifi_crack_handshake(const String &wordlist_path, const String &pcap_path) 
         resetTftDisplay();
         drawMainBorderWithTitle("Quebra de senha WiFi", true);
         padprintln("");
-        tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+        tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
         padprintln("SENHA ENCONTRADA!");
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
         padprintln("");
@@ -1106,7 +1107,7 @@ void wifi_crack_handshake(const String &wordlist_path, const String &pcap_path) 
         while (!check(AnyKeyPress)) vTaskDelay(pdMS_TO_TICKS(50));
 
     } else if (!g_abortRequested) {
-        tft.setTextColor(TFT_RED, bruceConfig.bgColor);
+        tft.setTextColor(MaliUI::ERROR, bruceConfig.bgColor);
         padprintln("Senha nao encontrada");
         tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
         displayError("Sem correspondencia", true);

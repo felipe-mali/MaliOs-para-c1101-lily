@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 /**
  * @file RFIDInterface.h
  * @author Rennan Cockles (https://github.com/rennancockles)
@@ -123,12 +124,12 @@ public:
 
     String statusMessage(int status) const {
         switch (status) {
-            case SUCCESS: return String(F("Success"));
-            case FAILURE: return String(F("Failed reading data blocks"));
-            case TAG_NOT_PRESENT: return String(F("Failed reading. Tag not found"));
-            case TAG_NOT_MATCH: return String(F("Error! Tags don't match"));
-            case TAG_AUTH_ERROR: return String(F("Failed authenticating"));
-            case NOT_IMPLEMENTED: return String(F("Not implemented"));
+            case SUCCESS: return String(MaliText::success_42a8f6);
+            case FAILURE: return String(MaliText::failed_reading_data_blocks_f21a08);
+            case TAG_NOT_PRESENT: return String(MaliText::failed_reading_tag_not_found_9b280e);
+            case TAG_NOT_MATCH: return String(MaliText::error_tags_don_t_match_7433e7);
+            case TAG_AUTH_ERROR: return String(MaliText::failed_authenticating_c8dbff);
+            case NOT_IMPLEMENTED: return String(MaliText::not_implemented_ac15bc);
             default: return String();
         }
     }

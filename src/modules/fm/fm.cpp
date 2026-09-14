@@ -1,3 +1,4 @@
+#include "core/ui/PtBr.h"
 #ifndef LITE_VERSION
 #include "fm.h"
 #include "core/utils.h"
@@ -14,7 +15,7 @@ void set_frq(uint16_t frq) { fm_station = frq; }
 void fm_banner() {
     tft.fillScreen(bruceConfig.bgColor);
     tft.setCursor(10, 10);
-    tft.drawCentreString("~== Bruce Radio ==~", tftWidth / 2, 10, SMOOTH_FONT);
+    tft.drawCentreString(MaliText::bruce_radio_e3d32d, tftWidth / 2, 10, SMOOTH_FONT);
     delay(500);
 }
 
@@ -60,7 +61,7 @@ void fm_options_frq(uint16_t f_min, bool reserved) {
     char f_str[9];
     uint16_t f_max;
     // Choose between scan for best freq or select freq
-    displayTextLine("Choose frequency");
+    displayTextLine(MaliText::choose_frequency_eca6ac);
     delay(1000);
 
     // Handle min / max frequency
@@ -90,7 +91,7 @@ void fm_options_digit(uint16_t f_min, bool reserved) {
     char f_str[10];
     uint16_t f_max;
     // Choose between scan for best freq or select freq
-    displayTextLine("Choose digit");
+    displayTextLine(MaliText::choose_digit_35dc13);
     delay(1000);
 
     // Handle min / max frequency
@@ -124,7 +125,7 @@ void fm_options_digit(uint16_t f_min, bool reserved) {
 void fm_options(uint16_t f_min, uint16_t f_max, bool reserved) {
     char f_str[15];
     // Choose between scan for best freq or select freq
-    displayTextLine("Choose tens");
+    displayTextLine(MaliText::choose_tens_b4fbcd);
     delay(1000);
 
     options = {};
@@ -221,7 +222,7 @@ bool fm_begin() {
     if (!radio.begin()) { // begin with address 0x63 (CS high default)
         tft.fillScreen(bruceConfig.bgColor);
         Serial.println("Cannot find radio");
-        displayTextLine("Cannot find radio", true);
+        displayTextLine(MaliText::cannot_find_radio_a8867b, true);
         return false;
     }
 
@@ -250,7 +251,7 @@ bool fm_setup(bool traffic_alert, bool silent) {
     if (!silent) {
         Serial.print("\nTX power: ");
         Serial.println(tx_power);
-        tft.print("\n TX power: ");
+        tft.print(MaliText::n_tx_power_bed839);
         tft.println(tx_power);
     }
     radio.setTXpower(tx_power); // dBuV, 88-115 max
@@ -262,7 +263,7 @@ bool fm_setup(bool traffic_alert, bool silent) {
         Serial.print(fm_station % 100);
         Serial.println(" MHz");
 
-        tft.print(" Tuning: ");
+        tft.print(MaliText::tuning_c7d9c3);
         tft.print(fm_station / 100);
         tft.print('.');
         tft.print(fm_station % 100);

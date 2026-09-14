@@ -1,3 +1,4 @@
+#include "core/ui/MaliUI.h"
 // Senape3000 (Really Ugly) Audio Player UI
 
 #include "audio_player.h"
@@ -133,7 +134,7 @@ void drawVectorIcon(int x, int y, int size, IconType icon, uint16_t color) {
             tft.drawCircle(cx, cy, r, TFT_DARKGREY);
             // Arrow tip to indicate loop direction
             tft.fillTriangle(cx + r - 3, cy - 3, cx + r + 3, cy - 3, cx + r, cy + 3, TFT_DARKGREY);
-            tft.setTextColor(TFT_DARKGREY);
+            tft.setTextColor(MaliUI::TEXT_SECONDARY);
             tft.setTextSize(1);
             tft.setCursor(cx - 2, cy - 3);
             tft.print("1");
@@ -220,7 +221,7 @@ bool showVolumeControl(uint8_t &currentVolume) {
         tft.fillRect(innerBarX, innerBarY + (innerBarH - fillH), innerBarW, fillH, volColor);
 
         // Volume percentage text
-        tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        tft.setTextColor(MaliUI::TEXT_PRIMARY, TFT_BLACK);
         tft.setTextSize(1);
         tft.setCursor(BAR_X + 10, BAR_Y + BAR_HEIGHT - 15);
         tft.printf("%3d%%", tempVolume);
@@ -322,7 +323,7 @@ void musicPlayerUI(FS *fs, const String &filepath) {
         int iconSize = ui.DISPLAY_HEIGHT - 4;
         int boxSize = iconSize + 45; // Wider box towards right
         tft.drawRoundRect(ui.MARGIN_X, y + 2, boxSize, iconSize, 4, TFT_DARKGREY);
-        tft.setTextColor(TFT_WHITE);
+        tft.setTextColor(MaliUI::TEXT_PRIMARY);
         tft.setTextSize(2);
 
         // Center "AUDIO" text in box
@@ -339,7 +340,7 @@ void musicPlayerUI(FS *fs, const String &filepath) {
         int textX = ui.MARGIN_X + boxSize + gap;
         int maxChars = (tftWidth - textX - 5) / (6 * ui.TEXT_SIZE_LARGE);
 
-        tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+        tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
         tft.setTextSize(ui.TEXT_SIZE_LARGE);
 
         String displayText = player.filename;
@@ -362,7 +363,7 @@ void musicPlayerUI(FS *fs, const String &filepath) {
     auto drawTimers = [&]() {
         int y = ui.HEADER_HEIGHT + ui.MARGIN_Y + ui.DISPLAY_HEIGHT + 2;
         tft.setTextSize(ui.TEXT_SIZE_SMALL);
-        tft.setTextColor(TFT_LIGHTGREY, bruceConfig.bgColor);
+        tft.setTextColor(MaliUI::TEXT_SECONDARY, bruceConfig.bgColor);
 
         String curr = formatTime(currentPosition);
         String tot = duration > 0 ? formatTime(duration) : "--:--";

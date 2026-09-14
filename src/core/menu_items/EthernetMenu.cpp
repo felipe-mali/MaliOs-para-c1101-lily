@@ -57,7 +57,7 @@ void EthernetMenu::optionsMenu() {
 
     delay(200);
 
-    loopOptions(options, MENU_TYPE_SUBMENU, "Ethernet");
+    loopOptions(options, MENU_TYPE_GEAR, "Ethernet");
 }
 
 void EthernetMenu::drawIcon(float scale) {

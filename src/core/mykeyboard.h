@@ -1,15 +1,16 @@
+#include "core/ui/PtBr.h"
 #pragma once
 #include "display.h"
 #include <globals.h>
 
 String keyboard(
-    const String &mytext, int maxSize = 76, const String &msg = "Type your message:", bool mask_input = false
+    const String &mytext, int maxSize = 76, const String &msg = MaliText::type_your_message_0dab45, bool mask_input = false
 );
 String hex_keyboard(
-    const String &mytext, int maxSize = 76, const String &msg = "Type you HEX value:", bool mask_input = false
+    const String &mytext, int maxSize = 76, const String &msg = MaliText::type_you_hex_value_5bba08, bool mask_input = false
 );
 String num_keyboard(
-    const String &mytext, int maxSize = 76, const String &msg = "Insert your number:", bool mask_input = false
+    const String &mytext, int maxSize = 76, const String &msg = MaliText::insert_your_number_80b04b, bool mask_input = false
 );
 
 // Opens a menu to pick the keyboard language and saves the choice to bruceConfig

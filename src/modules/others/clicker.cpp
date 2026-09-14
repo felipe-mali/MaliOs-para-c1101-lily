@@ -1,3 +1,5 @@
+#include "core/ui/MaliUI.h"
+#include "core/ui/PtBr.h"
 // AutoClicker - v1.1 (Updated by Senape3000)
 // Optimized for stability, readability, and dynamic GUI scaling
 
@@ -26,7 +28,7 @@ static int cpsClickCount = 0;          // Clicks performed in current second
 // ===== CONSTANTS =====
 
 // Mouse button display names
-static const char *BUTTON_NAMES[] = {"LEFT", "RIGHT", "MID"};
+static const char *BUTTON_NAMES[] = {MaliText::left_969e2c, MaliText::right_952532, MaliText::mid_4437f9};
 
 // Preset click count values for quick selection (0 = infinite)
 static const int PRESET_CLICKS[] = {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,   10,  15,  20,  25,
@@ -156,7 +158,7 @@ void drawMenuItem(
         case ITEM_DELAY: {
             // Label on left
             tft.setCursor(layout.margin + 2, contentY);
-            tft.print("Delay:");
+            tft.print(MaliText::delay_93fb2e);
 
             // Value on right with unit
             char delayStr[16];
@@ -164,7 +166,7 @@ void drawMenuItem(
             int numWidth = strlen(delayStr) * 6 * layout.text_size_large;
 
             tft.setCursor(unitX - numWidth - 12, contentY);
-            if (isEdit && isSelected) tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+            if (isEdit && isSelected) tft.setTextColor(MaliUI::WARNING, bruceConfig.bgColor);
             tft.print(delayStr);
 
             tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
@@ -182,7 +184,7 @@ void drawMenuItem(
             int textWidth = strlen(btnName) * 6 * layout.text_size_large;
 
             tft.setCursor(unitX - textWidth, contentY);
-            if (isEdit && isSelected) tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+            if (isEdit && isSelected) tft.setTextColor(MaliUI::WARNING, bruceConfig.bgColor);
             tft.print(btnName);
             break;
         }
@@ -190,7 +192,7 @@ void drawMenuItem(
         case ITEM_CLICKS: {
             // Label on left
             tft.setCursor(layout.margin + 2, contentY);
-            tft.print("Clicks:");
+            tft.print(MaliText::clicks_ff9da6);
 
             // Display value based on mode
             if (custom_mode) {
@@ -198,14 +200,14 @@ void drawMenuItem(
                 const char *customText = "Manual";
                 int textWidth = strlen(customText) * 6 * layout.text_size_large;
                 tft.setCursor(unitX - textWidth, contentY);
-                if (isEdit && isSelected) tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+                if (isEdit && isSelected) tft.setTextColor(MaliUI::WARNING, bruceConfig.bgColor);
                 tft.print(customText);
             } else if (config.max_clicks == 0) {
-                // Show "Infinite" or "INF" for unlimited clicks
-                const char *infText = (tftWidth > 200) ? "Infinite" : "INF";
+                // Show MaliText::infinite_b8449b or "INF" for unlimited clicks
+                const char *infText = (tftWidth > 200) ? MaliText::infinite_b8449b : "INF";
                 int textWidth = strlen(infText) * 6 * layout.text_size_large;
                 tft.setCursor(unitX - textWidth, contentY);
-                if (isEdit && isSelected) tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+                if (isEdit && isSelected) tft.setTextColor(MaliUI::WARNING, bruceConfig.bgColor);
                 tft.print(infText);
             } else {
                 // Show numeric value
@@ -213,7 +215,7 @@ void drawMenuItem(
                 snprintf(clicksStr, sizeof(clicksStr), "%d", config.max_clicks);
                 int numWidth = strlen(clicksStr) * 6 * layout.text_size_large;
                 tft.setCursor(unitX - numWidth, contentY);
-                if (isEdit && isSelected) tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+                if (isEdit && isSelected) tft.setTextColor(MaliUI::WARNING, bruceConfig.bgColor);
                 tft.print(clicksStr);
             }
             break;
@@ -227,7 +229,7 @@ void drawMenuItem(
             );
 
             // Centered text
-            tft.setTextColor(TFT_WHITE, btnColor);
+            tft.setTextColor(MaliUI::TEXT_PRIMARY, btnColor);
             const char *btnText = (tftWidth > 200) ? "INICIAR CLIQUE" : "INICIAR";
             int textWidth = strlen(btnText) * 6 * layout.text_size_large;
             tft.setCursor(
@@ -254,7 +256,7 @@ void drawConfigScreen(const LayoutConfig &layout) {
     tft.setTextColor(bruceConfig.bgColor, bruceConfig.priColor);
     tft.setTextSize(layout.text_size_large);
     tft.setCursor(layout.margin, (layout.header_height - (layout.text_size_large * 8)) / 2);
-    tft.println("AUTO CLICKER v1.1");
+    tft.println(MaliText::auto_clicker_v1_1_7dd9a1);
 
     // Footer with control hints (only on larger screens)
     if (tftHeight > 200) {
@@ -278,9 +280,9 @@ void drawClickingScreen(const LayoutConfig &layout, const char *buttonName) {
     const int headerHeight = (tftHeight > 200) ? 40 : 30;
     tft.fillRect(0, 0, tftWidth, headerHeight, TFT_DARKGREEN);
     tft.setTextSize((tftWidth > 200) ? 2 : 1);
-    tft.setTextColor(TFT_WHITE, TFT_DARKGREEN);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, TFT_DARKGREEN);
 
-    const char *headerText = (tftWidth > 200) ? "-> CLICKING <-" : "-> CLICK <-";
+    const char *headerText = (tftWidth > 200) ? MaliText::clicking_a253b0 : MaliText::click_b71ee7;
     int headerWidth = strlen(headerText) * 6 * ((tftWidth > 200) ? 2 : 1);
     tft.setCursor((tftWidth - headerWidth) / 2, (headerHeight - 16) / 2);
     tft.print(headerText);
@@ -292,7 +294,7 @@ void drawClickingScreen(const LayoutConfig &layout, const char *buttonName) {
 
     // Line 1: Delay and button type
     tft.setCursor(layout.margin, infoY);
-    tft.print("Delay: ");
+    tft.print(MaliText::delay_962b42);
     tft.print(config.delay_ms);
     tft.print("ms | Btn: ");
     tft.print(buttonName);
@@ -300,9 +302,9 @@ void drawClickingScreen(const LayoutConfig &layout, const char *buttonName) {
     // Line 2: Target (if finite)
     if (config.max_clicks > 0) {
         tft.setCursor(layout.margin, infoY + 12);
-        tft.print("Target: ");
+        tft.print(MaliText::target_593eec);
         tft.print(config.max_clicks);
-        tft.print(" clicks");
+        tft.print(MaliText::clicks_1eebb4);
     }
 
     // Line 3: Stop instructions
@@ -328,7 +330,7 @@ void updateCPSDisplay(const LayoutConfig &layout, int currentCPS, unsigned long 
     char cpsStr[16];
     snprintf(cpsStr, sizeof(cpsStr), "%d", currentCPS);
     tft.setTextSize(cpsSize);
-    tft.setTextColor(TFT_GREEN, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::SUCCESS, bruceConfig.bgColor);
     int cpsWidth = strlen(cpsStr) * 6 * cpsSize;
     tft.setCursor((tftWidth - cpsWidth) / 2, cpsY);
     tft.print(cpsStr);
@@ -336,7 +338,7 @@ void updateCPSDisplay(const LayoutConfig &layout, int currentCPS, unsigned long 
     // Label below CPS value
     tft.setTextSize(layout.text_size_small);
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
-    const char *label = "Clicks/Second";
+    const char *label = MaliText::clicks_second_d101b3;
     int labelWidth = strlen(label) * 6;
     tft.setCursor((tftWidth - labelWidth) / 2, cpsY + cpsSize * 8 + 5);
     tft.print(label);
@@ -378,7 +380,7 @@ void drawSummaryScreen(
     // Header shows completion status
     uint16_t headerColor = completed ? TFT_DARKGREEN : TFT_DARKGREY;
     tft.fillRect(0, 0, tftWidth, layout.header_height, headerColor);
-    tft.setTextColor(TFT_WHITE, headerColor);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, headerColor);
     tft.setTextSize(layout.text_size_large);
 
     const char *statusText = completed ? "CONCLUIDO" : "PARADO";
@@ -393,7 +395,7 @@ void drawSummaryScreen(
 
     // Total clicks with target (if applicable)
     tft.setCursor(layout.margin, infoY);
-    tft.print("Clicks: ");
+    tft.print(MaliText::clicks_3efad0);
     tft.print(totalClicks);
     if (max_clicks > 0) {
         tft.print(" / ");
@@ -407,7 +409,7 @@ void drawSummaryScreen(
 
     // Delay configuration
     tft.setCursor(layout.margin, infoY + 30);
-    tft.print("Delay: ");
+    tft.print(MaliText::delay_962b42);
     tft.print(delay_ms);
     tft.print("ms");
 }
@@ -427,9 +429,9 @@ void drawUSBInitScreen(const LayoutConfig &layout) {
     const int headerHeight = (tftHeight > 200) ? 40 : 30;
     tft.fillRect(0, 0, tftWidth, headerHeight, TFT_ORANGE);
     tft.setTextSize((tftWidth > 200) ? 2 : 1);
-    tft.setTextColor(TFT_WHITE, TFT_ORANGE);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, TFT_ORANGE);
 
-    const char *headerText = "USB INIT";
+    const char *headerText = MaliText::usb_init_b68acb;
     int headerWidth = strlen(headerText) * 6 * ((tftWidth > 200) ? 2 : 1);
     tft.setCursor((tftWidth - headerWidth) / 2, (headerHeight - 16) / 2);
     tft.print(headerText);
@@ -439,19 +441,19 @@ void drawUSBInitScreen(const LayoutConfig &layout) {
     tft.setTextSize(layout.text_size_small);
     int msgY = tftHeight / 2 - 20;
 
-    const char *msg1 = "Initializing USB HID...";
+    const char *msg1 = MaliText::initializing_usb_hid_b03fbf;
     int msg1Width = strlen(msg1) * 6;
     tft.setCursor((tftWidth - msg1Width) / 2, msgY);
     tft.print(msg1);
 
-    const char *msg2 = "Please wait";
+    const char *msg2 = MaliText::please_wait_ee9e88;
     int msg2Width = strlen(msg2) * 6;
     tft.setCursor((tftWidth - msg2Width) / 2, msgY + 15);
     tft.print(msg2);
 
     // Countdown animation (3 seconds)
     tft.setTextSize((tftWidth > 200) ? 3 : 2);
-    tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::WARNING, bruceConfig.bgColor);
 
     for (int i = 3; i > 0; i--) {
         // Clear previous number
@@ -830,7 +832,7 @@ void clicker_setup() {
     delay(2000);
 
     // Show restart/exit prompt
-    tft.setTextColor(TFT_WHITE, bruceConfig.bgColor);
+    tft.setTextColor(MaliUI::TEXT_PRIMARY, bruceConfig.bgColor);
     tft.setTextSize(layout.text_size_small);
     int promptY = tftHeight - 20;
     tft.fillRect(0, promptY - 5, tftWidth, 25, bruceConfig.bgColor);
@@ -851,7 +853,7 @@ void clicker_setup() {
         if (check(EscPress)) {
             delay(600);
             displayWarning(
-                "Turn-off to restore USB", true
+                MaliText::turn_off_to_restore_usb_bb8e5d, true
             ); // BUG (?) - Need to restore Usb without Power-Off (reboot seems uneffective)
             restart = false;
             userChoice = true;
