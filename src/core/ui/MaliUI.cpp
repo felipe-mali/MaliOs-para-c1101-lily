@@ -106,6 +106,7 @@ Icon iconFor(const String &label){
     return Icon::Settings;
 }
 const char *description(const String &label){
+    if(label=="Wi-Fi Inspector")return "Inventario da rede local";
     if(label=="Chaves")return "Medir / catalogar";
     if(label=="Chave Plana")return "Vista lateral";
     if(label=="Chave Cruciforme")return "Quatro faces / cruz";

@@ -1,5 +1,8 @@
 # Entrega — Chaves, ajuda e PT-BR
 
+> Este relatório registra a etapa de 14/09/2026. O binário mais recente, com
+> versão 1.0 e Wi-Fi Inspector, é descrito na [entrega do Inspector](../../modules/wifi/inspector/ENTREGA.md).
+
 ## Compilação final
 
 **SUCCESS** em 14/09/2026 para `lilygo-t-embed-cc1101`, saída 0, duração

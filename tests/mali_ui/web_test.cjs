@@ -10,8 +10,8 @@ function asset(name){if(!embedded)return fs.readFileSync(path.join('embedded_res
    if(['/','/index.js','/index.css','/login'].includes(p)){const name=p==='/'?'index.html':p==='/login'?'login.html':p.slice(1);return route.fulfill({contentType:name.endsWith('html')?'text/html':name.endsWith('js')?'text/javascript':'text/css',body:asset(name)});}
    if(p==='/theme.css')return route.fulfill({contentType:'text/css',body:''});
    if(p==='/listfiles')return route.fulfill({contentType:'text/plain',body:''});
-   if(p==='/systeminfo')return json({MALIOS_VERSION:'0.7',BRUCE_VERSION:'base',SD:{used:'0 B',total:'16 GB'},LittleFS:{used:'1 MB',total:'2 MB'}});
-   return json({items:[],model:'LILYGO T-Embed',version:'0.7',heap:165432,uptime:'00:18:42',firmware:'MaliOS',maliVersion:'0.7',uptimeSeconds:1122,memory:{heapFree:165432},storage:{sd:{mounted:true}},status:'READY'});
+   if(p==='/systeminfo')return json({MALIOS_VERSION:'1.0',BRUCE_VERSION:'base',SD:{used:'0 B',total:'16 GB'},LittleFS:{used:'1 MB',total:'2 MB'}});
+   return json({items:[],model:'LILYGO T-Embed',version:'1.0',heap:165432,uptime:'00:18:42',firmware:'MaliOS',maliVersion:'1.0',uptimeSeconds:1122,memory:{heapFree:165432},storage:{sd:{mounted:true}},status:'READY'});
   });
   await page.goto('http://mali.test/');await page.waitForTimeout(400);
   assert.equal(await page.locator('[data-webui-target]').count(),11);
@@ -22,7 +22,11 @@ function asset(name){if(!embedded)return fs.readFileSync(path.join('embedded_res
   await page.screenshot({path:`tests/mali_ui/home-${width}.png`,fullPage:true});
   for(const view of ['tools','radio','files','system','home']){await page.locator(`[data-webui-target=${view}]`).click();await page.waitForTimeout(80);assert.ok(await page.locator(`.${view}-view`).first().isVisible());assert.equal(await page.locator('.mali-sidebar .active').count(),1);assert.equal(await page.locator(`[data-webui-target=${view}]`).getAttribute('aria-current'),'page');}
   await page.locator('.mali-selector [data-open-view=tools]').click();assert.equal(await page.locator('.tools-view').isVisible(),true);
-  await page.locator('#mali-tools-help summary').click();
+  await page.locator('#mali-tools-help > summary').click();
+  for(const topic of await page.locator('#mali-tools-help > details > summary').all()) {
+   await topic.click();
+   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'help topic fits viewport');
+  }
   assert.match(await page.locator('#mali-tools-help').innerText(),/MaliKeys/);
   assert.match(await page.locator('#mali-tools-help').innerText(),/A \u2212 B/);
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'expanded help fits viewport');

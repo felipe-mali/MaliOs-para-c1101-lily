@@ -19,6 +19,7 @@
 #include "modules/wifi/responder.h"
 #include "modules/wifi/scan_hosts.h"
 #include "modules/wifi/sniffer.h"
+#include "modules/wifi/inspector/wifi_inspector.h"
 #include "modules/wifi/wifi_atks.h"
 
 #ifndef LITE_VERSION
@@ -64,6 +65,7 @@ void WifiMenu::optionsMenu() {
         options.push_back({"Info do AP", displayAPInfo});
     }
     options.push_back({"Wi-Fi Counter", [](){ CounterSuite::run(CounterSuite::WIFI); }});
+    options.push_back({"Wi-Fi Inspector", WifiInspector::open});
     options.push_back({"WebUI", loopOptionsWebUi});
     options.push_back({"Mali Portal", []() {
                            String name;

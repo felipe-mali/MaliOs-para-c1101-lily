@@ -59,17 +59,59 @@
           <button class="mali-card" onclick="openNavigator()"><strong>Chaves</strong><span>Plana, cruciforme, medidas e catálogo no dispositivo</span></button>
         </div>
         <details class="mali-panel" id="mali-tools-help">
-          <summary>Ajuda das ferramentas</summary>
-          <h2>Chaves: identificar, medir e catalogar</h2>
-          <p>No dispositivo, abra <strong>Ferramentas → Mali Tools → Chaves</strong>. Escolha Chave Plana ou Chave Cruciforme. Em Medir Chave, informe as medidas de régua ou paquímetro em mm; zero significa não informado. O desenho é ilustrativo e não usa escala física 1:1.</p>
-          <p>Na cruciforme, gire durante a visualização para alternar as faces A, B, C e D. Na vista frontal, A fica acima, B à direita, C abaixo e D à esquerda. Meça cada braço do centro à borda e registre sua largura.</p>
-          <p>Em Editar dados, registre cabeça, orientação, perfil, fabricante informado e notas. O editor de texto oferece caracteres, Espaço, Apagar último e Concluir texto. Clique confirma; segurar cancela ou volta.</p>
-          <p>Salvar cria um registro em <code>/MaliKeys/</code>. No Catálogo, abra um registro para carregar, renomear ou excluir. Comparar abre dois registros e mostra diferenças como <strong>A − B</strong>. Alterações pendentes ficam marcadas com *. O passo de medição e as guias valem durante a sessão.</p>
-          <p>O módulo Chaves é operado pela tela ou pelo navegador do dispositivo. Os arquivos <code>.mkey</code> podem ser gerenciados em Arquivos. O KEY GAUGE anterior continua separado, com seus perfis <code>.mkg</code>, escalas visuais e editor Web.</p>
-          <h2>Counter, D20 e Pixel Paint</h2>
-          <p>Counter reúne simulação, observação e testes conforme o hardware disponível. Selecione modo e alvo, revise os parâmetros e use Parar para encerrar. Os modos ativos exigem autorização. A tela e a WebUI apresentam estado, métricas e histórico.</p>
-          <p>D20 permite escolher o dado, rolar e consultar o histórico. Pixel Paint mantém edição por pixels, modos, cores e salvamento. Abra ambos pelo navegador do dispositivo e consulte ? Ajuda em Ferramentas.</p>
-          <p>Na navegação MaliOS: girar escolhe, clicar abre e segurar volta. Nomes de protocolos, comandos, teclas e arquivos mantêm a grafia necessária para uso e compatibilidade.</p>
+          <summary>Ajuda das ferramentas — passos e exemplos práticos</summary>
+          <p>Escolha um assunto abaixo. Os números são exemplos didáticos de uso cotidiano, não medições feitas pelo aparelho. Nas páginas <strong>? Ajuda</strong> do dispositivo, cada ferramenta também explica a situação, os passos e o resultado esperado.</p>
+          <details><summary>Wi-Fi Inspector: inventariar sua rede</summary>
+            <ol><li>No dispositivo ou no navegador do dispositivo, abra Wi-Fi → Wi-Fi Inspector. Confira IP, máscara, gateway e SSID e escolha Escanear Rede.</li><li>Selecione um IP em Dispositivos Encontrados. Portas 631 ou 9100 podem sugerir impressora; confira o MAC no equipamento antes de marcar como conhecido.</li><li>Em Gerenciamento, use Renomear para registrar “Impressora Financeiro”. Em Conhecidos → Criar Baseline Atual, confira a quantidade antes de confirmar.</li><li>Execute Atualizar scan e consulte as alterações: [V] conhecido, [!] MAC novo e [?] não identificado. Um MAC privado novo pode pertencer ao mesmo celular.</li></ol>
+            <p><strong>Limites:</strong> até 64 dispositivos por scan, 254 IPs por faixa, 14 portas TCP selecionadas e 90 s de execução. Clique ou segure para cancelar. DNS/mDNS e SSDP dependem de resposta dos equipamentos; ARP pode incluir cache recente. “Não encontrado” não comprova saída definitiva.</p>
+            <p>Histórico em <code>/MaliInspector/</code>, com até 96 MACs por rede/AP e oito bases. A referência distingue BSSID e sub-rede. Nenhum fabricante é consultado pela Internet. No adaptador <strong>Genérico</strong>, a desconexão administrativa informa falta de suporte; nenhuma credencial ou comando de rádio é enviado. Esta versão não inclui adaptadores OpenWrt, MikroTik ou UniFi.</p>
+          </details>
+          <details><summary>Primeiro acesso: abrir a WebUI no celular</summary>
+            <ol><li>Conecte o MaliOS à sua rede de 2,4 GHz e inicie a WebUI. Conecte o celular à mesma rede.</li><li>Abra o endereço mostrado pelo aparelho e faça login. Se <code>bruce.local</code> não abrir, consulte o IP em Info do AP e use esse IP.</li><li>Sem roteador, inicie o AP do MaliOS e conecte o celular ao nome e senha configurados.</li></ol>
+            <p><strong>Resultado:</strong> o painel permite consultar o aparelho e gerenciar arquivos. No modo AP, o celular pode avisar “sem Internet”; a interface local ainda pode funcionar. Se não abrir, confira a rede escolhida, o IP e se a WebUI está iniciada.</p>
+          </details>
+          <details><summary>Chave plana: medir e salvar uma referência</summary>
+            <p>Abra <strong>Ferramentas → Mali Tools → Chaves</strong> na tela ou no navegador do dispositivo.</p>
+            <ol><li>Escolha Chave Plana → Medir Chave. Use régua ou paquímetro; o MaliOS recebe as medidas manualmente.</li><li>Exemplo: comprimento total 55,00 mm, útil 28,00 mm, largura 8,00 mm e espessura 2,00 mm. Substitua pelos valores da sua chave. Informe total antes de útil; o útil não pode superar o total informado.</li><li>Em Editar dados, registre cabeça, orientação, canaletas, posições aproximadas, fabricante informado e notas.</li><li>Confira em Visualizar e salve como <code>Bancada_A</code>. Abra Catálogo → Bancada_A → Visualizar para recuperar o registro.</li></ol>
+            <p><strong>Resultado:</strong> um registro <code>/MaliKeys/Bancada_A.mkey</code>. O desenho é ilustrativo, sem escala física 1:1. Zero significa “não informado”. O módulo não identifica fabricante automaticamente nem calcula profundidades de corte.</p>
+          </details>
+          <details><summary>Chave cruciforme: entender as faces A, B, C e D</summary>
+            <ol><li>Escolha Chave Cruciforme e preencha as medidas gerais. Exemplo: comprimento útil de 28,00 mm.</li><li>Edite a face A. Exemplo: comprimento 25,00 mm, braço 3,00 mm e largura 2,00 mm. O braço é medido do centro da cruz até a borda, não de uma extremidade à outra.</li><li>Meça e preencha B, C e D separadamente. Os valores de A não preenchem automaticamente as outras faces.</li><li>Em Visualizar, gire para alternar a face destacada: A acima, B à direita, C abaixo e D à esquerda.</li></ol>
+            <p><strong>Resultado:</strong> cada face mantém suas medidas e notas. Espaçamento de 50% a 150% muda apenas a distribuição visual das posições. Não transforma o desenho em escala real.</p>
+          </details>
+          <details><summary>Medidas, texto e alterações ainda não salvas</summary>
+            <ol><li>Para registrar 8,25 mm, use passo 1,00 até perto de 8,00; depois 0,10 até 8,20 e 0,01 até 8,25. Troque o passo em Configurações.</li><li>No editor de texto, gire até um caractere e clique para inserir. Use Espaço, Apagar último e Concluir texto conforme necessário. Segurar cancela a edição atual.</li><li>Data usa <code>AAAA-MM-DD</code>, como <code>2026-09-15</code>, ou pode ficar vazia. O símbolo <strong>*</strong> indica alterações pendentes; use Salvar.</li></ol>
+            <p><strong>Resultado:</strong> a medida confirmada entra no rascunho; salvar a torna persistente. Voltar ao menu Chaves mantém o rascunho, e sair da seção solicita confirmação de descarte. Passo e guias valem durante a sessão. Exibir centésimos não aumenta a precisão do seu instrumento.</p>
+          </details>
+          <details><summary>Catálogo: copiar, comparar, renomear e excluir</summary>
+            <ol><li>Abra <code>Bancada_A</code> e use Salvar como → <code>Bancada_B</code> para criar outra referência.</li><li>Exemplo de comparação: salve A com largura 8,20 mm e B com 8,00 mm. Em Catálogo → Comparar, escolha A e depois B.</li><li>O resultado <strong>A − B</strong> é +0,20 mm. Inverter os registros produz −0,20 mm. Uma medida ausente aparece como não informada.</li><li>No menu do registro, Renomear muda o nome sem mudar as medidas. Excluir pede confirmação; use apenas em uma cópia dispensável.</li></ol>
+            <p><strong>Se não achar um registro:</strong> confira o armazenamento. Chaves usa o SD disponível ao entrar ou LittleFS. São locais distintos. Os nomes aceitam até 31 caracteres: letras sem acento, números, espaços internos, hífen e sublinhado. O catálogo comporta até 256 registros. Semelhança não comprova compatibilidade com fechaduras.</p>
+          </details>
+          <details><summary>Key Gauge: espessura, largura e prévia</summary>
+            <ol><li>Abra Key Gauge e crie seis pontos. Use ESPESSURA 5 e LARGURA DO PERFIL 90% como ponto de partida.</li><li>Mude apenas ESPESSURA para 8: a base fica mais grossa, mantendo o contorno superior e os níveis dos pontos.</li><li>Mude apenas LARGURA DO PERFIL para 60%: o perfil ocupa menos espaço horizontal. Arrastar um marcador altera o nível desse ponto, entre 0 e 9.</li><li>Use Exibir no dispositivo para enviar uma prévia e Salvar para gravar. Duplicar cria uma cópia ainda não salva.</li></ol>
+            <p><strong>Resultado:</strong> espessura de 1 a 10 e largura de 50% a 100% são escalas visuais independentes, sem associação a mm, códigos ou fabricantes. A prévia usa RAM e desaparece ao reiniciar. Perfis <code>.mkg</code> ficam em <code>/MaliTools/KeyGauge/</code>, separados dos registros <code>.mkey</code> de Chaves.</p>
+          </details>
+          <details><summary>Counter: experimentar os controles em simulação</summary>
+            <ol><li>Abra Counter e mantenha SIMULAÇÃO marcada. Escolha um módulo, duração de 10 s e inicie.</li><li>Observe o estado, as contagens e o gráfico. Use Parar teste e aguarde a confirmação de parada.</li><li>Use Salvar resultado se quiser consultar o resumo depois.</li></ol>
+            <p><strong>Resultado:</strong> o fluxo exercita a interface com eventos artificiais, sem iniciar operações externas. Os números não descrevem a sua rede. Resultados só são persistidos ao salvar, em <code>/MaliTools/Counter/</code>; o histórico é limitado e reutiliza posições.</p>
+          </details>
+          <details><summary>Counter: medir latência e interpretar perda</summary>
+            <ol><li>Conecte o Wi-Fi à sua rede e consulte o IPv4 real do gateway em Info do AP.</li><li>No Counter, escolha Wi-Fi e um modo de latência ou perda de pacotes. Desmarque Simulação, informe o IPv4 e confirme a autorização para seu roteador.</li><li>Escolha 10 s, inicie e consulte o resultado ao terminar. Para comparar posições, repita com o mesmo alvo e parâmetros.</li></ol>
+            <p><strong>Como ler:</strong> 20 sondas concluídas com uma sem resposta representam 5% de perda. A latência considera respostas recebidas. Esses números são um exemplo, não uma quantidade garantida para 10 s. Falta de resposta pode ser bloqueio de ICMP, não necessariamente queda da Internet.</p>
+            <p>Modos e métricas dependem da capacidade informada. Intensidade altera intervalo, não potência. Testes reais de conexão Wi-Fi exigem o rádio desligado antes de iniciar: use a tela local para não interromper o acesso da WebUI. Modos marcados como somente simulação não medem serviços reais.</p>
+          </details>
+          <details><summary>Counter Suite: sinais não são dispositivos únicos</summary>
+            <ol><li>No monitor IR, pressione uma tecla do seu controle uma vez e depois mantenha-a pressionada. Compare sinais e repetições; clique para salvar uma amostra.</li><li>No BLE, observe um sensor próprio durante alguns ciclos: ele pode anunciar muitas vezes.</li><li>No RF, compare o RSSI do transmissor próprio em duas posições; −50 dBm é mais forte que −80 dBm. Clique limpa o pico; girar muda a página.</li></ol>
+            <p><strong>Resultado:</strong> repetições IR, anúncios BLE e eventos RF não equivalem a novos aparelhos. RSSI não informa distância exata. No NFC, uma consulta sem tag pode contar como falha de leitura; não é falha de autenticação.</p>
+          </details>
+          <details><summary>D20 e Pixel Paint: exemplos rápidos</summary>
+            <ol><li>No D20, escolha D6 e role para um jogo de tabuleiro. O resultado fica entre 1 e 6; repetições são normais. Consulte o histórico da sessão.</li><li>No Pixel Paint, gire para mover o cursor e clique para pintar uma cruz na grade 16 × 16. Abra as ações para escolher Apagar e corrigir.</li><li>Use Salvar e depois Carregar para recuperar o desenho. Exportar bitmap cria <code>/MaliPaint/paint_001.h</code>.</li></ol>
+            <p><strong>Resultado:</strong> o desenho é monocromático. O slot de salvamento é fixo; faça uma cópia do arquivo se quiser preservar outra versão. Ambos os aplicativos são acessíveis pelo navegador do dispositivo.</p>
+          </details>
+          <details><summary>Arquivos e diagnóstico: encontrar o que foi salvo</summary>
+            <ol><li>Em Arquivos, escolha o armazenamento usado pela ferramenta: SD ou LittleFS.</li><li>Procure <code>/MaliKeys/</code> para Chaves, <code>/MaliTools/KeyGauge/</code> para Key Gauge ou <code>/MaliTools/Counter/</code> para resultados do Counter.</li><li>Antes de excluir ou substituir, baixe uma cópia e confira nome e tamanho. Um desenho enviado apenas como prévia não terá arquivo salvo.</li></ol>
+            <p><strong>Se houver erro:</strong> confira espaço livre, disponibilidade do armazenamento e confirmação de salvamento. Para relatar um problema, informe a versão em Sistema, a sequência de ações e a mensagem exibida. “Hardware configurado” não comprova que um módulo externo está conectado.</p>
+          </details>
         </details>
       </section>
       <section class="webui-view radio-view hidden" aria-labelledby="radio-title">

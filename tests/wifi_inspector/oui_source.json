@@ -1,0 +1,296 @@
+{
+  "source": "https://www.wireshark.org/download/automated/data/manuf",
+  "date": "2026-09-15",
+  "entries": [
+    {
+      "prefix": "000393",
+      "vendor": "Apple",
+      "registrant": "Apple, Inc."
+    },
+    {
+      "prefix": "000502",
+      "vendor": "Apple",
+      "registrant": "Apple, Inc."
+    },
+    {
+      "prefix": "000A27",
+      "vendor": "Apple",
+      "registrant": "Apple, Inc."
+    },
+    {
+      "prefix": "0000F0",
+      "vendor": "Samsung",
+      "registrant": "Samsung Electronics Co.,Ltd"
+    },
+    {
+      "prefix": "000278",
+      "vendor": "Samsung",
+      "registrant": "Samsung Electro Mechanics Co., Ltd."
+    },
+    {
+      "prefix": "0007AB",
+      "vendor": "Samsung",
+      "registrant": "Samsung Electronics Co.,Ltd"
+    },
+    {
+      "prefix": "00047D",
+      "vendor": "Motorola",
+      "registrant": "Motorola Solutions Inc."
+    },
+    {
+      "prefix": "000A28",
+      "vendor": "Motorola",
+      "registrant": "Motorola"
+    },
+    {
+      "prefix": "000EC7",
+      "vendor": "Motorola",
+      "registrant": "Motorola Korea"
+    },
+    {
+      "prefix": "009EC8",
+      "vendor": "Xiaomi",
+      "registrant": "Xiaomi Communications Co Ltd"
+    },
+    {
+      "prefix": "00C30A",
+      "vendor": "Xiaomi",
+      "registrant": "Xiaomi Communications Co Ltd"
+    },
+    {
+      "prefix": "00EC0A",
+      "vendor": "Xiaomi",
+      "registrant": "Xiaomi Communications Co Ltd"
+    },
+    {
+      "prefix": "0012F0",
+      "vendor": "Intel",
+      "registrant": "Intel Corporate"
+    },
+    {
+      "prefix": "001302",
+      "vendor": "Intel",
+      "registrant": "Intel Corporate"
+    },
+    {
+      "prefix": "001320",
+      "vendor": "Intel",
+      "registrant": "Intel Corporate"
+    },
+    {
+      "prefix": "00E04C",
+      "vendor": "Realtek",
+      "registrant": "Realtek Semiconductor Corp."
+    },
+    {
+      "prefix": "FC934E",
+      "vendor": "Realtek",
+      "registrant": "Realtek Semiconductor Corp."
+    },
+    {
+      "prefix": "004B12",
+      "vendor": "Espressif",
+      "registrant": "Espressif Inc."
+    },
+    {
+      "prefix": "007007",
+      "vendor": "Espressif",
+      "registrant": "Espressif Inc."
+    },
+    {
+      "prefix": "00FB4A",
+      "vendor": "Espressif",
+      "registrant": "Espressif Inc."
+    },
+    {
+      "prefix": "28CDC1",
+      "vendor": "Raspberry Pi",
+      "registrant": "Raspberry Pi Trading Ltd"
+    },
+    {
+      "prefix": "2CCF67",
+      "vendor": "Raspberry Pi",
+      "registrant": "Raspberry Pi (Trading) Ltd"
+    },
+    {
+      "prefix": "0068EB",
+      "vendor": "HP",
+      "registrant": "HP Inc."
+    },
+    {
+      "prefix": "040E3C",
+      "vendor": "HP",
+      "registrant": "HP Inc."
+    },
+    {
+      "prefix": "10B676",
+      "vendor": "HP",
+      "registrant": "HP Inc."
+    },
+    {
+      "prefix": "001787",
+      "vendor": "Brother",
+      "registrant": "Brother, Brother & Sons ApS"
+    },
+    {
+      "prefix": "001BA9",
+      "vendor": "Brother",
+      "registrant": "Brother industries, LTD."
+    },
+    {
+      "prefix": "008077",
+      "vendor": "Brother",
+      "registrant": "Brother industries, LTD."
+    },
+    {
+      "prefix": "000048",
+      "vendor": "Epson",
+      "registrant": "Seiko Epson Corporation"
+    },
+    {
+      "prefix": "0026AB",
+      "vendor": "Epson",
+      "registrant": "Seiko Epson Corporation"
+    },
+    {
+      "prefix": "381A52",
+      "vendor": "Epson",
+      "registrant": "Seiko Epson Corporation"
+    },
+    {
+      "prefix": "000512",
+      "vendor": "Zebra",
+      "registrant": "Zebra Technologies Inc"
+    },
+    {
+      "prefix": "00074D",
+      "vendor": "Zebra",
+      "registrant": "Zebra Technologies Corp."
+    },
+    {
+      "prefix": "001570",
+      "vendor": "Zebra",
+      "registrant": "Zebra Technologies Inc"
+    },
+    {
+      "prefix": "000AEB",
+      "vendor": "TP-Link",
+      "registrant": "Tp-Link Technologies Co.,Ltd."
+    },
+    {
+      "prefix": "001478",
+      "vendor": "TP-Link",
+      "registrant": "Tp-Link Technologies Co.,Ltd."
+    },
+    {
+      "prefix": "0019E0",
+      "vendor": "TP-Link",
+      "registrant": "Tp-Link Technologies Co.,Ltd."
+    },
+    {
+      "prefix": "00156D",
+      "vendor": "Ubiquiti",
+      "registrant": "Ubiquiti Inc"
+    },
+    {
+      "prefix": "002722",
+      "vendor": "Ubiquiti",
+      "registrant": "Ubiquiti Inc"
+    },
+    {
+      "prefix": "0418D6",
+      "vendor": "Ubiquiti",
+      "registrant": "Ubiquiti Inc"
+    },
+    {
+      "prefix": "001A3F",
+      "vendor": "Intelbras",
+      "registrant": "Intelbras"
+    },
+    {
+      "prefix": "180D2C",
+      "vendor": "Intelbras",
+      "registrant": "Intelbras"
+    },
+    {
+      "prefix": "24FD0D",
+      "vendor": "Intelbras",
+      "registrant": "Intelbras"
+    },
+    {
+      "prefix": "001882",
+      "vendor": "Huawei",
+      "registrant": "Huawei Technologies Co.,Ltd"
+    },
+    {
+      "prefix": "001E10",
+      "vendor": "Huawei",
+      "registrant": "Huawei Technologies Co.,Ltd"
+    },
+    {
+      "prefix": "0022A1",
+      "vendor": "Huawei",
+      "registrant": "Huawei Symantec Technologies Co.,Ltd."
+    },
+    {
+      "prefix": "00055D",
+      "vendor": "D-Link",
+      "registrant": "D-Link Systems, Inc."
+    },
+    {
+      "prefix": "000D88",
+      "vendor": "D-Link",
+      "registrant": "D-Link Corporation"
+    },
+    {
+      "prefix": "000F3D",
+      "vendor": "D-Link",
+      "registrant": "D-Link Corporation"
+    },
+    {
+      "prefix": "00EBD8",
+      "vendor": "Mercusys",
+      "registrant": "Mercusys Technologies Co., Ltd."
+    },
+    {
+      "prefix": "088AF1",
+      "vendor": "Mercusys",
+      "registrant": "Mercusys Technologies Co., Ltd."
+    },
+    {
+      "prefix": "0C1C31",
+      "vendor": "Mercusys",
+      "registrant": "Mercusys Technologies Co., Ltd."
+    },
+    {
+      "prefix": "001A11",
+      "vendor": "Google",
+      "registrant": "Google, Inc."
+    },
+    {
+      "prefix": "00F620",
+      "vendor": "Google",
+      "registrant": "Google, Inc."
+    },
+    {
+      "prefix": "04006E",
+      "vendor": "Google",
+      "registrant": "Google, Inc."
+    },
+    {
+      "prefix": "007147",
+      "vendor": "Amazon",
+      "registrant": "Amazon Technologies Inc."
+    },
+    {
+      "prefix": "008621",
+      "vendor": "Amazon",
+      "registrant": "Amazon Technologies Inc."
+    },
+    {
+      "prefix": "00BB3A",
+      "vendor": "Amazon",
+      "registrant": "Amazon Technologies Inc."
+    }
+  ]
+}

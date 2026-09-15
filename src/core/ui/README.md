@@ -1,5 +1,9 @@
 # MaliOS Gear UI
 
+> O [Wi-Fi Inspector](../../modules/wifi/inspector/README.md) acrescenta inventário
+> local, conhecidos, baseline e histórico. A ajuda agora contém 151 páginas com
+> exemplos práticos, além dos guias expansíveis da WebUI e exemplos do terminal.
+
 > A seção [Chaves](../../mali_tools/keys/README.md) acrescenta catálogo de
 > referências, medição manual, quatro faces e comparação. A ajuda do firmware,
 > da WebUI e do terminal foi atualizada junto com o módulo.

@@ -52,6 +52,9 @@ Configuracoes:
   factory_reset - Restaura a configuracao padrao.
 
 Novas ferramentas, pela tela ou pelo navegador do dispositivo:
+  Wi-Fi > Wi-Fi Inspector: scan local, conhecidos, baseline e historico /MaliInspector/.
+  Inspector > ? Ajuda: descoberta, MAC privado, limites e exemplos de inventario.
+  Gerenciamento generico: sem API administrativa de desconexao nesta versao.
   Ferramentas > Mali Tools > Chaves: plana, cruciforme, medicao em mm e catalogo /MaliKeys/.
   Chaves > Catalogo > Comparar: abre dois registros; diferencas usam A menos B.
   Chaves > ? Ajuda: medidas, quatro faces, texto, salvar, carregar, renomear e excluir.
@@ -59,5 +62,53 @@ Novas ferramentas, pela tela ou pelo navegador do dispositivo:
   Counter: testes de resiliencia, simulacao, metricas e parada pela tela ou WebUI.
   D20 e Pixel Paint: dados e desenho local em Ferramentas.
   Encoder: girar escolhe, clicar confirma, segurar volta.
+
+Exemplos praticos (envie um comando por vez):
+  1. Identificar o aparelho antes de relatar um erro:
+     info
+     free
+     uptime
+     Resultado: dados do dispositivo, memoria disponivel e tempo ligado.
+     Anote tambem os passos que provocaram o problema; heap varia durante uso.
+
+  2. Encontrar arquivos salvos:
+     storage list /
+     storage list /MaliKeys
+     Resultado: nomes e tamanhos no armazenamento selecionado pelo firmware.
+     Se /MaliKeys nao existir, confira se o registro foi salvo no SD ou LittleFS.
+     .mkey e binario: consulte as medidas pelo Catalogo de Chaves.
+
+  3. Consultar um perfil geometrico que voce ja salvou como Bancada_A:
+     storage read /MaliTools/KeyGauge/Bancada_A.mkg
+     Resultado: texto MKG1 com pontos, niveis, thickness e width.
+     thickness=5 e width=90 sao escalas visuais, nao milimetros.
+     Troque Bancada_A pelo nome real do arquivo; leitura nao altera o perfil.
+
+  4. Abrir a WebUI:
+     wifi on
+     webui
+     Conecte o computador a mesma rede e abra o endereco mostrado na tela.
+     Se bruce.local nao abrir, use o IP do MaliOS em Info do AP.
+     wifi on pode iniciar um AP quando nao houver rede conhecida.
+
+  5. Conferir uma opcao antes de navegar remotamente:
+     options
+     nav next
+     options
+     Resultado: consulta o menu, avanca uma opcao e permite conferir novamente.
+     nav select executa a opcao atual; confira a selecao antes de envia-lo.
+
+Exemplo em Chaves, pela tela ou navegador do dispositivo:
+  Salve A com largura 8,20 mm e B com 8,00 mm (valores didaticos).
+  Catalogo > Comparar > A > B mostra A menos B = +0,20 mm.
+  Inverter os registros muda o sinal. Zero significa medida nao informada.
+  Use as medidas do seu instrumento; o desenho nao e uma regua fisica 1:1.
+
+Exemplo em Counter:
+  Mantenha Simulacao ativa, escolha 10 s, inicie e experimente Parar.
+  Aguarde o estado final e use Salvar resultado para persistir o resumo.
+  As metricas simuladas sao artificiais, nao observacoes da sua rede.
+  Em ICMP real, 1 sonda sem resposta entre 20 concluidas significa 5% de perda.
+  Latencia considera respostas recebidas; bloqueio ICMP tambem causa ausencia.
 )HELP";
 }
